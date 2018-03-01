@@ -4,7 +4,6 @@
 // Author:      Benjamin I. Williams
 // Modified by: Malcolm MacLeod (mmacleod@webmail.co.za)
 // Created:     2005-05-17
-// RCS-ID:      $Id: floatpane.cpp 60940 2009-06-07 10:56:38Z MJM $
 // Copyright:   (C) Copyright 2005-2006, Kirix Corporation, All Rights Reserved
 // Licence:     wxWindows Library Licence, Version 3.1
 ///////////////////////////////////////////////////////////////////////////////
