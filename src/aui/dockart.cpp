@@ -5,7 +5,6 @@
 // Modified by: Malcolm MacLeod (mmacleod@webmail.co.za)
 // Modified by: Jens Lody
 // Created:     2005-05-17
-// RCS-ID:      $Id: dockart.cpp 61738 2009-08-23 07:52:17Z MJM $
 // Copyright:   (C) Copyright 2005-2006, Kirix Corporation, All Rights Reserved
 //                            2012, Jens Lody for the code related to left
 //                                  and right positioning

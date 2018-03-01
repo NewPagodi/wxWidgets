@@ -4,7 +4,6 @@
 // Author:      Benjamin I. Williams
 // Modified by: Malcolm MacLeod (mmacleod@webmail.co.za)
 // Created:     2005-05-17
-// RCS-ID:      $Id: framemanager.h 61581 2009-08-02 19:27:13Z MJM $
 // Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
 // Licence:     wxWindows Library Licence, Version 3.1
 ///////////////////////////////////////////////////////////////////////////////

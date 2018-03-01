@@ -4,7 +4,6 @@
 // Author:      Benjamin I. Williams
 // Modified by: Malcolm MacLeod (mmacleod@webmail.co.za)
 // Created:     2005-05-17
-// RCS-ID:      $Id: dockart.h 61738 2009-08-23 07:52:17Z MJM $
 // Copyright:   (C) Copyright 2005, Kirix Corporation, All Rights Reserved.
 // Licence:     wxWindows Library Licence, Version 3.1
 ///////////////////////////////////////////////////////////////////////////////
