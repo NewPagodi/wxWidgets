@@ -53,7 +53,7 @@ public:
                          {
                              return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                          }
-    int GetBorderWidth(wxWindow* wnd);
+    int GetBorderWidth(wxWindow* wnd) wxOVERRIDE;
     int GetAdditionalBorderSpace(wxWindow* wnd) wxOVERRIDE;
     virtual wxSize GetTabSize(wxDC& dc, wxWindow* wnd, const wxString& caption,
                               const wxBitmap& bitmap, bool active,
