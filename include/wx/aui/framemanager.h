@@ -795,8 +795,8 @@ protected:
     void* m_reserved;
 
 #ifndef SWIG
-    DECLARE_EVENT_TABLE()
-    DECLARE_CLASS(wxAuiManager)
+    wxDECLARE_EVENT_TABLE();
+    wxDECLARE_CLASS(wxAuiManager);
 #endif // SWIG
 };
 

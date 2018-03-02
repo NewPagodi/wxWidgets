@@ -83,8 +83,8 @@ wxDEFINE_EVENT( wxEVT_AUI_ALLOW_DND, wxAuiManagerEvent );
     #include "wx/msw/dc.h"
 #endif
 
-IMPLEMENT_DYNAMIC_CLASS(wxAuiManagerEvent, wxEvent)
-IMPLEMENT_CLASS(wxAuiManager, wxEvtHandler)
+wxIMPLEMENT_DYNAMIC_CLASS(wxAuiManagerEvent, wxEvent);
+wxIMPLEMENT_CLASS(wxAuiManager, wxEvtHandler);
 
 // the utility function ShowWnd() is the same as show,
 // except it handles wxAuiMDIChildFrame windows as well,
@@ -293,20 +293,20 @@ private:
 
     wxRegion m_region;
 
-    DECLARE_DYNAMIC_CLASS(wxPseudoTransparentFrame)
-    DECLARE_EVENT_TABLE()
+    wxDECLARE_DYNAMIC_CLASS(wxPseudoTransparentFrame);
+    wxDECLARE_EVENT_TABLE();
 };
 
 
-IMPLEMENT_DYNAMIC_CLASS(wxPseudoTransparentFrame, wxFrame)
+wxIMPLEMENT_DYNAMIC_CLASS(wxPseudoTransparentFrame, wxFrame);
 
-BEGIN_EVENT_TABLE(wxPseudoTransparentFrame, wxFrame)
+wxBEGIN_EVENT_TABLE(wxPseudoTransparentFrame, wxFrame)
     EVT_PAINT(wxPseudoTransparentFrame::OnPaint)
     EVT_SIZE(wxPseudoTransparentFrame::OnSize)
 #ifdef __WXGTK__
     EVT_WINDOW_CREATE(wxPseudoTransparentFrame::OnWindowCreate)
 #endif
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 
 #else
@@ -375,10 +375,10 @@ protected:
     }
 
 private:
-    DECLARE_DYNAMIC_CLASS(wxPseudoTransparentFrame)
+    wxDECLARE_DYNAMIC_CLASS(wxPseudoTransparentFrame);
 };
 
-IMPLEMENT_DYNAMIC_CLASS(wxPseudoTransparentFrame, wxFrame)
+wxIMPLEMENT_DYNAMIC_CLASS(wxPseudoTransparentFrame, wxFrame);
 
 #endif
  // __WXGTK20__
@@ -773,7 +773,7 @@ return *this;
 // -- wxAuiManager class implementation --
 
 
-BEGIN_EVENT_TABLE(wxAuiManager, wxEvtHandler)
+wxBEGIN_EVENT_TABLE(wxAuiManager, wxEvtHandler)
     EVT_AUI_PANE_BUTTON(wxAuiManager::OnPaneButton)
     EVT_AUI_RENDER(wxAuiManager::OnRender)
     EVT_PAINT(wxAuiManager::OnPaint)
@@ -792,7 +792,7 @@ BEGIN_EVENT_TABLE(wxAuiManager, wxEvtHandler)
     EVT_MOUSE_CAPTURE_LOST(wxAuiManager::OnCaptureLost)
     EVT_CHILD_FOCUS(wxAuiManager::OnChildFocus)
     EVT_AUI_FIND_MANAGER(wxAuiManager::OnFindManager)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 
 wxAuiManager::wxAuiManager(wxWindow* managedWindow, unsigned int flags)

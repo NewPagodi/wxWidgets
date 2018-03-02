@@ -57,8 +57,8 @@ wxDEFINE_EVENT(wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP, wxAuiNotebookEvent);
 wxDEFINE_EVENT(wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_DOWN, wxAuiNotebookEvent);
 wxDEFINE_EVENT(wxEVT_AUINOTEBOOK_TAB_DCLICK, wxAuiNotebookEvent);
 
-IMPLEMENT_CLASS(wxAuiNotebook, wxBookCtrlBase)
-IMPLEMENT_DYNAMIC_CLASS(wxAuiNotebookEvent, wxBookCtrlEvent)
+wxIMPLEMENT_CLASS(wxAuiNotebook, wxBookCtrlBase)
+wxIMPLEMENT_DYNAMIC_CLASS(wxAuiNotebookEvent, wxBookCtrlEvent)
 
 // extern functions from framemanager.cpp
 extern void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray&,int,int);
@@ -67,10 +67,10 @@ extern void wxAuiDoInsertPane(wxAuiPaneInfoArray&,int,int,int,int);
 extern void wxAuiDoInsertPage(wxAuiPaneInfoArray&,int,int,int,int,int);
 
 
-BEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
+wxBEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
 EVT_SIZE(wxAuiNotebook::OnSize)
 EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
-END_EVENT_TABLE()
+wxEND_EVENT_TABLE()
 
 // -- wxAuiNotebook class implementation --
 bool wxAuiNotebook::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
