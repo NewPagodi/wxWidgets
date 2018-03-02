@@ -35,9 +35,9 @@ class WXDLLIMPEXP_AUI wxAuiGtkTabArt : public wxAuiGenericTabArt
 public:
     wxAuiGtkTabArt();
 
-    virtual wxAuiTabArt* Clone();
-    virtual void DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect);
-    virtual void DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect);
+    virtual wxAuiTabArt* Clone() wxOVERRIDE;
+    virtual void DrawBorder(wxDC& dc, wxWindow* wnd, const wxRect& rect) wxOVERRIDE;
+    virtual void DrawBackground(wxDC& dc, wxWindow* wnd, const wxRect& rect) wxOVERRIDE;
     virtual void DrawTab(wxDC& dc,
                          wxWindow* wnd,
                          const wxAuiPaneInfo& page,
@@ -46,18 +46,18 @@ public:
                          bool haveFocus,
                          wxRect* outTabRect,
                          wxRect* outButtonRect,
-                         int* xExtent);
-    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID, int buttonState, int orientation, wxRect* outRect);
+                         int* xExtent) wxOVERRIDE;
+    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID, int buttonState, int orientation, wxRect* outRect) wxOVERRIDE;
     wxSize GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages, const wxSize& requiredBmpSize);
-    int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages)
+    int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages)  wxOVERRIDE
                          {
                              return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                          }
     int GetBorderWidth(wxWindow* wnd);
-    int GetAdditionalBorderSpace(wxWindow* wnd);
+    int GetAdditionalBorderSpace(wxWindow* wnd) wxOVERRIDE;
     virtual wxSize GetTabSize(wxDC& dc, wxWindow* wnd, const wxString& caption,
                               const wxBitmap& bitmap, bool active,
-                              int closeButtonState, int* extent);
+                              int closeButtonState, int* extent) wxOVERRIDE;
 };
 
 #endif  // wxUSE_AUI
