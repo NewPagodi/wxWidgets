@@ -1860,6 +1860,11 @@ bool wxAuiToolBar::Realize()
 
 bool wxAuiToolBar::RealizeHelper(wxClientDC& dc, bool horizontal)
 {
+    // Remove old sizer before adding any controls in this tool bar, which are
+    // elements of this sizer, to the new sizer below.
+    delete m_sizer;
+    m_sizer = NULL;
+
     // create the new sizer to add toolbar elements to
     wxBoxSizer* sizer = new wxBoxSizer(horizontal ? wxHORIZONTAL : wxVERTICAL);
 
@@ -2051,7 +2056,6 @@ bool wxAuiToolBar::RealizeHelper(wxClientDC& dc, bool horizontal)
             outside_sizer->Add(m_bottomPadding, 1);
     }
 
-    delete m_sizer; // remove old sizer
     m_sizer = outside_sizer;
 
     // calculate the rock-bottom minimum size
@@ -2462,7 +2466,7 @@ void wxAuiToolBar::OnPaint(wxPaintEvent& WXUNUSED(evt))
     }
 
     // paint the overflow button
-    if (dropdown_size > 0 && m_overflowSizerItem)
+    if (dropdown_size > 0 && m_overflowSizerItem && m_overflowVisible)
     {
         wxRect dropDownRect = GetOverflowRect();
         m_art->DrawOverflowButton(dc, this, dropDownRect, m_overflowState);
@@ -2544,7 +2548,7 @@ void wxAuiToolBar::OnLeftDown(wxMouseEvent& evt)
                 {
                     wxCommandEvent event(wxEVT_MENU, res);
                     event.SetEventObject(this);
-                    GetParent()->GetEventHandler()->ProcessEvent(event);
+                    GetEventHandler()->ProcessEvent(event);
                 }
             }
 
