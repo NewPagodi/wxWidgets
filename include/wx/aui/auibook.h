@@ -188,6 +188,63 @@ protected:
 };
 
 
+
+class WXDLLIMPEXP_AUI wxAuiTabCtrl : public wxControl,
+                                     public wxAuiTabContainer
+{
+public:
+
+    wxAuiTabCtrl(wxWindow* parent,
+                 wxWindowID id = wxID_ANY,
+                 const wxPoint& pos = wxDefaultPosition,
+                 const wxSize& size = wxDefaultSize,
+                 long style = 0);
+
+    ~wxAuiTabCtrl();
+
+    bool IsDragging() const { return m_isDragging; }
+
+protected:
+    // choose the default border for this window
+    virtual wxBorder GetDefaultBorder() const wxOVERRIDE { return wxBORDER_NONE; }
+
+    void OnPaint(wxPaintEvent& evt);
+    void OnEraseBackground(wxEraseEvent& evt);
+    void OnSize(wxSizeEvent& evt);
+    void OnLeftDown(wxMouseEvent& evt);
+    void OnLeftDClick(wxMouseEvent& evt);
+    void OnLeftUp(wxMouseEvent& evt);
+    void OnMiddleDown(wxMouseEvent& evt);
+    void OnMiddleUp(wxMouseEvent& evt);
+    void OnRightDown(wxMouseEvent& evt);
+    void OnRightUp(wxMouseEvent& evt);
+    void OnMotion(wxMouseEvent& evt);
+    void OnLeaveWindow(wxMouseEvent& evt);
+    void OnButton(wxAuiNotebookEvent& evt);
+    void OnSetFocus(wxFocusEvent& event);
+    void OnKillFocus(wxFocusEvent& event);
+    void OnChar(wxKeyEvent& event);
+    void OnCaptureLost(wxMouseCaptureLostEvent& evt);
+
+protected:
+
+    wxPoint m_clickPt;
+    wxWindow* m_clickTab;
+    bool m_isDragging;
+    wxAuiTabContainerButton* m_hoverButton;
+    wxAuiTabContainerButton* m_pressedButton;
+
+    void SetHoverTab(wxWindow* wnd);
+
+#ifndef SWIG
+    wxDECLARE_CLASS(wxAuiTabCtrl);
+    wxDECLARE_EVENT_TABLE();
+#endif
+};
+
+
+
+
 class WXDLLIMPEXP_AUI wxAuiNotebook : public wxNavigationEnabled<wxBookCtrlBase>
 {
 public:
