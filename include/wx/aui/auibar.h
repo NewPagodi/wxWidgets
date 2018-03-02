@@ -347,13 +347,13 @@ public:
 
 
 
-class WXDLLIMPEXP_AUI wxAuiDefaultToolBarArt : public wxAuiToolBarArt
+class WXDLLIMPEXP_AUI wxAuiGenericToolBarArt : public wxAuiToolBarArt
 {
 
 public:
 
-    wxAuiDefaultToolBarArt();
-    virtual ~wxAuiDefaultToolBarArt();
+    wxAuiGenericToolBarArt();
+    virtual ~wxAuiGenericToolBarArt();
 
     virtual wxAuiToolBarArt* Clone();
     virtual void SetFlags(unsigned int flags);
