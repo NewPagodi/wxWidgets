@@ -203,7 +203,7 @@ public:
         SetTransparent(0);
     }
 
-    virtual bool SetTransparent(wxByte alpha)
+    virtual bool SetTransparent(wxByte alpha) wxOVERRIDE
     {
         if (m_canSetShape)
         {
@@ -361,13 +361,13 @@ public:
         gtk_widget_modify_bg( m_widget, GTK_STATE_NORMAL, &col );
     }
 
-    bool SetTransparent(wxByte WXUNUSED(alpha))
+    bool SetTransparent(wxByte WXUNUSED(alpha)) wxOVERRIDE
     {
         return true;
     }
 
 protected:
-    virtual void DoSetSizeHints( int minW, int minH, int maxW, int maxH, int incW, int incH)
+    virtual void DoSetSizeHints( int minW, int minH, int maxW, int maxH, int incW, int incH) wxOVERRIDE
     {
         // the real wxFrame method doesn't work for us because we're not really
         // a top level window so skip it
