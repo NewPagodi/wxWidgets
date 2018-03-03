@@ -628,13 +628,20 @@ public:
 
     bool FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx);
 
-    bool AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo);
+    bool AddPane(wxWindow* window,
+                 const wxAuiPaneInfo& paneInfo);
 
-    bool AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo, const wxPoint& dropPos);
+    bool AddPane(wxWindow* window,
+                 const wxAuiPaneInfo& paneInfo,
+                 const wxPoint& dropPos);
 
-    bool AddPane(wxWindow* window, int direction = wxLEFT, const wxString& caption = wxEmptyString);
+    bool AddPane(wxWindow* window,
+                 int direction = wxLEFT,
+                 const wxString& caption = wxEmptyString);
 
-    bool InsertPane(wxWindow* window, const wxAuiPaneInfo& insertLocation, int insertLevel = wxAUI_INSERT_PANE);
+    bool InsertPane(wxWindow* window,
+                 const wxAuiPaneInfo& insertLocation,
+                 int insertLevel = wxAUI_INSERT_PANE);
 
     bool DetachPane(wxWindow* window);
 

@@ -228,7 +228,12 @@ wxRect CalculateCloseButtonRect(wxRect const& inRect, int orientation)
     return outRect;
 }
 
-wxRect DrawCloseButton(wxDC& dc, GtkWidget* widget, int buttonState, wxRect const& inRect, int orientation, GdkRectangle* clipRect)
+wxRect DrawCloseButton(wxDC& dc,
+                       GtkWidget* widget,
+                       int buttonState,
+                       wxRect const& inRect,
+                       int orientation,
+                       GdkRectangle* clipRect)
 {
     GtkStyle* styleButton = gtk_widget_get_style(wxGTKPrivate::GetButtonWidget());
     int xthickness = styleButton->xthickness;
@@ -275,7 +280,9 @@ int GetGapSize(bool isHorizontal)
         return 3 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
 }
 
-void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page, const wxRect& inRect, int closeButtonState, bool haveFocus, wxRect* outTabRect, wxRect* outButtonRect, int* xExtent)
+void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
+                             const wxRect& inRect, int closeButtonState, bool haveFocus, wxRect* outTabRect,
+                             wxRect* outButtonRect, int* xExtent)
 {
     GtkWidget* widget = wnd->GetHandle();
     GtkStyle* styleNotebook = gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget());
@@ -508,7 +515,12 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
     dc.DestroyClippingRegion();
 }
 
-wxRect DrawSimpleArrow(wxDC& dc, GtkWidget* widget, int buttonState, wxRect const& inRect, int orientation, GtkArrowType arrowType)
+wxRect DrawSimpleArrow(wxDC& dc,
+                       GtkWidget* widget,
+                       int buttonState,
+                       wxRect const& inRect,
+                       int orientation,
+                       GtkArrowType arrowType)
 {
     int scrollArrowHLength, scrollArrowVLength;
     gtk_widget_style_get(widget,
@@ -546,7 +558,12 @@ wxRect DrawSimpleArrow(wxDC& dc, GtkWidget* widget, int buttonState, wxRect cons
     return outRect;
 }
 
-void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID, int buttonState, int orientation, wxRect* outRect)
+void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
+                            const wxRect& inRect,
+                            int bitmapID,
+                            int buttonState,
+                            int orientation,
+                            wxRect* outRect)
 {
     GtkWidget* widget = wnd->GetHandle();
     wxRect rect = inRect;
@@ -624,7 +641,9 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, i
 }
 
 
-wxSize wxAuiGtkTabArt::GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages, const wxSize& requiredBmpSize)
+wxSize wxAuiGtkTabArt::GetBestTabSize(wxWindow* wnd,
+                                   const wxAuiPaneInfoPtrArray& pages,
+                                   const wxSize& requiredBmpSize)
 {
     SetMeasuringFont(m_normalFont);
     SetSelectedFont(m_normalFont);
@@ -647,7 +666,13 @@ int wxAuiGtkTabArt::GetAdditionalBorderSpace(wxWindow* wnd)
     return 2 * GetBorderWidth(wnd);
 }
 
-wxSize wxAuiGtkTabArt::GetTabSize(wxDC& dc, wxWindow* wnd, const wxString& caption, const wxBitmap& bitmap, bool active, int closeButtonState, int* extent)
+wxSize wxAuiGtkTabArt::GetTabSize(wxDC& dc,
+                              wxWindow* wnd,
+                              const wxString& caption,
+                              const wxBitmap& bitmap,
+                              bool active,
+                              int closeButtonState,
+                              int* extent)
 {
     wxSize tabSize = wxAuiGenericTabArt::GetTabSize(dc, wnd, caption, bitmap, active, closeButtonState, extent);
 

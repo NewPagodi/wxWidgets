@@ -630,7 +630,8 @@ void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow* WXUNUSED(window),
     dc.DestroyClippingRegion();
 }
 
-void wxAuiDefaultDockArt::DrawIcon(wxDC& dc, const wxRect& rect, wxAuiPaneInfo& pane)
+void
+wxAuiDefaultDockArt::DrawIcon(wxDC& dc, const wxRect& rect, wxAuiPaneInfo& pane)
 {
    // Draw the icon centered vertically
    dc.DrawBitmap(pane.GetIcon(),

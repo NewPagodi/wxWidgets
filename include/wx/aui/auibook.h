@@ -148,7 +148,10 @@ public:
     wxRect GetRect() const { return m_targetRect; }
 
     void RemoveButton(int id);
-    void AddButton(int id, int location, const wxBitmap& normalBitmap = wxNullBitmap, const wxBitmap& disabledBitmap = wxNullBitmap);
+    void AddButton(int id,
+                   int location,
+                   const wxBitmap& normalBitmap = wxNullBitmap,
+                   const wxBitmap& disabledBitmap = wxNullBitmap);
 
     size_t GetTabOffset() const;
     void SetTabOffset(size_t offset);
