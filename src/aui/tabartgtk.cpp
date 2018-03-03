@@ -71,7 +71,7 @@ wxAuiTabArt* wxAuiGtkTabArt::Clone()
 
 void wxAuiGtkTabArt::DrawBackground(wxDC& dc, wxWindow* WXUNUSED(wnd), const wxRect& rect)
 {
-    wxGTKDCImpl* impldc = (wxGTKDCImpl*) dc.GetImpl();
+    wxGTKDCImpl *impldc = (wxGTKDCImpl*) dc.GetImpl();
     GdkWindow* window = impldc->GetGDKWindow();
 
     gtk_style_apply_default_background(gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget()),
@@ -175,7 +175,7 @@ void wxAuiGtkTabArt::DrawBorder(wxDC& WXUNUSED(dc), wxWindow* wnd, const wxRect&
 
 }
 
-void ButtonStateAndShadow(int buttonState, GtkStateType& state, GtkShadowType& shadow)
+void ButtonStateAndShadow(int buttonState, GtkStateType &state, GtkShadowType &shadow)
 {
 
     if (buttonState & wxAUI_BUTTON_STATE_DISABLED)
@@ -235,7 +235,7 @@ wxRect DrawCloseButton(wxDC& dc,
                        int orientation,
                        GdkRectangle* clipRect)
 {
-    GtkStyle* styleButton = gtk_widget_get_style(wxGTKPrivate::GetButtonWidget());
+    GtkStyle *styleButton = gtk_widget_get_style(wxGTKPrivate::GetButtonWidget());
     int xthickness = styleButton->xthickness;
     int ythickness = styleButton->ythickness;
 
@@ -250,7 +250,7 @@ wxRect DrawCloseButton(wxDC& dc,
 
     wxRect outRect = CalculateCloseButtonRect(inRect, orientation);
 
-    wxGTKDCImpl* impldc = (wxGTKDCImpl*) dc.GetImpl();
+    wxGTKDCImpl *impldc = (wxGTKDCImpl*) dc.GetImpl();
     GdkWindow* window = impldc->GetGDKWindow();
 
     if (buttonState == wxAUI_BUTTON_STATE_HOVER)
@@ -284,8 +284,8 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
                              const wxRect& inRect, int closeButtonState, bool haveFocus, wxRect* outTabRect,
                              wxRect* outButtonRect, int* xExtent)
 {
-    GtkWidget* widget = wnd->GetHandle();
-    GtkStyle* styleNotebook = gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget());
+    GtkWidget *widget = wnd->GetHandle();
+    GtkStyle *styleNotebook = gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget());
 
     int focusWidth = 0;
 
@@ -516,9 +516,9 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
 }
 
 wxRect DrawSimpleArrow(wxDC& dc,
-                       GtkWidget* widget,
+                       GtkWidget *widget,
                        int buttonState,
-                       wxRect const& inRect,
+                       wxRect const &inRect,
                        int orientation,
                        GtkArrowType arrowType)
 {
@@ -550,7 +550,7 @@ wxRect DrawSimpleArrow(wxDC& dc,
     outRect.width = scrollArrowHLength;
     outRect.height = scrollArrowVLength;
 
-    wxGTKDCImpl* impldc = (wxGTKDCImpl*) dc.GetImpl();
+    wxGTKDCImpl *impldc = (wxGTKDCImpl*) dc.GetImpl();
     GdkWindow* window = impldc->GetGDKWindow();
     gtk_paint_arrow (gtk_widget_get_style(wxGTKPrivate::GetButtonWidget()), window, state, shadow, NULL, widget, "notebook",
                      arrowType, TRUE, outRect.x, outRect.y, outRect.width, outRect.height);
@@ -565,7 +565,7 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
                             int orientation,
                             wxRect* outRect)
 {
-    GtkWidget* widget = wnd->GetHandle();
+    GtkWidget *widget = wnd->GetHandle();
     wxRect rect = inRect;
     if (m_flags &wxAUI_NB_BOTTOM)
         rect.y += 2 * gtk_widget_get_style(wxGTKPrivate::GetButtonWidget())->ythickness;
