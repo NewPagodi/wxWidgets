@@ -47,8 +47,10 @@ public:
                          wxRect* outTabRect,
                          wxRect* outButtonRect,
                          int* xExtent) wxOVERRIDE;
-    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID, int buttonState, int orientation, wxRect* outRect) wxOVERRIDE;
-    wxSize GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages, const wxSize& requiredBmpSize);
+    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID,
+                    int buttonState, int orientation, wxRect* outRect) wxOVERRIDE;
+    wxSize GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages,
+                            const wxSize& requiredBmpSize);
     int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages)  wxOVERRIDE
                          {
                              return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();

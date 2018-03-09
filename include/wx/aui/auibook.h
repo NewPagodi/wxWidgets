@@ -64,7 +64,8 @@ class wxAuiNotebook;
 class WXDLLIMPEXP_AUI wxAuiNotebookEvent : public wxBookCtrlEvent
 {
 public:
-    wxAuiNotebookEvent(wxEventType commandType = wxEVT_NULL, int winId = 0)
+    wxAuiNotebookEvent(wxEventType commandType = wxEVT_NULL,
+                       int winId = 0)
           : wxBookCtrlEvent(commandType, winId)
     {
         m_dragSource = NULL;
