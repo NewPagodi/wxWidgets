@@ -128,7 +128,7 @@ public:
 
     bool AddPage(wxAuiPaneInfo& info);
     bool InsertPage(wxWindow* page, wxAuiPaneInfo& info, size_t idx);
-    bool MovePage(wxWindow* page, size_t newIndex);
+    bool MovePage(wxWindow* page, size_t newIdx);
     bool RemovePage(wxWindow* page);
     bool SetActivePage(wxWindow* page);
     bool SetActivePage(size_t page);
@@ -231,7 +231,7 @@ public:
                  bool select = false,
                  const wxBitmap& bitmap = wxNullBitmap);
 
-    bool InsertPage(size_t pageIndex,
+    bool InsertPage(size_t pageIdx,
                     wxWindow* page,
                     const wxString& caption,
                     bool select = false,
@@ -241,17 +241,17 @@ public:
     bool RemovePage(size_t page) wxOVERRIDE;
 
     virtual size_t GetPageCount() const wxOVERRIDE;
-    virtual wxWindow* GetPage(size_t pageIndex) const wxOVERRIDE;
-    int GetPageIndex(wxWindow* pageWindow);
+    virtual wxWindow* GetPage(size_t pageIdx) const wxOVERRIDE;
+    int GetPageIndex(wxWindow* pageWnd);
 
     bool SetPageText(size_t page, const wxString& text) wxOVERRIDE;
-    wxString GetPageText(size_t pageIndex) const wxOVERRIDE;
+    wxString GetPageText(size_t pageIdx) const wxOVERRIDE;
 
-    bool SetPageToolTip(size_t page_idx, const wxString& text);
-    wxString GetPageToolTip(size_t page_idx) const;
+    bool SetPageToolTip(size_t page, const wxString& text);
+    wxString GetPageToolTip(size_t pageIdx) const;
 
     bool SetPageBitmap(size_t page, const wxBitmap& bitmap);
-    wxBitmap GetPageBitmap(size_t pageIndex) const;
+    wxBitmap GetPageBitmap(size_t pageIdx) const;
 
     int SetSelection(size_t newPage) wxOVERRIDE;
     int GetSelection() const wxOVERRIDE;

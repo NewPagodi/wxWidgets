@@ -96,14 +96,14 @@ wxBitmap wxAuiBitmapFromBits(const unsigned char bits[], int w, int h,
 
 static void DrawGradientRectangle(wxDC& dc,
                                   const wxRect& rect,
-                                  const wxColour& startColor,
-                                  const wxColour& endColor,
+                                  const wxColour& start_color,
+                                  const wxColour& end_color,
                                   int direction)
 {
     int rd, gd, bd, high = 0;
-    rd = endColor.Red() - startColor.Red();
-    gd = endColor.Green() - startColor.Green();
-    bd = endColor.Blue() - startColor.Blue();
+    rd = end_color.Red() - start_color.Red();
+    gd = end_color.Green() - start_color.Green();
+    bd = end_color.Blue() - start_color.Blue();
 
     if (direction == wxAUI_GRADIENT_VERTICAL)
         high = rect.GetHeight()-1;
@@ -115,9 +115,9 @@ static void DrawGradientRectangle(wxDC& dc,
         int r,g,b;
 
 
-        r = startColor.Red() + (high <= 0 ? 0 : (((i*rd*100)/high)/100));
-        g = startColor.Green() + (high <= 0 ? 0 : (((i*gd*100)/high)/100));
-        b = startColor.Blue() + (high <= 0 ? 0 : (((i*bd*100)/high)/100));
+        r = start_color.Red() + (high <= 0 ? 0 : (((i*rd*100)/high)/100));
+        g = start_color.Green() + (high <= 0 ? 0 : (((i*gd*100)/high)/100));
+        b = start_color.Blue() + (high <= 0 ? 0 : (((i*bd*100)/high)/100));
 
         wxPen p(wxColor((unsigned char)r,
                         (unsigned char)g,
@@ -131,30 +131,30 @@ static void DrawGradientRectangle(wxDC& dc,
     }
 }
 
-wxString wxAuiChopText(wxDC& dc, const wxString& text, int maxSize)
+wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size)
 {
     wxCoord x,y;
 
     // first check if the text fits with no problems
     dc.GetTextExtent(text, &x, &y);
-    if (x <= maxSize)
+    if (x <= max_size)
         return text;
 
     size_t i, len = text.Length();
-    size_t lastGoodLength = 0;
+    size_t last_good_length = 0;
     for (i = 0; i < len; ++i)
     {
         wxString s = text.Left(i);
         s += wxT("...");
 
         dc.GetTextExtent(s, &x, &y);
-        if (x > maxSize)
+        if (x > max_size)
             break;
 
-        lastGoodLength = i;
+        last_good_length = i;
     }
 
-    wxString ret = text.Left(lastGoodLength);
+    wxString ret = text.Left(last_good_length);
     ret += wxT("...");
     return ret;
 }
@@ -490,11 +490,11 @@ void wxAuiDefaultDockArt::DrawBorder(wxDC& dc, wxWindow* window, const wxRect& _
     dc.SetBrush(*wxTRANSPARENT_BRUSH);
 
     wxRect rect = _rect;
-    int i, borderWidth = GetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE);
+    int i, border_width = GetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE);
 
     if (pane.IsToolbar())
     {
-        for (i = 0; i < borderWidth; ++i)
+        for (i = 0; i < border_width; ++i)
         {
             dc.SetPen(*wxWHITE_PEN);
             dc.DrawLine(rect.x, rect.y, rect.x+rect.width, rect.y);
@@ -527,7 +527,7 @@ void wxAuiDefaultDockArt::DrawBorder(wxDC& dc, wxWindow* window, const wxRect& _
         }
         else
         {
-            for (i = 0; i < borderWidth; ++i)
+            for (i = 0; i < border_width; ++i)
             {
                 dc.DrawRectangle(rect.x, rect.y, rect.width, rect.height);
                 rect.Deflate(1);
@@ -599,12 +599,12 @@ void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow *WXUNUSED(window),
 
     DrawCaptionBackground(dc, rect, showActive);
 
-    int captionOffset = 0;
+    int caption_offset = 0;
     if ( pane.GetIcon().IsOk() )
     {
         DrawIcon(dc, rect, pane);
 
-        captionOffset += pane.GetIcon().GetWidth() + 3;
+        caption_offset += pane.GetIcon().GetWidth() + 3;
     }
 
 
@@ -613,20 +613,20 @@ void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow *WXUNUSED(window),
     wxCoord w,h;
     dc.GetTextExtent(wxT("ABCDEFHXfgkj"), &w, &h);
 
-    wxRect clipRect = rect;
-    clipRect.width -= 3; // text offset
-    clipRect.width -= 2; // button padding
+    wxRect clip_rect = rect;
+    clip_rect.width -= 3; // text offset
+    clip_rect.width -= 2; // button padding
     if (pane.HasCloseButton())
-        clipRect.width -= m_buttonSize;
+        clip_rect.width -= m_buttonSize;
     if (pane.HasPinButton())
-        clipRect.width -= m_buttonSize;
+        clip_rect.width -= m_buttonSize;
     if (pane.HasMaximizeButton())
-        clipRect.width -= m_buttonSize;
+        clip_rect.width -= m_buttonSize;
 
-    wxString drawText = wxAuiChopText(dc, text, clipRect.width);
+    wxString draw_text = wxAuiChopText(dc, text, clip_rect.width);
 
-    dc.SetClippingRegion(clipRect);
-    dc.DrawText(drawText, rect.x+3 + captionOffset, rect.y+(rect.height/2)-(h/2)-1);
+    dc.SetClippingRegion(clip_rect);
+    dc.DrawText(draw_text, rect.x+3 + caption_offset, rect.y+(rect.height/2)-(h/2)-1);
     dc.DestroyClippingRegion();
 }
 
@@ -692,7 +692,7 @@ void wxAuiDefaultDockArt::DrawGripper(wxDC& dc, wxWindow *WXUNUSED(window),
 
 void wxAuiDefaultDockArt::DrawPaneButton(wxDC& dc, wxWindow *WXUNUSED(window),
                                       int button,
-                                      int buttonState,
+                                      int button_state,
                                       const wxRect& _rect,
                                       wxAuiPaneInfo& pane)
 {
@@ -723,18 +723,18 @@ void wxAuiDefaultDockArt::DrawPaneButton(wxDC& dc, wxWindow *WXUNUSED(window),
 
     wxRect rect = _rect;
 
-    int oldY = rect.y;
+    int old_y = rect.y;
     rect.y = rect.y + (rect.height/2) - (bmp.GetScaledHeight()/2);
-    rect.height = oldY + rect.height - rect.y - 1;
+    rect.height = old_y + rect.height - rect.y - 1;
 
 
-    if (buttonState == wxAUI_BUTTON_STATE_PRESSED)
+    if (button_state == wxAUI_BUTTON_STATE_PRESSED)
     {
         rect.x++;
         rect.y++;
     }
 
-    if (buttonState == wxAUI_BUTTON_STATE_HOVER || buttonState == wxAUI_BUTTON_STATE_PRESSED)
+    if (button_state == wxAUI_BUTTON_STATE_HOVER || button_state == wxAUI_BUTTON_STATE_PRESSED)
     {
         wxColour color = showActive ? m_activeCaptionColour : m_inactiveCaptionColour;
 

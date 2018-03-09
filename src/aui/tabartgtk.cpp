@@ -175,20 +175,20 @@ void wxAuiGtkTabArt::DrawBorder(wxDC& WXUNUSED(dc), wxWindow* wnd, const wxRect&
 
 }
 
-void ButtonStateAndShadow(int buttonState, GtkStateType &state, GtkShadowType &shadow)
+void ButtonStateAndShadow(int button_state, GtkStateType &state, GtkShadowType &shadow)
 {
 
-    if (buttonState & wxAUI_BUTTON_STATE_DISABLED)
+    if (button_state & wxAUI_BUTTON_STATE_DISABLED)
     {
         state = GTK_STATE_INSENSITIVE;
         shadow = GTK_SHADOW_ETCHED_IN;
     }
-    else if (buttonState & wxAUI_BUTTON_STATE_HOVER)
+    else if (button_state & wxAUI_BUTTON_STATE_HOVER)
     {
         state = GTK_STATE_PRELIGHT;
         shadow = GTK_SHADOW_OUT;
     }
-    else if (buttonState & wxAUI_BUTTON_STATE_PRESSED)
+    else if (button_state & wxAUI_BUTTON_STATE_PRESSED)
     {
         state = GTK_STATE_ACTIVE;
         shadow = GTK_SHADOW_IN;
@@ -230,14 +230,14 @@ wxRect CalculateCloseButtonRect(wxRect const& inRect, int orientation)
 
 wxRect DrawCloseButton(wxDC& dc,
                        GtkWidget* widget,
-                       int buttonState,
-                       wxRect const& inRect,
+                       int button_state,
+                       wxRect const& in_rect,
                        int orientation,
                        GdkRectangle* clipRect)
 {
-    GtkStyle *styleButton = gtk_widget_get_style(wxGTKPrivate::GetButtonWidget());
-    int xthickness = styleButton->xthickness;
-    int ythickness = styleButton->ythickness;
+    GtkStyle *style_button = gtk_widget_get_style(wxGTKPrivate::GetButtonWidget());
+    int xthickness = style_button->xthickness;
+    int ythickness = style_button->ythickness;
 
     wxBitmap bmp(gtk_widget_render_icon(widget, GTK_STOCK_CLOSE, GTK_ICON_SIZE_SMALL_TOOLBAR, "tab"));
 
@@ -248,28 +248,28 @@ wxRect DrawCloseButton(wxDC& dc,
         bmp = img;
     }
 
-    wxRect outRect = CalculateCloseButtonRect(inRect, orientation);
+    wxRect out_rect = CalculateCloseButtonRect(in_rect, orientation);
 
     wxGTKDCImpl *impldc = (wxGTKDCImpl*) dc.GetImpl();
     GdkWindow* window = impldc->GetGDKWindow();
 
-    if (buttonState == wxAUI_BUTTON_STATE_HOVER)
+    if (button_state == wxAUI_BUTTON_STATE_HOVER)
     {
-        gtk_paint_box(styleButton, window,
+        gtk_paint_box(style_button, window,
                       GTK_STATE_PRELIGHT, GTK_SHADOW_OUT, clipRect, widget, "button",
-                     outRect.x, outRect.y, outRect.width, outRect.height);
+                     out_rect.x, out_rect.y, out_rect.width, out_rect.height);
     }
-    else if (buttonState == wxAUI_BUTTON_STATE_PRESSED)
+    else if (button_state == wxAUI_BUTTON_STATE_PRESSED)
     {
-        gtk_paint_box(styleButton, window,
+        gtk_paint_box(style_button, window,
                       GTK_STATE_ACTIVE, GTK_SHADOW_IN, clipRect, widget, "button",
-                      outRect.x, outRect.y, outRect.width, outRect.height);
+                      out_rect.x, out_rect.y, out_rect.width, out_rect.height);
     }
 
 
-    dc.DrawBitmap(bmp, outRect.x + xthickness, outRect.y + ythickness, true);
+    dc.DrawBitmap(bmp, out_rect.x + xthickness, out_rect.y + ythickness, true);
 
-    return outRect;
+    return out_rect;
 }
 
 int GetGapSize(bool isHorizontal)
@@ -281,23 +281,23 @@ int GetGapSize(bool isHorizontal)
 }
 
 void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
-                             const wxRect& inRect, int closeButtonState, bool haveFocus, wxRect* outTabRect,
-                             wxRect* outButtonRect, int* xExtent)
+                             const wxRect& in_rect, int close_button_state, bool haveFocus, wxRect* out_tab_rect,
+                             wxRect* out_button_rect, int* x_extent)
 {
     GtkWidget *widget = wnd->GetHandle();
-    GtkStyle *styleNotebook = gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget());
+    GtkStyle *style_notebook = gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget());
 
-    int focusWidth = 0;
+    int focus_width = 0;
 
     gtk_widget_style_get(wxGTKPrivate::GetNotebookWidget(),
-                         "focus-line-width", &focusWidth,
+                         "focus-line-width", &focus_width,
                          NULL);
 
     // figure out the size of the tab
-    wxSize tabSize = GetTabSize(dc, wnd, page.caption, page.GetIcon(),
-                                    page.HasFlag(wxAuiPaneInfo::optionActiveNotebook), closeButtonState, xExtent);
+    wxSize tab_size = GetTabSize(dc, wnd, page.caption, page.GetIcon(),
+                                    page.HasFlag(wxAuiPaneInfo::optionActiveNotebook), close_button_state, x_extent);
 
-    wxRect tabRect = inRect;
+    wxRect tab_rect = in_rect;
     wxRect gapRect;
 
     int gapStart = 0, gapWidth = 0;
@@ -311,34 +311,34 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
         gapRect.x = 1;
         gapRect.width = dc.GetSize().x - 1;
 
-        tabRect.width = tabSize.x;
+        tab_rect.width = tab_size.x;
 
-        gapStart = tabRect.x - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder / 2;
-        gapWidth = tabRect.width;
+        gapStart = tab_rect.x - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder / 2;
+        gapWidth = tab_rect.width;
         int hborder = GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
 
         if (HasFlag(wxAUI_NB_TOP))
         {
-            gapRect.y = inRect.y + inRect.height - gapRect.height;
+            gapRect.y = in_rect.y + in_rect.height - gapRect.height;
             gapRect.height += 10;
 
             if (!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
-                tabRect.y += 2 * hborder;
-            tabRect.height = gapRect.y - tabRect.y - hborder;
-            tabRect.y += hborder;
+                tab_rect.y += 2 * hborder;
+            tab_rect.height = gapRect.y - tab_rect.y - hborder;
+            tab_rect.y += hborder;
 
             gapBoxPos = GTK_POS_TOP;
             gapPos = GTK_POS_BOTTOM;
         }
         else//wxAUI_NB_BOTTOM
         {
-            gapRect.y = inRect.y - 10;
+            gapRect.y = in_rect.y - 10;
             gapRect.height += 10;
 
-            tabRect.y = inRect.y + gapRect.y + gapRect.height;
-            tabRect.height = inRect.y + inRect.height - tabRect.y - hborder;
+            tab_rect.y = in_rect.y + gapRect.y + gapRect.height;
+            tab_rect.height = in_rect.y + in_rect.height - tab_rect.y - hborder;
             if (!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
-                tabRect.height -= 2 * hborder;
+                tab_rect.height -= 2 * hborder;
 
             gapBoxPos = GTK_POS_BOTTOM;
             gapPos = GTK_POS_TOP;
@@ -350,22 +350,22 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
         gapRect.y = 1;
         gapRect.height = dc.GetSize().y - 1;
 
-        tabRect.height = tabSize.y;
+        tab_rect.height = tab_size.y;
 
-        gapStart = tabRect.y - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder / 2;
-        gapWidth = tabRect.height;
+        gapStart = tab_rect.y - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder / 2;
+        gapWidth = tab_rect.height;
         int vborder = GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
 
         if (HasFlag(wxAUI_NB_LEFT))
         {
-            gapRect.x = inRect.x + inRect.width - gapRect.width;
+            gapRect.x = in_rect.x + in_rect.width - gapRect.width;
             gapRect.width += 10;
 
             if (!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
-                tabRect.x += 2 * vborder;
+                tab_rect.x += 2 * vborder;
 
-            tabRect.width = gapRect.x - tabRect.x - vborder;
-            tabRect.x += vborder;
+            tab_rect.width = gapRect.x - tab_rect.x - vborder;
+            tab_rect.x += vborder;
 
             gapBoxPos = GTK_POS_LEFT;
             gapPos = GTK_POS_RIGHT;
@@ -373,33 +373,33 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
         else//wxAUI_NB_RIGHT
         {
 
-            gapRect.x = inRect.x - 10;
+            gapRect.x = in_rect.x - 10;
             gapRect.width += 10;
 
-            tabRect.x = inRect.x + gapRect.x + gapRect.width;
-            tabRect.width = inRect.x + inRect.width - tabRect.x - vborder;
+            tab_rect.x = in_rect.x + gapRect.x + gapRect.width;
+            tab_rect.width = in_rect.x + in_rect.width - tab_rect.x - vborder;
             if (!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
-                tabRect.width -= 2 * vborder;
+                tab_rect.width -= 2 * vborder;
 
             gapBoxPos = GTK_POS_RIGHT;
             gapPos = GTK_POS_LEFT;
         }
     }
 
-    int padding = focusWidth + GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
+    int padding = focus_width + GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
 
-    int clipWidth = tabRect.width;
-    int clipHeight = tabRect.height;
-    if (tabRect.x + tabRect.width > inRect.x + inRect.width)
-        clipWidth = (inRect.x + inRect.width) - tabRect.x;
-    if (tabRect.y + tabRect.height > inRect.y + inRect.height)
-        clipHeight = (inRect.y + inRect.height) - tabRect.y;
+    int clipWidth = tab_rect.width;
+    int clipHeight = tab_rect.height;
+    if (tab_rect.x + tab_rect.width > in_rect.x + in_rect.width)
+        clipWidth = (in_rect.x + in_rect.width) - tab_rect.x;
+    if (tab_rect.y + tab_rect.height > in_rect.y + in_rect.height)
+        clipHeight = (in_rect.y + in_rect.height) - tab_rect.y;
 
-    dc.SetClippingRegion(tabRect.x, tabRect.y, clipWidth, clipHeight);
+    dc.SetClippingRegion(tab_rect.x, tab_rect.y, clipWidth, clipHeight);
 
     GdkRectangle area;
-    area.x = tabRect.x - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
-    area.y = tabRect.y - 2 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
+    area.x = tab_rect.x - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
+    area.y = tab_rect.y - 2 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
     area.width = clipWidth + GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
     area.height = clipHeight + 2 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
 
@@ -407,7 +407,7 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
     GdkWindow* window = impldc->GetGDKWindow();
 
     // we draw a box here, because the gap-box is not drawn, if the active tab is not visible
-    gtk_paint_box(styleNotebook, window, GTK_STATE_NORMAL, GTK_SHADOW_OUT,
+    gtk_paint_box(style_notebook, window, GTK_STATE_NORMAL, GTK_SHADOW_OUT,
                   NULL, widget,
                   const_cast<char*>("notebook"),
                   gapRect.x, gapRect.y,
@@ -415,22 +415,22 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
 
     if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
     {
-        gtk_paint_box_gap(styleNotebook, window, GTK_STATE_NORMAL, GTK_SHADOW_OUT,
+        gtk_paint_box_gap(style_notebook, window, GTK_STATE_NORMAL, GTK_SHADOW_OUT,
                           NULL, widget,
                           const_cast<char*>("notebook"),
                           gapRect.x, gapRect.y,
                           gapRect.width, gapRect.height,
                           gapBoxPos, gapStart , gapWidth);
     }
-    gtk_paint_extension(styleNotebook, window,
+    gtk_paint_extension(style_notebook, window,
                        page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) ? GTK_STATE_NORMAL : GTK_STATE_ACTIVE, GTK_SHADOW_OUT,
                        &area, widget,
                        const_cast<char*>("tab"),
-                       tabRect.x, tabRect.y,
-                       tabRect.width, tabRect.height,
+                       tab_rect.x, tab_rect.y,
+                       tab_rect.width, tab_rect.height,
                        gapPos);
 
-    wxCoord textX = tabRect.x + padding + styleNotebook->xthickness;
+    wxCoord textX = tab_rect.x + padding + style_notebook->xthickness;
 
     int bitmapX = 0;
     if (page.GetIcon().IsOk())
@@ -438,13 +438,13 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
         bitmapX = textX;
 
         // draw bitmap
-        int bitmapY = tabRect.y +(tabRect.height - page.GetIcon().GetScaledHeight()) / 2;
+        int bitmapY = tab_rect.y +(tab_rect.height - page.GetIcon().GetScaledHeight()) / 2;
         if(!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
         {
             if (HasFlag(wxAUI_NB_TOP))
-                bitmapY += styleNotebook->ythickness / 2;
+                bitmapY += style_notebook->ythickness / 2;
             else
-                bitmapY -= styleNotebook->ythickness / 2;
+                bitmapY -= style_notebook->ythickness / 2;
         }
         dc.DrawBitmap(page.GetIcon(),
                       bitmapX,
@@ -458,119 +458,119 @@ void wxAuiGtkTabArt::DrawTab(wxDC& dc, wxWindow* wnd, const wxAuiPaneInfo& page,
 
     dc.SetFont(m_normalFont);
     dc.GetTextExtent(page.caption, &textW, &textH);
-    textY = tabRect.y + (tabRect.height - textH) / 2;
+    textY = tab_rect.y + (tab_rect.height - textH) / 2;
     if(!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
     {
         if (HasFlag(wxAUI_NB_TOP))
-            textY += styleNotebook->ythickness / 2;
+            textY += style_notebook->ythickness / 2;
         else
-            textY -= styleNotebook->ythickness / 2;
+            textY -= style_notebook->ythickness / 2;
     }
 
     // draw tab text
-    GdkColor textColour = page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) ? styleNotebook->fg[GTK_STATE_NORMAL] : styleNotebook->fg[GTK_STATE_ACTIVE];
+    GdkColor textColour = page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) ? style_notebook->fg[GTK_STATE_NORMAL] : style_notebook->fg[GTK_STATE_ACTIVE];
     dc.SetTextForeground(wxColor(textColour));
-    GdkRectangle focusArea;
+    GdkRectangle focus_area;
 
-    int paddingFocus = padding - focusWidth;
-    focusArea.x = tabRect.x + paddingFocus;
-    focusArea.y = textY - focusWidth;
-    focusArea.width = tabRect.width - 2 * paddingFocus;
-    focusArea.height = textH + 2 * focusWidth;
+    int padding_focus = padding - focus_width;
+    focus_area.x = tab_rect.x + padding_focus;
+    focus_area.y = textY - focus_width;
+    focus_area.width = tab_rect.width - 2 * padding_focus;
+    focus_area.height = textH + 2 * focus_width;
 
-    if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && haveFocus && focusArea.x <= (area.x + area.width))
+    if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && haveFocus && focus_area.x <= (area.x + area.width))
     {
         // clipping seems not to work here, so we we have to recalc the focus-area manually
-        if((focusArea.x + focusArea.width) > (area.x + area.width))
-            focusArea.width = area.x + area.width - focusArea.x + focusWidth - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
-        if((focusArea.y + focusArea.height) > (area.y + area.height))
-            focusArea.height = area.y + area.height - focusArea.y + focusWidth - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
-        gtk_paint_focus (styleNotebook, window,
+        if((focus_area.x + focus_area.width) > (area.x + area.width))
+            focus_area.width = area.x + area.width - focus_area.x + focus_width - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
+        if((focus_area.y + focus_area.height) > (area.y + area.height))
+            focus_area.height = area.y + area.height - focus_area.y + focus_width - GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_hborder;
+        gtk_paint_focus (style_notebook, window,
                          GTK_STATE_ACTIVE, NULL, widget, "tab",
-                         focusArea.x, focusArea.y, focusArea.width, focusArea.height);
+                         focus_area.x, focus_area.y, focus_area.width, focus_area.height);
     }
 
-    int closeButtonWidth = (closeButtonState != wxAUI_BUTTON_STATE_HIDDEN) ? s_CloseIconSize + 3 * padding : 0;
-    wxString draw_text = wxAuiChopText(dc,page.caption, tabRect.width - (textX - tabRect.x) - closeButtonWidth);
+    int closeButtonWidth = (close_button_state != wxAUI_BUTTON_STATE_HIDDEN) ? s_CloseIconSize + 3 * padding : 0;
+    wxString draw_text = wxAuiChopText(dc,page.caption, tab_rect.width - (textX - tab_rect.x) - closeButtonWidth);
 
     dc.DrawText(draw_text, textX, textY);
 
     // draw close-button on tab (if enabled)
-    if (closeButtonState != wxAUI_BUTTON_STATE_HIDDEN)
+    if (close_button_state != wxAUI_BUTTON_STATE_HIDDEN)
     {
-        wxRect rect(tabRect.x, tabRect.y, tabRect.width - styleNotebook->xthickness, tabRect.height);
+        wxRect rect(tab_rect.x, tab_rect.y, tab_rect.width - style_notebook->xthickness, tab_rect.height);
         if(!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
         {
             if (HasFlag(wxAUI_NB_TOP))
-                rect.y += styleNotebook->ythickness / 2;
+                rect.y += style_notebook->ythickness / 2;
             else
-                rect.y -= styleNotebook->ythickness / 2;
+                rect.y -= style_notebook->ythickness / 2;
         }
-        *outButtonRect = DrawCloseButton(dc, widget, closeButtonState, rect, wxRIGHT, &area);
+        *out_button_rect = DrawCloseButton(dc, widget, close_button_state, rect, wxRIGHT, &area);
     }
 
-    tabRect.width = std::min(tabRect.width, clipWidth);
-    *outTabRect = tabRect;
+    tab_rect.width = std::min(tab_rect.width, clipWidth);
+    *out_tab_rect = tab_rect;
 
     dc.DestroyClippingRegion();
 }
 
 wxRect DrawSimpleArrow(wxDC& dc,
                        GtkWidget *widget,
-                       int buttonState,
-                       wxRect const &inRect,
+                       int button_state,
+                       wxRect const &in_rect,
                        int orientation,
-                       GtkArrowType arrowType)
+                       GtkArrowType arrow_type)
 {
-    int scrollArrowHLength, scrollArrowVLength;
+    int scroll_arrow_hlength, scroll_arrow_vlength;
     gtk_widget_style_get(widget,
-                         "scroll-arrow-hlength", &scrollArrowHLength,
-                         "scroll-arrow-vlength", &scrollArrowVLength,
+                         "scroll-arrow-hlength", &scroll_arrow_hlength,
+                         "scroll-arrow-vlength", &scroll_arrow_vlength,
                          NULL);
 
     GtkStateType state;
     GtkShadowType shadow;
-    ButtonStateAndShadow(buttonState, state, shadow);
+    ButtonStateAndShadow(button_state, state, shadow);
 
-    wxRect outRect;
+    wxRect out_rect;
 
     if (orientation == wxLEFT)
-        outRect.x = inRect.x;
+        out_rect.x = in_rect.x;
     else if (orientation == wxUP || orientation == wxDOWN)
-        outRect.x = inRect.x + (inRect.width - scrollArrowHLength) / 2;
+        out_rect.x = in_rect.x + (in_rect.width - scroll_arrow_hlength) / 2;
     else  if (orientation == wxRIGHT)
-        outRect.x = inRect.x + inRect.width - scrollArrowHLength;
+        out_rect.x = in_rect.x + in_rect.width - scroll_arrow_hlength;
     if (orientation == wxDOWN)
-        outRect.y = inRect.y + inRect.height -  scrollArrowVLength;
+        out_rect.y = in_rect.y + in_rect.height -  scroll_arrow_vlength;
     else if (orientation == wxUP)
-        outRect.y = inRect.y;
+        out_rect.y = in_rect.y;
     else
-         outRect.y = (inRect.y + inRect.height - 3 * gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget())->ythickness - scrollArrowVLength) / 2;
+         out_rect.y = (in_rect.y + in_rect.height - 3 * gtk_widget_get_style(wxGTKPrivate::GetNotebookWidget())->ythickness - scroll_arrow_vlength) / 2;
 
-    outRect.width = scrollArrowHLength;
-    outRect.height = scrollArrowVLength;
+    out_rect.width = scroll_arrow_hlength;
+    out_rect.height = scroll_arrow_vlength;
 
     wxGTKDCImpl *impldc = (wxGTKDCImpl*) dc.GetImpl();
     GdkWindow* window = impldc->GetGDKWindow();
     gtk_paint_arrow (gtk_widget_get_style(wxGTKPrivate::GetButtonWidget()), window, state, shadow, NULL, widget, "notebook",
-                     arrowType, TRUE, outRect.x, outRect.y, outRect.width, outRect.height);
+                     arrow_type, TRUE, out_rect.x, out_rect.y, out_rect.width, out_rect.height);
 
-    return outRect;
+    return out_rect;
 }
 
 void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
-                            const wxRect& inRect,
-                            int bitmapID,
-                            int buttonState,
+                            const wxRect& in_rect,
+                            int bitmap_id,
+                            int button_state,
                             int orientation,
-                            wxRect* outRect)
+                            wxRect* out_rect)
 {
     GtkWidget *widget = wnd->GetHandle();
-    wxRect rect = inRect;
+    wxRect rect = in_rect;
     if (m_flags &wxAUI_NB_BOTTOM)
         rect.y += 2 * gtk_widget_get_style(wxGTKPrivate::GetButtonWidget())->ythickness;
 
-    switch (bitmapID)
+    switch (bitmap_id)
     {
         case wxAUI_BUTTON_CLOSE:
             if (orientation != wxUP)
@@ -579,11 +579,11 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
                 rect.y -= gtk_widget_get_style(wxGTKPrivate::GetButtonWidget())->ythickness;
             if (HasFlag(wxAUI_NB_LEFT))
                 rect.x -= 4 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
-            rect = DrawCloseButton(dc, widget, buttonState, rect, orientation, NULL);
+            rect = DrawCloseButton(dc, widget, button_state, rect, orientation, NULL);
             break;
 
         case wxAUI_BUTTON_LEFT:
-            rect = DrawSimpleArrow(dc, widget, buttonState, rect, orientation, GTK_ARROW_LEFT);
+            rect = DrawSimpleArrow(dc, widget, button_state, rect, orientation, GTK_ARROW_LEFT);
             break;
 
         case wxAUI_BUTTON_RIGHT:
@@ -596,16 +596,16 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
                 rect.width -= 1.5 * scrollArrowHLength;
             }
             if (HasFlag(wxAUI_NB_CLOSE_BUTTON))
-                rect.width -= CalculateCloseButtonRect(inRect, orientation).GetWidth();
-            rect = DrawSimpleArrow(dc, widget, buttonState, rect, orientation, GTK_ARROW_RIGHT);
+                rect.width -= CalculateCloseButtonRect(in_rect, orientation).GetWidth();
+            rect = DrawSimpleArrow(dc, widget, button_state, rect, orientation, GTK_ARROW_RIGHT);
             break;
 
         case wxAUI_BUTTON_UP:
-            rect = DrawSimpleArrow(dc, widget, buttonState, rect, orientation, GTK_ARROW_UP);
+            rect = DrawSimpleArrow(dc, widget, button_state, rect, orientation, GTK_ARROW_UP);
             break;
 
         case wxAUI_BUTTON_DOWN:
-            rect = DrawSimpleArrow(dc, widget, buttonState, rect, orientation, GTK_ARROW_DOWN);
+            rect = DrawSimpleArrow(dc, widget, button_state, rect, orientation, GTK_ARROW_DOWN);
             break;
 
         case wxAUI_BUTTON_WINDOWLIST:
@@ -617,9 +617,9 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
                                      NULL);
                 rect.height = 1.5 * scrollArrowVLength;
                 rect.width = 1.5 * scrollArrowHLength;
-                rect.x = inRect.x + inRect.width - rect.width;
+                rect.x = in_rect.x + in_rect.width - rect.width;
                 if (HasFlag(wxAUI_NB_CLOSE_BUTTON))
-                    rect.x -= CalculateCloseButtonRect(inRect, orientation).GetWidth();
+                    rect.x -= CalculateCloseButtonRect(in_rect, orientation).GetWidth();
 
                 if (orientation == wxUP)
                 {
@@ -627,9 +627,9 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
                         rect.x -= 4 * GTK_NOTEBOOK (wxGTKPrivate::GetNotebookWidget())->tab_vborder;
                 }
 
-                if (buttonState == wxAUI_BUTTON_STATE_HOVER)
+                if (button_state == wxAUI_BUTTON_STATE_HOVER)
                     wxRendererNative::Get().DrawComboBoxDropButton(wnd, dc, rect, wxCONTROL_CURRENT);
-                else if (buttonState == wxAUI_BUTTON_STATE_PRESSED)
+                else if (button_state == wxAUI_BUTTON_STATE_PRESSED)
                     wxRendererNative::Get().DrawComboBoxDropButton(wnd, dc, rect, wxCONTROL_PRESSED);
                 else
                     wxRendererNative::Get().DrawDropArrow(wnd, dc, rect);
@@ -637,18 +637,18 @@ void wxAuiGtkTabArt::DrawButton(wxDC& dc, wxWindow* wnd,
             break;
     }
 
-    *outRect = rect;
+    *out_rect = rect;
 }
 
 
 wxSize wxAuiGtkTabArt::GetBestTabSize(wxWindow* wnd,
                                    const wxAuiPaneInfoPtrArray& pages,
-                                   const wxSize& requiredBmpSize)
+                                   const wxSize& required_bmp_size)
 {
     SetMeasuringFont(m_normalFont);
     SetSelectedFont(m_normalFont);
 
-    wxSize tabSize = wxAuiGenericTabArt::GetBestTabSize(wnd, pages, requiredBmpSize);
+    wxSize tabSize = wxAuiGenericTabArt::GetBestTabSize(wnd, pages, required_bmp_size);
 
     tabSize.IncBy(GetGapSize(IsHorizontal()));
 
@@ -671,14 +671,14 @@ wxSize wxAuiGtkTabArt::GetTabSize(wxDC& dc,
                               const wxString& caption,
                               const wxBitmap& bitmap,
                               bool active,
-                              int closeButtonState,
-                              int* extent)
+                              int close_button_state,
+                              int* x_extent)
 {
-    wxSize tabSize = wxAuiGenericTabArt::GetTabSize(dc, wnd, caption, bitmap, active, closeButtonState, extent);
+    wxSize s = wxAuiGenericTabArt::GetTabSize(dc, wnd, caption, bitmap, active, close_button_state, x_extent);
 
     int overlap = 0;
     gtk_widget_style_get (wnd->GetHandle(), "focus-line-width", &overlap, NULL);
-    *extent -= overlap;
-    return tabSize;
+    *x_extent -= overlap;
+    return s;
 }
 #endif  // wxUSE_AUI

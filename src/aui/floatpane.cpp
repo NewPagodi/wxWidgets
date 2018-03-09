@@ -85,29 +85,29 @@ void wxAuiFloatingFrame::SetPaneWindow(const wxAuiPaneInfo& pane)
     m_paneWindow = pane.GetWindow();
     m_paneWindow->Reparent(this);
 
-    wxAuiPaneInfo containedPane = pane;
-    containedPane.Dock().Center().Show().
+    wxAuiPaneInfo contained_pane = pane;
+    contained_pane.Dock().Center().Show().
                     CaptionVisible(false).
                     PaneBorder(false).
                     Layer(0).Row(0).Position(0).SetFlag(wxAuiPaneInfo::optionAlwaysDockInNotebook, false);
 
     // Carry over the minimum size
-    wxSize paneMinSize = pane.GetWindow()->GetMinSize();
+    wxSize pane_min_size = pane.GetWindow()->GetMinSize();
 
     // if the frame window's max size is greater than the min size
     // then set the max size to the min size as well
-    wxSize curMaxSize = GetMaxSize();
-    if (curMaxSize.IsFullySpecified() &&
-          (curMaxSize.x < pane.GetMinSize().x ||
-           curMaxSize.y < pane.GetMinSize().y)
+    wxSize cur_max_size = GetMaxSize();
+    if (cur_max_size.IsFullySpecified() &&
+          (cur_max_size.x < pane.GetMinSize().x ||
+           cur_max_size.y < pane.GetMinSize().y)
        )
     {
-        SetMaxSize(paneMinSize);
+        SetMaxSize(pane_min_size);
     }
 
     SetMinSize(pane.GetWindow()->GetMinSize());
 
-    m_mgr.AddPane(m_paneWindow, containedPane);
+    m_mgr.AddPane(m_paneWindow, contained_pane);
     m_mgr.Update();
 
     if (pane.GetMinSize().IsFullySpecified())
@@ -251,10 +251,10 @@ void wxAuiFloatingFrame::OnMoveEvent(wxMoveEvent& event)
 
     wxDirection dir = wxALL;
 
-    int horizDist = abs(winRect.x - m_last3Rect.x);
-    int vertDist = abs(winRect.y - m_last3Rect.y);
+    int horiz_dist = abs(winRect.x - m_last3Rect.x);
+    int vert_dist = abs(winRect.y - m_last3Rect.y);
 
-    if (vertDist >= horizDist)
+    if (vert_dist >= horiz_dist)
     {
         if (winRect.y < m_last3Rect.y)
             dir = wxNORTH;

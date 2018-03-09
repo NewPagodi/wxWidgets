@@ -41,16 +41,16 @@ public:
     virtual void DrawTab(wxDC& dc,
                          wxWindow* wnd,
                          const wxAuiPaneInfo& page,
-                         const wxRect& inRect,
-                         int close_buttonState,
+                         const wxRect& in_rect,
+                         int close_button_state,
                          bool haveFocus,
-                         wxRect* outTabRect,
-                         wxRect* outButtonRect,
-                         int* xExtent) wxOVERRIDE;
-    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& inRect, int bitmapID,
-                    int buttonState, int orientation, wxRect* outRect) wxOVERRIDE;
+                         wxRect* out_tab_rect,
+                         wxRect* out_button_rect,
+                         int* x_extent) wxOVERRIDE;
+    void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& in_rect, int bitmap_id,
+                    int button_state, int orientation, wxRect* out_rect) wxOVERRIDE;
     wxSize GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages,
-                            const wxSize& requiredBmpSize);
+                            const wxSize& required_bmp_size);
     int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages)  wxOVERRIDE
                          {
                              return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
@@ -59,7 +59,7 @@ public:
     int GetAdditionalBorderSpace(wxWindow* wnd) wxOVERRIDE;
     virtual wxSize GetTabSize(wxDC& dc, wxWindow* wnd, const wxString& caption,
                               const wxBitmap& bitmap, bool active,
-                              int closeButtonState, int* extent) wxOVERRIDE;
+                              int close_button_state, int* x_extent) wxOVERRIDE;
 };
 
 #endif  // wxUSE_AUI
