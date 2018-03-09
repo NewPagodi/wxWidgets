@@ -316,7 +316,7 @@ wxEND_EVENT_TABLE()
 #include "wx/gtk/private/gtk2-compat.h"
 
 static void
-gtk_pseudo_window_realized_callback( GtkWidget* m_widget, void* WXUNUSED(win) )
+gtk_pseudo_window_realized_callback( GtkWidget *m_widget, void *WXUNUSED(win) )
 {
         wxSize disp = wxGetDisplaySize();
         int amount = 128;
@@ -401,7 +401,7 @@ static void DrawResizeHint(wxDC& dc, const wxRect& rect)
     wxBrush brush(stipple);
     dc.SetBrush(brush);
 #ifdef __WXMSW__
-    wxMSWDCImpl* impl = (wxMSWDCImpl*) dc.GetImpl();
+    wxMSWDCImpl *impl = (wxMSWDCImpl*) dc.GetImpl();
     PatBlt(GetHdcOf(*impl), rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight(), PATINVERT);
 #else
     dc.SetPen(*wxTRANSPARENT_PEN);
@@ -870,7 +870,7 @@ wxAuiFloatingFrame* wxAuiManager::CreateFloatingFrame(wxWindow* parent,
     return new wxAuiFloatingFrame(parent, this, paneInfo);
 }
 
-bool wxAuiManager::CanDockPanel(const wxAuiPaneInfo& WXUNUSED(p))
+bool wxAuiManager::CanDockPanel(const wxAuiPaneInfo & WXUNUSED(p))
 {
     // if a key modifier is pressed while dragging the frame,
     // don't dock the window

@@ -384,7 +384,7 @@ wxFont wxAuiDefaultDockArt::GetFont(int id)
     return wxNullFont;
 }
 
-void wxAuiDefaultDockArt::DrawSash(wxDC& dc, wxWindow* window, int orientation, const wxRect& rect)
+void wxAuiDefaultDockArt::DrawSash(wxDC& dc, wxWindow *window, int orientation, const wxRect& rect)
 {
 #if defined( __WXMAC__ ) && wxOSX_USE_COCOA_OR_CARBON
     wxUnusedVar(window);
@@ -392,7 +392,7 @@ void wxAuiDefaultDockArt::DrawSash(wxDC& dc, wxWindow* window, int orientation, 
 
     HIRect splitterRect = CGRectMake( rect.x , rect.y , rect.width , rect.height );
     CGContextRef cgContext ;
-    wxGCDCImpl* impl = (wxGCDCImpl*) dc.GetImpl();
+    wxGCDCImpl *impl = (wxGCDCImpl*) dc.GetImpl();
     cgContext = (CGContextRef) impl->GetGraphicsContext()->GetNativeContext() ;
 
     HIThemeSplitterDrawInfo drawInfo ;
@@ -470,7 +470,7 @@ void wxAuiDefaultDockArt::DrawSash(wxDC& dc, wxWindow* window, int orientation, 
 }
 
 
-void wxAuiDefaultDockArt::DrawBackground(wxDC& dc, wxWindow* WXUNUSED(window), int, const wxRect& rect)
+void wxAuiDefaultDockArt::DrawBackground(wxDC& dc, wxWindow *WXUNUSED(window), int, const wxRect& rect)
 {
     dc.SetPen(*wxTRANSPARENT_PEN);
 #ifdef __WXMAC__
@@ -586,7 +586,7 @@ void wxAuiDefaultDockArt::DrawCaptionBackground(wxDC& dc, const wxRect& rect, bo
 }
 
 
-void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow* WXUNUSED(window),
+void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow *WXUNUSED(window),
                                    const wxString& text,
                                    const wxRect& rect,
                                    wxAuiPaneInfo& pane)
@@ -639,7 +639,7 @@ wxAuiDefaultDockArt::DrawIcon(wxDC& dc, const wxRect& rect, wxAuiPaneInfo& pane)
                  true);
 }
 
-void wxAuiDefaultDockArt::DrawGripper(wxDC& dc, wxWindow* WXUNUSED(window),
+void wxAuiDefaultDockArt::DrawGripper(wxDC& dc, wxWindow *WXUNUSED(window),
                                    const wxRect& rect,
                                    wxAuiPaneInfo& pane)
 {
@@ -690,7 +690,7 @@ void wxAuiDefaultDockArt::DrawGripper(wxDC& dc, wxWindow* WXUNUSED(window),
     }
 }
 
-void wxAuiDefaultDockArt::DrawPaneButton(wxDC& dc, wxWindow* WXUNUSED(window),
+void wxAuiDefaultDockArt::DrawPaneButton(wxDC& dc, wxWindow *WXUNUSED(window),
                                       int button,
                                       int buttonState,
                                       const wxRect& _rect,

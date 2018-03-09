@@ -298,8 +298,8 @@ public:
 
     //wxBookCtrlBase functions
 
-    virtual void SetPageSize (const wxSize& size) wxOVERRIDE;
-    virtual int  HitTest (const wxPoint& pt, long* flags=NULL) const wxOVERRIDE;
+    virtual void SetPageSize (const wxSize &size) wxOVERRIDE;
+    virtual int  HitTest (const wxPoint &pt, long *flags=NULL) const wxOVERRIDE;
 
     virtual int GetPageImage(size_t n) const wxOVERRIDE;
     virtual bool SetPageImage(size_t n, int imageId) wxOVERRIDE;
@@ -308,10 +308,10 @@ public:
 
     virtual int ChangeSelection(size_t n) wxOVERRIDE;
 
-    virtual bool AddPage(wxWindow* page, const wxString& text, bool select,
+    virtual bool AddPage(wxWindow *page, const wxString &text, bool select, 
                          int imageId) wxOVERRIDE;
     virtual bool DeleteAllPages() wxOVERRIDE;
-    virtual bool InsertPage(size_t index, wxWindow* page, const wxString& text,
+    virtual bool InsertPage(size_t index, wxWindow *page, const wxString &text,
                             bool select, int imageId) wxOVERRIDE;
 
     // Returns true if the tabart has the given flag bit set
