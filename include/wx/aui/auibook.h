@@ -148,7 +148,10 @@ public:
     wxRect GetRect() const { return m_targetRect; }
 
     void RemoveButton(int id);
-    void AddButton(int id, int location, const wxBitmap& normalBitmap = wxNullBitmap, const wxBitmap& disabledBitmap = wxNullBitmap);
+    void AddButton(int id,
+                   int location,
+                   const wxBitmap& normalBitmap = wxNullBitmap,
+                   const wxBitmap& disabledBitmap = wxNullBitmap);
 
     size_t GetTabOffset() const;
     void SetTabOffset(size_t offset);
@@ -304,9 +307,11 @@ public:
 
     virtual int ChangeSelection(size_t n) wxOVERRIDE;
 
-    virtual bool AddPage(wxWindow* page, const wxString& text, bool select,  int imageId) wxOVERRIDE;
+    virtual bool AddPage(wxWindow* page, const wxString& text, bool select,
+                         int imageId) wxOVERRIDE;
     virtual bool DeleteAllPages() wxOVERRIDE;
-    virtual bool InsertPage(size_t index, wxWindow* page, const wxString& text, bool select, int imageId) wxOVERRIDE;
+    virtual bool InsertPage(size_t index, wxWindow* page, const wxString& text,
+                            bool select, int imageId) wxOVERRIDE;
 
     // Returns true if the tabart has the given flag bit set
     bool HasFlag(int flag) const    { return m_mgr.HasFlag(flag); }

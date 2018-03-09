@@ -628,13 +628,20 @@ public:
 
     bool FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx);
 
-    bool AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo);
+    bool AddPane(wxWindow* window,
+                 const wxAuiPaneInfo& paneInfo);
 
-    bool AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo, const wxPoint& dropPos);
+    bool AddPane(wxWindow* window,
+                 const wxAuiPaneInfo& paneInfo,
+                 const wxPoint& dropPos);
 
-    bool AddPane(wxWindow* window, int direction = wxLEFT, const wxString& caption = wxEmptyString);
+    bool AddPane(wxWindow* window,
+                 int direction = wxLEFT,
+                 const wxString& caption = wxEmptyString);
 
-    bool InsertPane(wxWindow* window, const wxAuiPaneInfo& insertLocation, int insertLevel = wxAUI_INSERT_PANE);
+    bool InsertPane(wxWindow* window,
+                 const wxAuiPaneInfo& insertLocation,
+                 int insertLevel = wxAUI_INSERT_PANE);
 
     bool DetachPane(wxWindow* window);
 
@@ -660,11 +667,19 @@ public:
     virtual wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo& p);
     virtual bool CanDockPanel(const wxAuiPaneInfo& p);
 
-    void StartPaneDrag(wxWindow* paneWindow, const wxPoint& offset);
+    void StartPaneDrag(
+                 wxWindow* paneWindow,
+                 const wxPoint& offset);
 
-    wxRect CalculateHintRect(wxWindow* paneWindow, const wxPoint& pt, const wxPoint& offset);
+    wxRect CalculateHintRect(
+                 wxWindow* paneWindow,
+                 const wxPoint& pt,
+                 const wxPoint& offset);
 
-    void DrawHintRect(wxWindow* paneWindow, const wxPoint& pt, const wxPoint& offset);
+    void DrawHintRect(
+                 wxWindow* paneWindow,
+                 const wxPoint& pt,
+                 const wxPoint& offset);
 
     virtual void ShowHint(const wxRect& rect);
     virtual void HideHint();
@@ -678,15 +693,39 @@ protected:
     bool CanDockOver(const wxAuiPaneInfo & pane, const wxAuiPaneInfo & covered_pane);
     bool MustDockInNotebook(const wxAuiPaneInfo &pane) const;
 	bool AreInSameNotebook(const wxAuiPaneInfo &pane0, const wxAuiPaneInfo &pane1);
-    void LayoutAddPane(wxSizer* container, wxAuiDockInfo& dock, wxAuiPaneInfo& pane, wxAuiDockUIPartArray& uiparts, bool spacerOnly, bool allowtitlebar=true);
-    void LayoutAddDock(wxSizer* container, wxAuiDockInfo& dock, wxAuiDockUIPartArray& uiParts, bool spacerOnly);
+    void LayoutAddPane(wxSizer* container,
+                       wxAuiDockInfo& dock,
+                       wxAuiPaneInfo& pane,
+                       wxAuiDockUIPartArray& uiparts,
+                       bool spacerOnly,
+                       bool allowtitlebar=true);
+
+    void LayoutAddDock(wxSizer* container,
+                       wxAuiDockInfo& dock,
+                       wxAuiDockUIPartArray& uiParts,
+                       bool spacerOnly);
+
     void LayoutAddNotebook(wxAuiTabArt* tabArt, wxAuiTabContainer* notebookContainer, wxSizer* notebookSizer, wxAuiDockUIPart& part, wxAuiDockInfo& dock, wxAuiDockUIPartArray& uiparts, wxAuiTabContainerPointerArray& tabContainerRecalcList, wxAuiSizerItemPointerArray& tabContainerRecalcSizers, wxAuiPaneInfo* pane, int orient);
-    wxSizer* LayoutAll(wxAuiPaneInfoArray& panes, wxAuiDockInfoArray& docks, wxAuiDockUIPartArray& uiParts, bool spacerOnly = false);
+    wxSizer* LayoutAll(wxAuiPaneInfoArray& panes,
+                       wxAuiDockInfoArray& docks,
+                          wxAuiDockUIPartArray& uiParts,
+                       bool spacerOnly = false);
 
     //Functions for handling pane drag and drop.
-    bool DoDrop(wxAuiDockInfoArray& docks, wxAuiPaneInfoArray& panes, wxAuiPaneInfo& drop, const wxPoint& pt, const wxPoint& actionOffset = wxPoint(0,0));
-    bool DoDropExternal(wxAuiManager* otherMgr,wxWindow* otherWnd,wxAuiPaneInfo& drop, const wxPoint& screenPt, const wxPoint& actionOffset = wxPoint(0,0));
-    virtual bool ProcessDockResult(wxAuiPaneInfo& target, const wxAuiPaneInfo& newPos);
+    bool DoDrop(wxAuiDockInfoArray& docks,
+                wxAuiPaneInfoArray& panes,
+                wxAuiPaneInfo& drop,
+                const wxPoint& pt,
+                const wxPoint& actionOffset = wxPoint(0,0));
+
+    bool DoDropExternal(wxAuiManager* otherMgr,
+                        wxWindow* otherWnd,
+                        wxAuiPaneInfo& drop,
+                        const wxPoint& screenPt,
+                        const wxPoint& actionOffset = wxPoint(0,0));
+
+    virtual bool ProcessDockResult(wxAuiPaneInfo& target,
+                                   const wxAuiPaneInfo& newPos);
 
     //Functions to handle rendering
     void Render(wxDC* dc);
@@ -703,8 +742,11 @@ protected:
     int GetDockPixelOffset(wxAuiPaneInfo& test);
 
     void ProcessMgrEvent(wxAuiManagerEvent& event);
-    void UpdateButtonOnScreen(wxAuiDockUIPart* buttonUiPart, const wxMouseEvent& event);
-    void GetPanePositionsAndSizes(wxAuiDockInfo& dock, wxArrayInt& positions, wxArrayInt& sizes);
+    void UpdateButtonOnScreen(wxAuiDockUIPart* buttonUiPart,
+                              const wxMouseEvent& event);
+    void GetPanePositionsAndSizes(wxAuiDockInfo& dock,
+                              wxArrayInt& positions,
+                              wxArrayInt& sizes);
 
     /// Ends a resize action, or for live update, resizes the sash
     bool DoEndResizeAction(wxMouseEvent& event);

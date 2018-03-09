@@ -315,7 +315,8 @@ wxEND_EVENT_TABLE()
 #include <gtk/gtk.h>
 #include "wx/gtk/private/gtk2-compat.h"
 
-static void gtk_pseudo_window_realized_callback( GtkWidget* m_widget, void* WXUNUSED(win) )
+static void
+gtk_pseudo_window_realized_callback( GtkWidget* m_widget, void* WXUNUSED(win) )
 {
         wxSize disp = wxGetDisplaySize();
         int amount = 128;
@@ -417,7 +418,10 @@ static void DrawResizeHint(wxDC& dc, const wxRect& rect)
 // to wxAuiPaneInfo classes, thus this function is necessary to reliably
 // reconstruct that relationship in the new dock info and pane info arrays
 
-static void CopyDocksAndPanes(wxAuiDockInfoArray& destDocks, wxAuiPaneInfoArray& destPanes, const wxAuiDockInfoArray& srcDocks, const wxAuiPaneInfoArray& srcPanes)
+static void CopyDocksAndPanes(wxAuiDockInfoArray& destDocks,
+                              wxAuiPaneInfoArray& destPanes,
+                              const wxAuiDockInfoArray& srcDocks,
+                              const wxAuiPaneInfoArray& srcPanes)
 {
     destDocks = srcDocks;
     destPanes = srcPanes;
@@ -469,7 +473,9 @@ static int GetMaxRow(const wxAuiPaneInfoArray& panes, int direction, int layer)
 
 // wxAuiDoInsertDockLayer() is an internal function that inserts a new dock
 // layer by incrementing all existing dock layer values by one
-void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer)
+void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray& panes,
+                              int dockDirection,
+                              int dockLayer)
 {
     int i, paneCount;
     for (i = 0, paneCount = panes.GetCount(); i < paneCount; ++i)
@@ -484,7 +490,10 @@ void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray& panes, int dockDirection, int do
 
 // wxAuiDoInsertDockRow() is an internal function that inserts a new dock
 // row by incrementing all existing dock row values by one
-void wxAuiDoInsertDockRow(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer, int dockRow)
+void wxAuiDoInsertDockRow(wxAuiPaneInfoArray& panes,
+                            int dockDirection,
+                            int dockLayer,
+                            int dockRow)
 {
     int i, paneCount;
     for (i = 0, paneCount = panes.GetCount(); i < paneCount; ++i)
@@ -500,7 +509,11 @@ void wxAuiDoInsertDockRow(wxAuiPaneInfoArray& panes, int dockDirection, int dock
 
 // wxAuiDoInsertPane() is an internal function that inserts a space for
 // another dock pane by incrementing all existing dock position values by one
-void wxAuiDoInsertPane(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer, int dockRow, int dockPos)
+void wxAuiDoInsertPane(wxAuiPaneInfoArray& panes,
+                         int dockDirection,
+                         int dockLayer,
+                         int dockRow,
+                         int dockPos)
 {
     int i, paneCount;
     for (i = 0, paneCount = panes.GetCount(); i < paneCount; ++i)
@@ -540,7 +553,11 @@ void wxAuiDoInsertPage(wxAuiPaneInfoArray& panes, int dockDirection, int dockLay
 // FindDocks() is an internal function that returns a list of docks which meet
 // the specified conditions in the parameters and returns a sorted array
 // (sorted by layer and then row)
-static void FindDocks(wxAuiDockInfoArray& docks, int dockDirection, int dockLayer, int dockRow, wxAuiDockInfoPtrArray& arr)
+static void FindDocks(wxAuiDockInfoArray& docks,
+                      int dockDirection,
+                      int dockLayer,
+                      int dockRow,
+                      wxAuiDockInfoPtrArray& arr)
 {
     int beginLayer = dockLayer;
     int endLayer = dockLayer;
@@ -602,7 +619,9 @@ static wxAuiPaneInfo* FindPaneInDock(const wxAuiDockInfo& dock, wxWindow* window
 
 // RemovePaneFromDocks() removes a pane window from all docks
 // with a possible exception specified by parameter "ex_cept"
-static void RemovePaneFromDocks(wxAuiDockInfoArray& docks, wxAuiPaneInfo& pane, wxAuiDockInfo* ex_cept  = NULL  )
+static void RemovePaneFromDocks(wxAuiDockInfoArray& docks,
+                                wxAuiPaneInfo& pane,
+                                wxAuiDockInfo* ex_cept  = NULL  )
 {
     int i, dockCount;
     for (i = 0, dockCount = docks.GetCount(); i < dockCount; ++i)
@@ -845,7 +864,8 @@ wxAuiManager::~wxAuiManager()
 }
 
 // creates a floating frame for the windows
-wxAuiFloatingFrame* wxAuiManager::CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo& paneInfo)
+wxAuiFloatingFrame* wxAuiManager::CreateFloatingFrame(wxWindow* parent,
+                                                      const wxAuiPaneInfo& paneInfo)
 {
     return new wxAuiFloatingFrame(parent, this, paneInfo);
 }
@@ -1385,7 +1405,9 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
     return true;
 }
 
-bool wxAuiManager::AddPane(wxWindow* window, int direction, const wxString& caption)
+bool wxAuiManager::AddPane(wxWindow* window,
+                           int direction,
+                           const wxString& caption)
 {
     wxAuiPaneInfo pinfo;
     pinfo.Caption(caption);
@@ -1400,7 +1422,9 @@ bool wxAuiManager::AddPane(wxWindow* window, int direction, const wxString& capt
     return AddPane(window, pinfo);
 }
 
-bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo, const wxPoint& dropPos)
+bool wxAuiManager::AddPane(wxWindow* window,
+                           const wxAuiPaneInfo& paneInfo,
+                           const wxPoint& dropPos)
 {
     if (!AddPane(window, paneInfo))
         return false;
@@ -1412,7 +1436,8 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo, cons
     return true;
 }
 
-bool wxAuiManager::InsertPane(wxWindow* window, const wxAuiPaneInfo& paneInfo, int insertLevel)
+bool wxAuiManager::InsertPane(wxWindow* window, const wxAuiPaneInfo& paneInfo,
+                                int insertLevel)
 {
     wxASSERT_MSG(window, wxT("NULL window ptrs are not allowed"));
 
@@ -2082,7 +2107,12 @@ void wxAuiManager::GetPanePositionsAndSizes(wxAuiDockInfo& dock,
 }
 
 
-void wxAuiManager::LayoutAddPane(wxSizer* cont, wxAuiDockInfo& dock, wxAuiPaneInfo& pane, wxAuiDockUIPartArray& uiparts, bool spacerOnly, bool allowtitlebar)
+void wxAuiManager::LayoutAddPane(wxSizer* cont,
+                                 wxAuiDockInfo& dock,
+                                 wxAuiPaneInfo& pane,
+                                 wxAuiDockUIPartArray& uiparts,
+                                 bool spacerOnly,
+                                 bool allowtitlebar)
 {
     wxAuiDockUIPart part;
     wxSizerItem* sizerItem;
@@ -2392,7 +2422,10 @@ bool wxAuiManager::MustDockInNotebook(const wxAuiPaneInfo &pane) const
 }
 
 
-void wxAuiManager::LayoutAddDock(wxSizer* cont, wxAuiDockInfo& dock, wxAuiDockUIPartArray& uiparts, bool spacerOnly)
+void wxAuiManager::LayoutAddDock(wxSizer* cont,
+                                 wxAuiDockInfo& dock,
+                                 wxAuiDockUIPartArray& uiparts,
+                                 bool spacerOnly)
 {
     wxSizerItem* sizerItem;
     wxAuiDockUIPart part;
@@ -3742,7 +3775,8 @@ int wxAuiManager::GetDockPixelOffset(wxAuiPaneInfo& test)
 // ProcessDockResult() is a utility function used by DoDrop() - it checks
 // if a dock operation is allowed, the new dock position is copied into
 // the target info.  If the operation was allowed, the function returns true.
-bool wxAuiManager::ProcessDockResult(wxAuiPaneInfo& target, const wxAuiPaneInfo& newPos)
+bool wxAuiManager::ProcessDockResult(wxAuiPaneInfo& target,
+                                     const wxAuiPaneInfo& newPos)
 {
     bool allowed = false;
     switch (newPos.GetDirection())
@@ -3792,7 +3826,11 @@ const int auiNewRowPixels = 40;
 const int auiLayerInsertPixels = 40;
 const int auiLayerInsertOffset = 5;
 
-bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks, wxAuiPaneInfoArray& panes, wxAuiPaneInfo& target, const wxPoint& pt, const wxPoint& offset)
+bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
+                          wxAuiPaneInfoArray& panes,
+                          wxAuiPaneInfo& target,
+                          const wxPoint& pt,
+                          const wxPoint& offset)
 {
     wxSize cliSize = m_frame->GetClientSize();
 
@@ -4351,7 +4389,8 @@ void wxAuiManager::OnHintActivate(wxActivateEvent& WXUNUSED(evt))
 
 
 
-void wxAuiManager::StartPaneDrag(wxWindow* paneWindow, const wxPoint& offset)
+void wxAuiManager::StartPaneDrag(wxWindow* paneWindow,
+                                 const wxPoint& offset)
 {
     wxAuiPaneInfo& pane = GetPane(paneWindow);
     if (!pane.IsOk())
@@ -4390,7 +4429,9 @@ void wxAuiManager::StartPaneDrag(wxWindow* paneWindow, const wxPoint& offset)
 // the mouse position, in client coordinates.  |offset| describes the offset
 // that the mouse is from the upper-left corner of the item being dragged
 
-wxRect wxAuiManager::CalculateHintRect(wxWindow* paneWindow, const wxPoint& pt, const wxPoint& offset)
+wxRect wxAuiManager::CalculateHintRect(wxWindow* paneWindow,
+                                       const wxPoint& pt,
+                                       const wxPoint& offset)
 {
     wxRect rect;
     m_doingHintCalculation = true;
@@ -4549,7 +4590,9 @@ wxRect wxAuiManager::CalculateHintRect(wxWindow* paneWindow, const wxPoint& pt, 
 // CalculateHintRect().  If there is a rectangle, it shows it
 // by calling ShowHint(), otherwise it hides any hint
 // rectangle currently shown
-void wxAuiManager::DrawHintRect(wxWindow* paneWindow, const wxPoint& pt, const wxPoint& offset)
+void wxAuiManager::DrawHintRect(wxWindow* paneWindow,
+                                const wxPoint& pt,
+                                const wxPoint& offset)
 {
     //Special case: if we allow external drops to windows managed by other managers then handle this first before all other cases.
     if(HasFlag(wxAUI_MGR_ALLOW_EXTERNAL_MOVE))
@@ -5109,7 +5152,8 @@ void wxAuiManager::OnSetCursor(wxSetCursorEvent& evt)
 
 
 
-void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* buttonUIPart, const wxMouseEvent& evt)
+void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* buttonUIPart,
+                                        const wxMouseEvent& evt)
 {
     wxAuiDockUIPart* hitTest = HitTest(evt.GetX(), evt.GetY());
     if (!hitTest || !buttonUIPart)
