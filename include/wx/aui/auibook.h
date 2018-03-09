@@ -85,7 +85,7 @@ private:
 
 #ifndef SWIG
 private:
-    DECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxAuiNotebookEvent)
+    wxDECLARE_DYNAMIC_CLASS_NO_ASSIGN(wxAuiNotebookEvent);
 #endif
 };
 
@@ -246,8 +246,8 @@ protected:
 protected:
     wxAuiManager m_mgr;
 #ifndef SWIG
-    DECLARE_CLASS(wxAuiNotebook)
-    DECLARE_EVENT_TABLE()
+    wxDECLARE_CLASS(wxAuiNotebook);
+    wxDECLARE_EVENT_TABLE();
 #endif
 };
 
