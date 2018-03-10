@@ -677,7 +677,9 @@ wxSize wxAuiGtkTabArt::GetTabSize(wxDC& dc,
     wxSize s = wxAuiGenericTabArt::GetTabSize(dc, wnd, caption, bitmap, active, close_button_state, x_extent);
 
     int overlap = 0;
-    gtk_widget_style_get (wnd->GetHandle(), "focus-line-width", &overlap, NULL);
+    gtk_widget_style_get (wnd->GetHandle(),
+        "focus-line-width", &overlap,
+        NULL);
     *x_extent -= overlap;
     return s;
 }

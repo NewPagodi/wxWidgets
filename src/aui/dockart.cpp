@@ -734,7 +734,8 @@ void wxAuiDefaultDockArt::DrawPaneButton(wxDC& dc, wxWindow *WXUNUSED(window),
         rect.y++;
     }
 
-    if (button_state == wxAUI_BUTTON_STATE_HOVER || button_state == wxAUI_BUTTON_STATE_PRESSED)
+    if (button_state == wxAUI_BUTTON_STATE_HOVER ||
+        button_state == wxAUI_BUTTON_STATE_PRESSED)
     {
         wxColour color = showActive ? m_activeCaptionColour : m_inactiveCaptionColour;
 

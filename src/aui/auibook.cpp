@@ -1907,7 +1907,8 @@ bool wxAuiNotebook::InsertPage(size_t index, wxWindow *page,
 {
     if(HasImageList())
     {
-        return InsertPage(index, page, text, select, GetImageList()->GetBitmap(imageId));
+        return InsertPage(index, page, text, select, 
+                          GetImageList()->GetBitmap(imageId));
     }
     else
     {

@@ -761,10 +761,14 @@ void wxAuiGenericTabArt::DrawTab(wxDC& dc,
     }
 
 
-    wxString draw_text = wxAuiChopText(dc, actualCaption, tab_width - (text_offset-tab_x) - close_button_width);
+    wxString draw_text = wxAuiChopText(dc,
+                          actualCaption,
+                          tab_width - (text_offset-tab_x) - close_button_width);
 
     // draw tab text
-    dc.DrawText(draw_text, text_offset, drawn_tab_yoff + (drawn_tab_height)/2 - (texty/2) - 1);
+    dc.DrawText(draw_text,
+                text_offset,
+                drawn_tab_yoff + (drawn_tab_height)/2 - (texty/2) - 1);
 
     // draw focus rectangle
     if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && haveFocus)
@@ -1493,10 +1497,14 @@ void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
     if (HasFlag(wxAUI_NB_RIGHT))
         text_offset -= tab_height;
     // chop text if necessary
-    wxString draw_text = wxAuiChopText(dc, actualCaption, tab_width - (HasFlag(wxAUI_NB_RIGHT)&&HasFlag(wxAUI_MGR_NB_TAB_FIXED_WIDTH)?tab_height:0) - (text_offset-tab_x) - close_button_width);
+    wxString draw_text = wxAuiChopText(dc,
+                          actualCaption,
+                          tab_width - (HasFlag(wxAUI_NB_RIGHT)&&HasFlag(wxAUI_MGR_NB_TAB_FIXED_WIDTH)?tab_height:0) - (text_offset-tab_x) - close_button_width);
 
     // draw tab text
-    dc.DrawText(draw_text, text_offset, tab_y + (tab_height - texty) / 2 + 1);
+    dc.DrawText(draw_text,
+                 text_offset,
+                 tab_y + (tab_height - texty) / 2 + 1);
 
     // draw focus rectangle
     if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && haveFocus)

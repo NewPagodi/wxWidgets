@@ -278,7 +278,8 @@ public:
         m_lastHeight = event.GetSize().GetHeight();
 
         SetTransparent(m_amount);
-        m_region.Intersect(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight());
+        m_region.Intersect(0, 0, event.GetSize().GetWidth(),
+                           event.GetSize().GetHeight());
         SetShape(m_region);
         Refresh();
         event.Skip();
@@ -353,7 +354,8 @@ public:
 
         if (parent) parent->AddChild(this);
 
-        g_signal_connect( m_widget, "realize", G_CALLBACK (gtk_pseudo_window_realized_callback), this );
+        g_signal_connect( m_widget, "realize",
+                      G_CALLBACK (gtk_pseudo_window_realized_callback), this );
 
         GdkColor col;
         col.red = 128 * 256;
@@ -1004,7 +1006,9 @@ void wxAuiManager::SetFlags(unsigned int flags)
 {
     // find out if we have to call UpdateHintWindowConfig()
     bool update_hint_wnd = false;
-    unsigned int hint_mask = wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_RECTANGLE_HINT;
+    unsigned int hint_mask = wxAUI_MGR_TRANSPARENT_HINT |
+                             wxAUI_MGR_VENETIAN_BLINDS_HINT |
+                             wxAUI_MGR_RECTANGLE_HINT;
     if ((flags & hint_mask) != (m_flags & hint_mask))
         update_hint_wnd = true;
 
@@ -1121,7 +1125,8 @@ void wxAuiManager::UpdateHintWindowConfig()
                                          wxDefaultPosition, wxSize(1,1),
                                          wxFRAME_FLOAT_ON_PARENT
                                          | wxFRAME_TOOL_WINDOW );
-            m_hintWnd->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(wxAuiManager::OnHintActivate), NULL, this);
+            m_hintWnd->Connect(wxEVT_ACTIVATE,
+                wxActivateEventHandler(wxAuiManager::OnHintActivate), NULL, this);
 
             // Can't set the bg colour of a Frame in wxMac
             wxPanel* p = new wxPanel(m_hintWnd);
@@ -1136,7 +1141,8 @@ void wxAuiManager::UpdateHintWindowConfig()
     }
     else
     {
-        if (HasFlag(wxAUI_MGR_TRANSPARENT_HINT) || HasFlag(wxAUI_MGR_VENETIAN_BLINDS_HINT))
+        if (HasFlag(wxAUI_MGR_TRANSPARENT_HINT) ||
+             HasFlag(wxAUI_MGR_VENETIAN_BLINDS_HINT))
         {
             // system can't support transparent fade, or the venetian
             // blinds effect was explicitly requested
@@ -1177,7 +1183,9 @@ void wxAuiManager::SetManagedWindow(wxWindow* wnd)
 
         wxASSERT_MSG(client_window, wxT("Client window is NULL!"));
 
-        AddPane(client_window, wxAuiPaneInfo().Name(wxT("mdiclient")).CenterPane().PaneBorder(false));
+        AddPane(client_window,
+                wxAuiPaneInfo().Name(wxT("mdiclient")).
+                CenterPane().PaneBorder(false));
     }
     else if (wxDynamicCast(m_frame,wxAuiMDIParentFrame))
     {
@@ -1293,7 +1301,8 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
                                         wxAuiPaneInfo::optionRightDockable |
                                         wxAuiPaneInfo::optionTopDockable |
                                         wxAuiPaneInfo::optionBottomDockable;
-        const unsigned int defaultDock = wxAuiPaneInfo().DefaultPane().state & dockMask;
+        const unsigned int defaultDock = wxAuiPaneInfo().
+                                            DefaultPane().state & dockMask;
         if ((test.GetFlags() & dockMask) == defaultDock)
         {
             // set docking flags based on toolbar style
@@ -1679,8 +1688,10 @@ void wxAuiManager::MaximizePane(wxAuiPaneInfo& paneInfo)
             p.Restore();
 
             // save hidden states
-            p.SetFlag(wxAuiPaneInfo::savedHiddenState, p.HasFlag(wxAuiPaneInfo::optionHidden));
-			p.SetFlag(wxAuiPaneInfo::savedActiveNotebookState, p.HasFlag(wxAuiPaneInfo::optionActiveNotebook));
+            p.SetFlag(wxAuiPaneInfo::savedHiddenState,
+                      p.HasFlag(wxAuiPaneInfo::optionHidden));
+			p.SetFlag(wxAuiPaneInfo::savedActiveNotebookState,
+                      p.HasFlag(wxAuiPaneInfo::optionActiveNotebook));
 
             // hide the pane, because only the newly
             // maximized pane should show
@@ -1710,8 +1721,10 @@ void wxAuiManager::RestorePane(wxAuiPaneInfo& paneInfo)
         wxAuiPaneInfo& p = m_panes.Item(i);
         if (!p.IsToolbar() && !p.IsFloating())
         {
-            p.SetFlag(wxAuiPaneInfo::optionHidden, p.HasFlag(wxAuiPaneInfo::savedHiddenState));
-			p.SetFlag(wxAuiPaneInfo::optionActiveNotebook, p.HasFlag(wxAuiPaneInfo::savedActiveNotebookState));
+            p.SetFlag(wxAuiPaneInfo::optionHidden,
+                      p.HasFlag(wxAuiPaneInfo::savedHiddenState));
+			p.SetFlag(wxAuiPaneInfo::optionActiveNotebook,
+                      p.HasFlag(wxAuiPaneInfo::savedActiveNotebookState));
         }
     }
 
@@ -3476,7 +3489,8 @@ void wxAuiManager::Update()
                 // on MSW and Mac, if the owner desires transparent dragging, and
                 // the dragging is happening right now, then the floating
                 // window should have this style by default
-                if (m_action == actionDragFloatingPane && HasFlag(wxAUI_MGR_TRANSPARENT_DRAG))
+                if (m_action == actionDragFloatingPane &&
+                    HasFlag(wxAUI_MGR_TRANSPARENT_DRAG))
                         frame->SetTransparent(150);
 
                 frame->SetPaneWindow(p);
@@ -3491,8 +3505,7 @@ void wxAuiManager::Update()
             {
                 // frame already exists, make sure its position
                 // and size reflect the information in wxAuiPaneInfo
-                if ((p.frame->GetPosition() != p.floating_pos)
-                    || (p.frame->GetSize() != p.floating_size))
+                if ((p.frame->GetPosition() != p.floating_pos) || (p.frame->GetSize() != p.floating_size))
                 {
                     p.frame->SetSize(p.floating_pos.x, p.floating_pos.y,
                                      p.floating_size.x, p.floating_size.y,
@@ -3915,7 +3928,8 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         // toolbars may only be moved in and to fixed-pane docks,
         // otherwise we will try to float the pane.  Also, the pane
         // should float if being dragged over center pane windows
-        if (!part->dock->fixed || part->dock->dock_direction == wxAUI_DOCK_CENTER || pt.x >= cli_size.x || pt.x <= 0 || pt.y >= cli_size.y || pt.y <= 0)
+        if (!part->dock->fixed || part->dock->dock_direction == wxAUI_DOCK_CENTER ||
+            pt.x >= cli_size.x || pt.x <= 0 || pt.y >= cli_size.y || pt.y <= 0)
         {
             if (m_lastRect.IsEmpty() || m_lastRect.Contains(pt.x, pt.y ))
             {
@@ -3943,22 +3957,31 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         m_lastRect = part->dock->rect;
         m_lastRect.Inflate( 15, 15 );
 
-        drop.Dock().Direction(part->dock->dock_direction).Layer(part->dock->dock_layer).Row(part->dock->dock_row).Position(dock_drop_offset);
+        drop.Dock().
+             Direction(part->dock->dock_direction).
+             Layer(part->dock->dock_layer).
+             Row(part->dock->dock_row).
+             Position(dock_drop_offset);
 
         if ((
             ((pt.y < part->dock->rect.y + 1) && part->dock->IsHorizontal()) ||
             ((pt.x < part->dock->rect.x + 1) && part->dock->IsVertical())
             ) && part->dock->panes.GetCount() > 1)
         {
-            if ((part->dock->dock_direction == wxAUI_DOCK_TOP) || (part->dock->dock_direction == wxAUI_DOCK_LEFT))
+            if ((part->dock->dock_direction == wxAUI_DOCK_TOP) ||
+                (part->dock->dock_direction == wxAUI_DOCK_LEFT))
             {
                 int row = drop.dock_row;
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction, part->dock->dock_layer, part->dock->dock_row);
+                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                                part->dock->dock_layer,
+                                part->dock->dock_row);
                 drop.dock_row = row;
             }
             else
             {
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction, part->dock->dock_layer, part->dock->dock_row+1);
+                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                                part->dock->dock_layer,
+                                part->dock->dock_row+1);
                 drop.dock_row = part->dock->dock_row+1;
             }
         }
@@ -3968,15 +3991,20 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             ((pt.x > part->dock->rect.x + part->dock->rect.width - 2 ) && part->dock->IsVertical())
             ) && part->dock->panes.GetCount() > 1)
         {
-            if ((part->dock->dock_direction == wxAUI_DOCK_TOP) || (part->dock->dock_direction == wxAUI_DOCK_LEFT))
+            if ((part->dock->dock_direction == wxAUI_DOCK_TOP) ||
+                (part->dock->dock_direction == wxAUI_DOCK_LEFT))
             {
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction, part->dock->dock_layer, part->dock->dock_row+1);
+                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                                part->dock->dock_layer,
+                                part->dock->dock_row+1);
                 drop.dock_row = part->dock->dock_row+1;
             }
             else
             {
                 int row = drop.dock_row;
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction, part->dock->dock_layer, part->dock->dock_row);
+                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                                part->dock->dock_layer,
+                                part->dock->dock_row);
                 drop.dock_row = row;
             }
         }
@@ -4069,21 +4097,32 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             switch (part->dock->dock_direction)
             {
                 case wxAUI_DOCK_LEFT:
-                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_LEFT), GetMaxLayer(docks, wxAUI_DOCK_BOTTOM)), GetMaxLayer(docks, wxAUI_DOCK_TOP));
+                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_LEFT),
+                                      GetMaxLayer(docks, wxAUI_DOCK_BOTTOM)),
+                                      GetMaxLayer(docks, wxAUI_DOCK_TOP));
                     break;
                 case wxAUI_DOCK_TOP:
-                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_TOP), GetMaxLayer(docks, wxAUI_DOCK_LEFT)), GetMaxLayer(docks, wxAUI_DOCK_RIGHT));
+                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_TOP),
+                                      GetMaxLayer(docks, wxAUI_DOCK_LEFT)),
+                                      GetMaxLayer(docks, wxAUI_DOCK_RIGHT));
                     break;
                 case wxAUI_DOCK_RIGHT:
-                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_RIGHT), GetMaxLayer(docks, wxAUI_DOCK_TOP)), GetMaxLayer(docks, wxAUI_DOCK_BOTTOM));
+                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_RIGHT),
+                                      GetMaxLayer(docks, wxAUI_DOCK_TOP)),
+                                      GetMaxLayer(docks, wxAUI_DOCK_BOTTOM));
                     break;
                 case wxAUI_DOCK_BOTTOM:
-                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_BOTTOM), GetMaxLayer(docks, wxAUI_DOCK_LEFT)), GetMaxLayer(docks, wxAUI_DOCK_RIGHT));
+                    layer = wxMax(wxMax(GetMaxLayer(docks, wxAUI_DOCK_BOTTOM),
+                                      GetMaxLayer(docks, wxAUI_DOCK_LEFT)),
+                                      GetMaxLayer(docks, wxAUI_DOCK_RIGHT));
                     break;
             }
 
-            wxAuiDoInsertDockRow(panes, part->dock->dock_direction, layer, 0);
-            drop.Dock().Direction(part->dock->dock_direction). Layer(layer).Row(0).Position(0);
+            wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                            layer, 0);
+            drop.Dock().
+                 Direction(part->dock->dock_direction).
+                 Layer(layer).Row(0).Position(0);
             return ProcessDockResult(target, drop);
         }
 
@@ -4150,9 +4189,11 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
                     insert_dir = wxAUI_DOCK_LEFT;
                 else if (pt.y >= pr.y && pt.y < pr.y + new_row_pixels_y)
                     insert_dir = wxAUI_DOCK_TOP;
-                else if (pt.x >= pr.x + pr.width - new_row_pixels_x && pt.x < pr.x + pr.width)
+                else if (pt.x >= pr.x + pr.width - new_row_pixels_x &&
+                         pt.x < pr.x + pr.width)
                     insert_dir = wxAUI_DOCK_RIGHT;
-                else if (pt.y >= pr.y+ pr.height - new_row_pixels_y && pt.y < pr.y + pr.height)
+                else if (pt.y >= pr.y+ pr.height - new_row_pixels_y &&
+                         pt.y < pr.y + pr.height)
                     insert_dir = wxAUI_DOCK_BOTTOM;
                 else
                     insert_dock_row = false;
@@ -4164,7 +4205,10 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         if (insert_dock_row)
         {
             wxAuiDoInsertDockRow(panes, insert_dir, insert_layer, insert_row);
-            drop.Dock().Direction(insert_dir).Layer(insert_layer).Row(insert_row).Position(0);
+            drop.Dock().Direction(insert_dir).
+                        Layer(insert_layer).
+                        Row(insert_row).
+                        Position(0);
             return ProcessDockResult(target, drop);
         }
 
@@ -4191,7 +4235,11 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         if (mouseOffset <= size/2)
         {
             drop_position = part->pane->GetPosition();
-            wxAuiDoInsertPane(panes, part->pane->GetDirection(), part->pane->GetLayer(), part->pane->GetRow(), part->pane->GetPosition());
+            wxAuiDoInsertPane(panes,
+                         part->pane->GetDirection(),
+                         part->pane->GetLayer(),
+                         part->pane->GetRow(),
+                         part->pane->GetPosition());
         }
 
         // if we are in the bottom/right part of the pane,
@@ -4199,10 +4247,18 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         if (mouseOffset > size/2)
         {
             drop_position = part->pane->dock_pos+1;
-            wxAuiDoInsertPane(panes, part->pane->GetDirection(), part->pane->GetLayer(), part->pane->GetRow(), part->pane->GetPosition()+1);
+            wxAuiDoInsertPane(panes,
+                         part->pane->GetDirection(),
+                         part->pane->GetLayer(),
+                         part->pane->GetRow(),
+                         part->pane->GetPosition()+1);
         }
 
-        drop.Dock().Direction(part->dock->dock_direction).Layer(part->dock->dock_layer).Row(part->dock->dock_row).Position(drop_position);
+        drop.Dock().
+             Direction(part->dock->dock_direction).
+             Layer(part->dock->dock_layer).
+             Row(part->dock->dock_row).
+             Position(drop_position);
         return ProcessDockResult(target, drop);
     }
 
@@ -4254,7 +4310,8 @@ void wxAuiManager::OnHintFadeTimer(wxTimerEvent& WXUNUSED(event))
     if (!m_hintWnd || m_hintFadeAmt >= m_hintFadeMax)
     {
         m_hintFadeTimer.Stop();
-        Disconnect(m_hintFadeTimer.GetId(), wxEVT_TIMER, wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
+        Disconnect(m_hintFadeTimer.GetId(), wxEVT_TIMER,
+                   wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
         return;
     }
 
@@ -4273,7 +4330,10 @@ void wxAuiManager::ShowHint(const wxRect& rect)
 
         m_hintFadeAmt = m_hintFadeMax;
 
-        if ( HasFlag(wxAUI_MGR_HINT_FADE) && !( wxDynamicCast(m_hintWnd,wxPseudoTransparentFrame) && HasFlag(wxAUI_MGR_NO_VENETIAN_BLINDS_FADE)) )
+        if ( HasFlag(wxAUI_MGR_HINT_FADE)
+            && !( wxDynamicCast(m_hintWnd,wxPseudoTransparentFrame) &&
+            HasFlag(wxAUI_MGR_NO_VENETIAN_BLINDS_FADE)) 
+            )
             m_hintFadeAmt = 0;
 
         m_hintWnd->SetSize(rect);
@@ -4295,7 +4355,8 @@ void wxAuiManager::ShowHint(const wxRect& rect)
             // start fade in timer
             m_hintFadeTimer.SetOwner(this);
             m_hintFadeTimer.Start(5);
-            Connect(m_hintFadeTimer.GetId(), wxEVT_TIMER, wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
+            Connect(m_hintFadeTimer.GetId(), wxEVT_TIMER,
+                    wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
         }
     }
     else  // Not using a transparent hint window...
@@ -4320,7 +4381,9 @@ void wxAuiManager::ShowHint(const wxRect& rect)
         {
             wxAuiPaneInfo& pane = m_panes.Item(i);
 
-            if(pane.IsFloating() && pane.frame && pane.frame->IsShown())
+            if(pane.IsFloating() &&
+                    pane.frame &&
+                        pane.frame->IsShown())
             {
                 wxRect r = pane.frame->GetRect();
 #ifdef __WXGTK__
@@ -4364,7 +4427,8 @@ void wxAuiManager::HideHint()
         m_hintFadeTimer.Stop();
         // In case this is called while a hint fade is going, we need to
         // disconnect the event handler.
-        Disconnect(m_hintFadeTimer.GetId(), wxEVT_TIMER, wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
+        Disconnect(m_hintFadeTimer.GetId(), wxEVT_TIMER,
+                   wxTimerEventHandler(wxAuiManager::OnHintFadeTimer));
         m_lastHint = wxRect();
         return;
     }
@@ -4955,7 +5019,11 @@ void wxAuiManager::OnRender(wxAuiManagerEvent& evt)
         wxAuiDockUIPart& part = m_uiParts.Item(i);
 
         // don't draw hidden pane items or items that aren't windows
-        if (part.sizer_item && ((!part.sizer_item->IsWindow() && !part.sizer_item->IsSpacer() && !part.sizer_item->IsSizer()) || !part.sizer_item->IsShown()))
+        if (part.sizer_item &&
+                ((!part.sizer_item->IsWindow() &&
+                  !part.sizer_item->IsSpacer() &&
+                  !part.sizer_item->IsSizer()) ||
+                  !part.sizer_item->IsShown()))
             continue;
 
         switch (part.type)
@@ -5237,7 +5305,8 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
     wxAuiDockUIPart* part = HitTest(event.GetX(), event.GetY());
     if (part)
     {
-        if (part->type == wxAuiDockUIPart::typeDockSizer || part->type == wxAuiDockUIPart::typePaneSizer)
+        if (part->type == wxAuiDockUIPart::typeDockSizer ||
+            part->type == wxAuiDockUIPart::typePaneSizer)
         {
             // a dock may not be resized if it has a single
             // pane which is not resizable
@@ -5267,7 +5336,8 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
 
             UpdateButtonOnScreen(part, event);
         }
-        else if (part->type == wxAuiDockUIPart::typeCaption || part->type == wxAuiDockUIPart::typeGripper)
+        else if (part->type == wxAuiDockUIPart::typeCaption ||
+                  part->type == wxAuiDockUIPart::typeGripper)
         {
             // if we are managing a wxAuiFloatingFrame window, then
             // we are an embedded wxAuiManager inside the wxAuiFloatingFrame.
@@ -5281,7 +5351,9 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
             {
                 wxAuiFloatingFrame* floating_frame = (wxAuiFloatingFrame*)managed_wnd;
                 wxAuiManager* owner_mgr = floating_frame->GetOwnerManager();
-                owner_mgr->StartPaneDrag(part->pane->GetWindow(), wxPoint(event.m_x - part->rect.x, event.m_y - part->rect.y));
+                owner_mgr->StartPaneDrag(part->pane->GetWindow(),
+                                             wxPoint(event.m_x - part->rect.x,
+                                                     event.m_y - part->rect.y));
                 return;
             }
 
@@ -5292,7 +5364,8 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
             m_action = actionClickCaption;
             m_actionPart = part;
             m_actionStart = wxPoint(event.m_x, event.m_y);
-            m_actionOffset = wxPoint(event.m_x - part->rect.x, event.m_y - part->rect.y);
+            m_actionOffset = wxPoint(event.m_x - part->rect.x,
+                                      event.m_y - part->rect.y);
             m_frame->CaptureMouse();
         }
         else if(part->type == wxAuiDockUIPart::typePaneTab)
@@ -5461,7 +5534,8 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         Update();
         Repaint(NULL);
     }
-    else if (m_actionPart && m_actionPart->type == wxAuiDockUIPart::typePaneSizer)
+    else if (m_actionPart &&
+        m_actionPart->type == wxAuiDockUIPart::typePaneSizer)
     {
         wxAuiDockInfo& dock = *m_actionPart->dock;
         wxAuiPaneInfo* pane = m_actionPart->pane;
@@ -5507,7 +5581,8 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
 
         // determine the pane rectangle by getting the pane part
         wxAuiDockUIPart* pane_part = GetPanePart(pane->window);
-        wxASSERT_MSG(pane_part, wxT("Pane border part not found -- shouldn't happen"));
+        wxASSERT_MSG(pane_part,
+            wxT("Pane border part not found -- shouldn't happen"));
 
         // determine the new pixel size that the user wants;
         // this will help us recalculate the pane's proportion
@@ -6197,7 +6272,9 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
         // caption has been clicked.  we need to check if the mouse
         // is now being dragged. if it is, we need to change the
         // mouse action to 'drag'
-        if (m_actionPart && (abs(event.m_x - m_actionStart.x) > drag_x_threshold || abs(event.m_y - m_actionStart.y) > drag_y_threshold))
+        if (m_actionPart &&
+            (abs(event.m_x - m_actionStart.x) > drag_x_threshold ||
+             abs(event.m_y - m_actionStart.y) > drag_y_threshold))
         {
             wxAuiPaneInfo* paneInfo = m_actionPart->pane;
 
@@ -6638,7 +6715,8 @@ void wxAuiManager::OnPaneButton(wxAuiManagerEvent& evt)
             Update();
         }
     }
-    else if (evt.button == wxAUI_BUTTON_PIN && (m_flags & wxAUI_MGR_ALLOW_FLOATING) && pane.IsFloatable())
+    else if (evt.button == wxAUI_BUTTON_PIN &&
+                (m_flags & wxAUI_MGR_ALLOW_FLOATING) && pane.IsFloatable())
     {
         if (pane.IsMaximized())
         {
