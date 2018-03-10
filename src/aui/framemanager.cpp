@@ -475,7 +475,7 @@ static int GetMaxRow(const wxAuiPaneInfoArray& panes, int direction, int layer)
 
 
 
-// wxAuiDoInsertDockLayer() is an internal function that inserts a new dock
+// DoInsertDockLayer() is an internal function that inserts a new dock
 // layer by incrementing all existing dock layer values by one
 void DoInsertDockLayer(wxAuiPaneInfoArray& panes,
                               int dock_direction,
@@ -534,7 +534,7 @@ void DoInsertPane(wxAuiPaneInfoArray& panes,
     }
 }
 
-// wxAuiDoInsertPane() is an internal function that inserts a space for
+// DoInsertPage() is an internal function that inserts a space for
 // another notebook page by incrementing all existing page values by one
 void DoInsertPage(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer, int dockRow, int dockPos, int dockPage)
 {
@@ -3786,7 +3786,7 @@ wxAuiDockUIPart* wxAuiManager::GetPanePart(wxWindow* wnd)
 // a dock's offset in pixels from the left side of the window
 // (for horizontal docks) or from the top of the window (for
 // vertical docks).  This value is necessary for calculating
-// fixel-pane/toolbar offsets when they are dragged.
+// pixel-pane/toolbar offsets when they are dragged.
 int wxAuiManager::GetDockPixelOffset(wxAuiPaneInfo& test)
 {
     // the only way to accurately calculate the dock's
@@ -5754,7 +5754,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         }
 
 
-        // for some reason, an arithmatic error somewhere is causing
+        // for some reason, an arithmetic error somewhere is causing
         // the proportion calculations to always be off by 1 pixel;
         // for now we will add the 1 pixel on, but we really should
         // determine what's causing this.
@@ -6522,7 +6522,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
                                         pt.y - m_actionOffset.y);
         }
 
-        // this will do the actiual move operation;
+        // this will do the actual move operation;
         // in the case that the pane has been floated,
         // this call will create the floating pane
         // and do the reparenting
