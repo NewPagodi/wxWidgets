@@ -118,61 +118,6 @@ const int auiToolBarLayer = 10;
 const int notebookTabHeight = 42;
 
 
-wxAuiPaneInfo::wxAuiPaneInfo()
-:
-  name(wxT("")),
-  caption(wxT("")),
-  window(NULL),
-  frame(NULL),
-  state(0),
-  dock_direction(wxAUI_DOCK_LEFT),
-  dock_layer(0),
-  dock_row(0),
-  dock_pos(0),
-  best_size(wxDefaultSize),
-  min_size(wxDefaultSize),
-  max_size(wxDefaultSize),
-  floating_pos(wxDefaultPosition),
-  floating_size(wxDefaultSize),
-  dock_proportion(0),
-  m_tooltip(wxT("")),
-  m_dock_page(0)
-{
-    DefaultPane();
-}
-
-#ifndef SWIG
-wxAuiPaneInfo::wxAuiPaneInfo(const wxAuiPaneInfo& c)
-{
-   *this = c;
-}
-
-wxAuiPaneInfo& wxAuiPaneInfo::operator=(const wxAuiPaneInfo& c)
-{
-    name            = c.name;
-    caption         = c.caption;
-    window          = c.window;
-    frame           = c.frame;
-    state           = c.state;
-    dock_direction  = c.dock_direction;
-    dock_layer      = c.dock_layer;
-    dock_row        = c.dock_row;
-    dock_pos        = c.dock_pos;
-    icon            = c.icon;
-    best_size       = c.best_size;
-    min_size        = c.min_size;
-    max_size        = c.max_size;
-    floating_pos    = c.floating_pos;
-    floating_size   = c.floating_size;
-    dock_proportion = c.dock_proportion;
-    buttons         = c.buttons;
-    rect            = c.rect;
-    m_tooltip       = c.m_tooltip;
-    m_dock_page     = c.m_dock_page;
-    return *this;
-}
-#endif // !SWIG
-
 #ifndef __WXGTK20__
 
 
