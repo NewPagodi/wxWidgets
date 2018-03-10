@@ -1073,7 +1073,7 @@ bool wxAuiManager_HasLiveResize(wxAuiManager& manager)
     wxUnusedVar(manager);
     return true;
 #else
-    return manager.HasFlag(wxAUI_MGR_LIVE_RESIZE);
+    return (manager.GetFlags() & wxAUI_MGR_LIVE_RESIZE) == wxAUI_MGR_LIVE_RESIZE;
 #endif
 }
 
@@ -1127,7 +1127,7 @@ void wxAuiManager::UpdateHintWindowConfig()
     m_hintFadeMax = 50;
     m_hintWnd = NULL;
 
-    if (HasFlag(wxAUI_MGR_TRANSPARENT_HINT) && can_do_transparent)
+    if ((m_flags & wxAUI_MGR_TRANSPARENT_HINT) && can_do_transparent)
     {
         // Make a window to use for a transparent hint
         #if defined(__WXMSW__) || defined(__WXGTK__)
@@ -1162,8 +1162,8 @@ void wxAuiManager::UpdateHintWindowConfig()
     }
     else
     {
-        if (HasFlag(wxAUI_MGR_TRANSPARENT_HINT) ||
-             HasFlag(wxAUI_MGR_VENETIAN_BLINDS_HINT))
+        if ((m_flags & wxAUI_MGR_TRANSPARENT_HINT) != 0 ||
+            (m_flags & wxAUI_MGR_VENETIAN_BLINDS_HINT) != 0)
         {
             // system can't support transparent fade, or the venetian
             // blinds effect was explicitly requested
@@ -3511,7 +3511,7 @@ void wxAuiManager::Update()
                 // the dragging is happening right now, then the floating
                 // window should have this style by default
                 if (m_action == actionDragFloatingPane &&
-                    HasFlag(wxAUI_MGR_TRANSPARENT_DRAG))
+                    (m_flags & wxAUI_MGR_TRANSPARENT_DRAG))
                         frame->SetTransparent(150);
 
                 frame->SetPaneWindow(p);
@@ -3983,7 +3983,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             }
             else
             {
-                if (HasFlag(wxAUI_MGR_ALLOW_FLOATING) && drop.IsFloatable())
+                if ((m_flags & wxAUI_MGR_ALLOW_FLOATING) && drop.IsFloatable())
                 {
                     drop.Float();
                 }
@@ -4376,9 +4376,9 @@ void wxAuiManager::ShowHint(const wxRect& rect)
 
         m_hintFadeAmt = m_hintFadeMax;
 
-        if ( HasFlag(wxAUI_MGR_HINT_FADE)
+        if ((m_flags & wxAUI_MGR_HINT_FADE)
             && !( wxDynamicCast(m_hintWnd,wxPseudoTransparentFrame) &&
-            HasFlag(wxAUI_MGR_NO_VENETIAN_BLINDS_FADE)) 
+                 (m_flags & wxAUI_MGR_NO_VENETIAN_BLINDS_FADE)) 
             )
             m_hintFadeAmt = 0;
 
@@ -4407,7 +4407,7 @@ void wxAuiManager::ShowHint(const wxRect& rect)
     }
     else  // Not using a transparent hint window...
     {
-        if (!HasFlag(wxAUI_MGR_RECTANGLE_HINT))
+        if (!(m_flags & wxAUI_MGR_RECTANGLE_HINT))
             return;
 
         if (m_lastHint != rect)
@@ -4817,7 +4817,7 @@ void wxAuiManager::OnFloatingPaneMoveStart(wxWindow* wnd)
     if(!pane.frame)
         return;
 
-    if (HasFlag(wxAUI_MGR_TRANSPARENT_DRAG))
+    if (m_flags & wxAUI_MGR_TRANSPARENT_DRAG)
         pane.frame->SetTransparent(150);
 }
 
@@ -4986,7 +4986,7 @@ void wxAuiManager::OnFloatingPaneMoved(wxWindow* wnd, wxDirection dir)
     {
         pane.floating_pos = pane.frame->GetPosition();
 
-        if (HasFlag(wxAUI_MGR_TRANSPARENT_DRAG))
+        if (m_flags & wxAUI_MGR_TRANSPARENT_DRAG)
             pane.frame->SetTransparent(255);
     }
     else if (m_hasMaximized)
@@ -5408,7 +5408,7 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
             }
 
             SetActivePane(part->pane->GetWindow());
-            if (HasFlag(wxAUI_MGR_ALLOW_ACTIVE_PANE))
+            if (GetFlags() & wxAUI_MGR_ALLOW_ACTIVE_PANE)
                 Repaint();
 
             m_action = actionClickCaption;
