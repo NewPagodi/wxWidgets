@@ -604,7 +604,7 @@ void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow *WXUNUSED(window),
     {
         DrawIcon(dc, rect, pane);
 
-        caption_offset += pane.GetIcon().GetWidth() + 3;
+        caption_offset += pane.GetIcon().GetScaledWidth() + 3;
     }
 
 
