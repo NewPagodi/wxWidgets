@@ -492,7 +492,7 @@ void DoInsertDockLayer(wxAuiPaneInfoArray& panes,
     }
 }
 
-// wxAuiDoInsertDockRow() is an internal function that inserts a new dock
+// DoInsertDockLayer() is an internal function that inserts a new dock
 // row by incrementing all existing dock row values by one
 void DoInsertDockRow(wxAuiPaneInfoArray& panes,
                             int dock_direction,
@@ -511,8 +511,8 @@ void DoInsertDockRow(wxAuiPaneInfoArray& panes,
     }
 }
 
-// wxAuiDoInsertPane() is an internal function that inserts a space for
-// another dock pane by incrementing all existing dock position values by one
+// DoInsertDockLayer() is an internal function that inserts a space for
+// another dock pane by incrementing all existing dock row values by one
 void DoInsertPane(wxAuiPaneInfoArray& panes,
                          int dock_direction,
                          int dock_layer,
@@ -1021,7 +1021,7 @@ wxAuiDockUIPart* wxAuiManager::HitTest(int x, int y)
 }
 
 
-// SetFlags() and GetFlags() allow the owner to set/get various
+// SetFlags() and GetFlags() allow the owner to set various
 // options which are global to wxAuiManager
 void wxAuiManager::SetFlags(unsigned int flags)
 {
@@ -1708,7 +1708,7 @@ void wxAuiManager::MaximizePane(wxAuiPaneInfo& paneInfo)
         {
             p.Restore();
 
-            // save hidden states
+            // save hidden state
             p.SetFlag(wxAuiPaneInfo::savedHiddenState,
                       p.HasFlag(wxAuiPaneInfo::optionHidden));
 			p.SetFlag(wxAuiPaneInfo::savedActiveNotebookState,
@@ -3012,7 +3012,7 @@ wxSizer* wxAuiManager::LayoutAll(wxAuiPaneInfoArray& panes,
     {
         wxAuiDockInfo& dock = docks.Item(i);
 
-        // empty out all panes, as they will be read below
+        // empty out all panes, as they will be readded below
         dock.panes.Empty();
 
         if (dock.fixed)
@@ -3213,7 +3213,7 @@ wxSizer* wxAuiManager::LayoutAll(wxAuiPaneInfoArray& panes,
         }
 
 
-        // If the dock mode is proportional and not fixed-pixel,
+        // if the dock mode is proportional and not fixed-pixel,
         // reassign the dock_pos to the sequential 0, 1, 2, 3;
         // e.g. remove gaps like 1, 2, 30, 500
         // If panes currently share a position they must continue to do so
@@ -3232,7 +3232,7 @@ wxSizer* wxAuiManager::LayoutAll(wxAuiPaneInfoArray& panes,
             }
         }
 
-        // If the dock mode is fixed, and none of the panes
+        // if the dock mode is fixed, and none of the panes
         // are being moved right now, make sure the panes
         // do not overlap each other.  If they do, we will
         // adjust the positions of the panes
