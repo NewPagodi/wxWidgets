@@ -271,7 +271,7 @@ bool wxAuiTabContainer::RemovePage(wxWindow* wnd)
     for (i = 0; i < pageCount; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
-        if (page.GetWindow() == wnd)
+        if (page.window == wnd)
         {
             m_pages.RemoveAt(i);
 
@@ -297,7 +297,7 @@ bool wxAuiTabContainer::SetActivePage(wxWindow* wnd)
     for (i = 0; i < pageCount; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
-        if (page.GetWindow() == wnd)
+        if (page.window == wnd)
         {
             if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetWindow()->IsShown())
             {
@@ -339,7 +339,7 @@ bool wxAuiTabContainer::SetActivePage(size_t page)
     if (page >= m_pages.GetCount())
         return false;
 
-    return SetActivePage(m_pages.Item(page)->GetWindow());
+    return SetActivePage(m_pages.Item(page)->window);
 }
 
 int wxAuiTabContainer::GetActivePage() const
@@ -369,7 +369,7 @@ int wxAuiTabContainer::GetIdxFromWindow(wxWindow* wnd) const
     for ( size_t i = 0; i < page_count; ++i )
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
-        if (page.GetWindow() == wnd)
+        if (page.window == wnd)
             return i;
     }
     return wxNOT_FOUND;

@@ -634,8 +634,8 @@ void
 wxAuiDefaultDockArt::DrawIcon(wxDC& dc, const wxRect& rect, wxAuiPaneInfo& pane)
 {
    // Draw the icon centered vertically
-   dc.DrawBitmap(pane.GetIcon(),
-                 rect.x+2, rect.y+(rect.height-pane.GetIcon().GetScaledHeight())/2,
+   dc.DrawBitmap(pane.icon,
+                 rect.x+2, rect.y+(rect.height-pane.icon.GetScaledHeight())/2,
                  true);
 }
 
