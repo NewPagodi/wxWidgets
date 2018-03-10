@@ -15,11 +15,10 @@
 // headers
 // ----------------------------------------------------------------------------
 
-
 #include "wx/wxprec.h"
 
 #ifdef __BORLANDC__
-#pragma hdrstop
+    #pragma hdrstop
 #endif
 
 #if wxUSE_AUI
@@ -31,9 +30,9 @@
 #include "wx/aui/tabmdi.h"
 
 #ifndef WX_PRECOMP
-#include "wx/settings.h"
-#include "wx/dcclient.h"
-#include "wx/dcmemory.h"
+    #include "wx/settings.h"
+    #include "wx/dcclient.h"
+    #include "wx/dcmemory.h"
 #endif
 
 
@@ -183,8 +182,6 @@ bool wxAuiTabContainer::IsHorizontal() const
 {
     return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM);
 }
-
-
 
 void wxAuiTabContainer::SetNormalFont(const wxFont& font)
 {
@@ -427,6 +424,7 @@ void wxAuiTabContainer::RemoveButton(int id)
         }
     }
 }
+
 
 
 size_t wxAuiTabContainer::GetTabOffset() const
@@ -1160,6 +1158,7 @@ bool wxAuiTabContainer::TabHitTest(int x, int y, wxAuiPaneInfo** hit) const
     }
 
     size_t i, page_count = m_pages.GetCount();
+
     for (i = m_tabOffset; i < page_count; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
@@ -1335,6 +1334,7 @@ void wxAuiNotebook::SetArtProvider(wxAuiTabArt* art)
 // such as text or bitmap height.  It overrides any call to
 // SetUniformBitmapSize().  Specifying a height of -1 reverts
 // any previous call and returns to the default behaviour
+
 void wxAuiNotebook::SetTabCtrlHeight(int height)
 {
     GetArtProvider()->SetTabCtrlHeight(height);
@@ -1881,7 +1881,7 @@ int wxAuiNotebook::ChangeSelection(size_t n)
 bool wxAuiNotebook::AddPage(wxWindow *page, const wxString &text, bool select,
                             int imageId)
 {
-    if(HasImageList())
+    if(HasImageList()) 
     {
         return AddPage(page, text, select, GetImageList()->GetBitmap(imageId));
     }

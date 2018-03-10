@@ -66,10 +66,10 @@ public:
     virtual void SetUniformBitmapSize(const wxSize& size) = 0;
 
     virtual void DrawBorder(
-                            wxDC& dc,
-                            wxWindow* wnd,
-                            const wxRect& rect) = 0;
-    
+                 wxDC& dc,
+                 wxWindow* wnd,
+                 const wxRect& rect) = 0;
+
     virtual void DrawBackground(
                          wxDC& dc,
                          wxWindow* wnd,

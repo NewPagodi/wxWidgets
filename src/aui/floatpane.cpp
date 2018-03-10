@@ -158,7 +158,6 @@ void wxAuiFloatingFrame::SetPaneWindow(const wxAuiPaneInfo& pane)
 
         SetClientSize(size);
     }
-
 }
 
 wxAuiManager* wxAuiFloatingFrame::GetOwnerManager() const

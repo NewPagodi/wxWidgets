@@ -1061,7 +1061,7 @@ void wxAuiManager::UpdateHintWindowConfig()
     wxWindow* w = m_frame;
     while (w)
     {
-        if (wxDynamicCast(w,wxFrame))
+        if (wxDynamicCast(w, wxFrame))
         {
             wxFrame* f = static_cast<wxFrame*>(w);
             can_do_transparent = f->CanSetTransparent();
@@ -1152,7 +1152,7 @@ void wxAuiManager::SetManagedWindow(wxWindow* wnd)
     // we need to add the MDI client window as the default
     // center pane
 
-    if (wxDynamicCast(m_frame,wxMDIParentFrame))
+    if (wxDynamicCast(m_frame, wxMDIParentFrame))
     {
         wxMDIParentFrame* mdi_frame = (wxMDIParentFrame*)m_frame;
         wxWindow* client_window = mdi_frame->GetClientWindow();
@@ -1163,7 +1163,7 @@ void wxAuiManager::SetManagedWindow(wxWindow* wnd)
                 wxAuiPaneInfo().Name(wxT("mdiclient")).
                 CenterPane().PaneBorder(false));
     }
-    else if (wxDynamicCast(m_frame,wxAuiMDIParentFrame))
+    else if (wxDynamicCast(m_frame, wxAuiMDIParentFrame))
     {
         wxAuiMDIParentFrame* mdi_frame = (wxAuiMDIParentFrame*)m_frame;
         wxAuiMDIClientWindow* client_window = mdi_frame->GetClientWindow();
@@ -1173,6 +1173,7 @@ void wxAuiManager::SetManagedWindow(wxWindow* wnd)
                 wxAuiPaneInfo().Name(wxT("mdiclient")).
                 CenterPane().PaneBorder(false));
     }
+
 #endif
 
     UpdateHintWindowConfig();
@@ -1349,7 +1350,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
 
     if (pinfo.HasGripper())
     {
-        if (wxDynamicCast(pinfo.GetWindow(),wxAuiToolBar))
+        if (wxDynamicCast(pinfo.GetWindow(), wxAuiToolBar))
         {
             // prevent duplicate gripper -- both wxAuiManager and wxAuiToolBar
             // have a gripper control.  The toolbar's built-in gripper
@@ -1369,7 +1370,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
         pinfo.best_size = pinfo.window->GetClientSize();
 
 #if wxUSE_TOOLBAR
-        if (wxDynamicCast(pinfo.window,wxToolBar))
+        if (wxDynamicCast(pinfo.window, wxToolBar))
         {
             // GetClientSize() doesn't get the best size for
             // a toolbar under some newer versions of wxWidgets,
@@ -1547,11 +1548,6 @@ bool wxAuiManager::DetachPane(wxWindow* window)
     return false;
 }
 
-
-
-
-
-
 // ClosePane() destroys or hides the pane depending on its flags
 bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
 {
@@ -1615,7 +1611,6 @@ bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
     {
         paneInfo.window->Reparent(m_frame);
     }
-
 
     // if we have a frame, destroy it
     if (paneInfo.frame)
@@ -2962,6 +2957,7 @@ wxSizer* wxAuiManager::LayoutAll(wxAuiPaneInfoArray& panes,
     wxSize cli_size = m_frame->GetClientSize();
     int i, dock_count, pane_count;
 
+
     // empty all docks out
     for (i = 0, dock_count = docks.GetCount(); i < dock_count; ++i)
     {
@@ -3633,6 +3629,7 @@ void wxAuiManager::Update()
         }
     }
 
+
     Repaint();
 
     // set frame's minimum size
@@ -3742,6 +3739,7 @@ wxAuiDockUIPart* wxAuiManager::GetPanePart(wxWindow* wnd)
 // (for horizontal docks) or from the top of the window (for
 // vertical docks).  This value is necessary for calculating
 // pixel-pane/toolbar offsets when they are dragged.
+
 int wxAuiManager::GetDockPixelOffset(wxAuiPaneInfo& test)
 {
     // the only way to accurately calculate the dock's
@@ -3791,6 +3789,7 @@ int wxAuiManager::GetDockPixelOffset(wxAuiPaneInfo& test)
 // ProcessDockResult() is a utility function used by DoDrop() - it checks
 // if a dock operation is allowed, the new dock position is copied into
 // the target info.  If the operation was allowed, the function returns true.
+
 bool wxAuiManager::ProcessDockResult(wxAuiPaneInfo& target,
                                      const wxAuiPaneInfo& new_pos)
 {
@@ -4332,8 +4331,8 @@ void wxAuiManager::ShowHint(const wxRect& rect)
         m_hintFadeAmt = m_hintFadeMax;
 
         if ((m_flags & wxAUI_MGR_HINT_FADE)
-            && !( wxDynamicCast(m_hintWnd,wxPseudoTransparentFrame) &&
-                 (m_flags & wxAUI_MGR_NO_VENETIAN_BLINDS_FADE)) 
+            && !(wxDynamicCast(m_hintWnd, wxPseudoTransparentFrame) &&
+                 (m_flags & wxAUI_MGR_NO_VENETIAN_BLINDS_FADE))
             )
             m_hintFadeAmt = 0;
 
@@ -4382,7 +4381,7 @@ void wxAuiManager::ShowHint(const wxRect& rect)
         {
             wxAuiPaneInfo& pane = m_panes.Item(i);
 
-            if(pane.IsFloating() &&
+            if (pane.IsFloating() &&
                     pane.frame &&
                         pane.frame->IsShown())
             {
@@ -4536,7 +4535,6 @@ wxRect wxAuiManager::CalculateHintRect(wxWindow* pane_window,
             break;
         }
     }
-
 
     // find out where the new pane would be
     if (!DoDrop(docks, panes, hint, pt, offset))
@@ -5081,7 +5079,7 @@ void wxAuiManager::Render(wxDC* dc)
 
 void wxAuiManager::Repaint(wxDC* dc)
 {
-#ifdef __WXMAC__
+#ifdef __WXMAC__ 
     if ( dc == NULL )
     {
         m_frame->Refresh() ;
@@ -5139,7 +5137,7 @@ void wxAuiManager::OnSize(wxSizeEvent& event)
         Repaint();
 
 #if wxUSE_MDI
-        if (wxDynamicCast(m_frame,wxMDIParentFrame))
+        if (wxDynamicCast(m_frame, wxMDIParentFrame))
         {
             // for MDI parent frames, this event must not
             // be "skipped".  In other words, the parent frame
@@ -5167,7 +5165,7 @@ void wxAuiManager::OnFindManager(wxAuiManagerEvent& evt)
     }
 
     // if we are managing a child frame, get the 'real' manager
-    if (wxDynamicCast(window,wxAuiFloatingFrame))
+    if (wxDynamicCast(window, wxAuiFloatingFrame))
     {
         wxAuiFloatingFrame* float_frame = static_cast<wxAuiFloatingFrame*>(window);
         evt.SetManager(float_frame->GetOwnerManager());
@@ -5183,7 +5181,6 @@ void wxAuiManager::OnFindManager(wxAuiManagerEvent& evt)
     // return pointer to ourself
     evt.SetManager(this);
 }
-
 
 void wxAuiManager::OnSetCursor(wxSetCursorEvent& event)
 {
@@ -5352,7 +5349,7 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
             if (part->pane &&
                 part->pane->window &&
                 managed_wnd &&
-                wxDynamicCast(managed_wnd,wxAuiFloatingFrame))
+                wxDynamicCast(managed_wnd, wxAuiFloatingFrame))
             {
                 wxAuiFloatingFrame* floating_frame = (wxAuiFloatingFrame*)managed_wnd;
                 wxAuiManager* owner_mgr = floating_frame->GetOwnerManager();
@@ -5488,7 +5485,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
 #if wxUSE_STATUSBAR
         // if there's a status control, the available
         // height decreases accordingly
-        if (m_frame && wxDynamicCast(m_frame,wxFrame))
+        if (m_frame && wxDynamicCast(m_frame, wxFrame))
         {
             wxFrame* frame = static_cast<wxFrame*>(m_frame);
             wxStatusBar* status = frame->GetStatusBar();
@@ -6223,7 +6220,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
         // It's necessary to reset m_actionPart since it destroyed
         // by the Update within DoEndResizeAction.
         if (m_currentDragItem != -1)
-            m_actionPart = &(m_uiParts.Item(m_currentDragItem));
+            m_actionPart = & (m_uiParts.Item(m_currentDragItem));
         else
             m_currentDragItem = m_uiParts.Index(* m_actionPart);
 
@@ -6398,7 +6395,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
             // We can't move the child window so we need to get the frame that
             // we want to be really moving. This is probably not the best place
             // to do this but at least it fixes the bug (#13177) for now.
-            if (!wxDynamicCast(m_actionWindow,wxAuiFloatingFrame))
+            if (!wxDynamicCast(m_actionWindow, wxAuiFloatingFrame))
             {
                 wxAuiPaneInfo& pane = GetPane(m_actionWindow);
                 m_actionWindow = pane.frame;
@@ -6656,7 +6653,7 @@ void wxAuiManager::OnChildFocus(wxChildFocusEvent& event)
             refresh = true;
     }
 
-    if(refresh)
+    if (refresh)
     {
         m_frame->Refresh();
     }
@@ -6725,21 +6722,23 @@ void wxAuiManager::OnPaneButton(wxAuiManagerEvent& evt)
     {
         if (pane.IsMaximized())
         {
-             // If the pane is maximized, the original state must be restored
-             // before trying to float the pane, otherwise the other panels
-             // wouldn't appear correctly when it becomes floating.
-             wxAuiManagerEvent e(wxEVT_AUI_PANE_RESTORE);
-             e.SetManager(this);
-             e.SetPane(evt.pane);
-             ProcessMgrEvent(e);
+            // If the pane is maximized, the original state must be restored
+            // before trying to float the pane, otherwise the other panels
+            // wouldn't appear correctly when it becomes floating.
+            wxAuiManagerEvent e(wxEVT_AUI_PANE_RESTORE);
+            e.SetManager(this);
+            e.SetPane(evt.pane);
+            ProcessMgrEvent(e);
 
-             if (e.GetVeto())
-             {
-                 // If it can't be restored, it can't be floated neither.
-                 return;
-             }
-             RestorePane(pane);
+            if (e.GetVeto())
+            {
+                // If it can't be restored, it can't be floated neither.
+                return;
+            }
+
+            RestorePane(pane);
         }
+
         pane.Float();
         Update();
     }

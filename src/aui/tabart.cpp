@@ -72,10 +72,11 @@ private:
 
 // these functions live in dockart.cpp -- they'll eventually
 // be moved to a new utility cpp file
+
 wxBitmap wxAuiBitmapFromBits(const unsigned char bits[], int w, int h,
                              const wxColour& color);
-wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size);
 
+wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size);
 
 static void DrawButtons(wxDC& dc,
                         const wxRect& _rect,
@@ -338,7 +339,7 @@ void wxAuiGenericTabArt::DrawBackground(wxDC& dc,
 {
     // draw background
 
-    wxColor top_color      = m_baseColour.ChangeLightness(90);
+    wxColor top_color       = m_baseColour.ChangeLightness(90);
     wxColor bottom_color   = m_baseColour.ChangeLightness(170);
     wxRect bgRect, baseRect;
 
@@ -1522,6 +1523,7 @@ void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
     dc.DrawText(draw_text,
                  text_offset,
                  tab_y + (tab_height - texty) / 2 + 1);
+
 
     // draw focus rectangle
     if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && haveFocus)

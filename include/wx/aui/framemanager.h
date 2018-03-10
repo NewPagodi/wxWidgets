@@ -177,6 +177,7 @@ extern WXDLLIMPEXP_AUI wxAuiPaneInfo wxAuiNullPaneInfo;
 class WXDLLIMPEXP_AUI wxAuiPaneInfo
 {
 public:
+
     wxAuiPaneInfo()
     {
         name = wxT("");
@@ -201,6 +202,7 @@ public:
     }
 
     ~wxAuiPaneInfo() {}
+
 #ifndef SWIG
     wxAuiPaneInfo(const wxAuiPaneInfo& c)
     {
@@ -209,26 +211,26 @@ public:
 
     wxAuiPaneInfo& operator=(const wxAuiPaneInfo& c)
     {
-        name            = c.name;
-        caption         = c.caption;
-        window          = c.window;
-        frame           = c.frame;
-        state           = c.state;
-        dock_direction  = c.dock_direction;
-        dock_layer      = c.dock_layer;
-        dock_row        = c.dock_row;
-        dock_pos        = c.dock_pos;
-        icon            = c.icon;
-        best_size       = c.best_size;
-        min_size        = c.min_size;
-        max_size        = c.max_size;
-        floating_pos    = c.floating_pos;
-        floating_size   = c.floating_size;
+        name = c.name;
+        caption = c.caption;
+        window = c.window;
+        frame = c.frame;
+        state = c.state;
+        dock_direction = c.dock_direction;
+        dock_layer = c.dock_layer;
+        dock_row = c.dock_row;
+        dock_pos = c.dock_pos;
+        icon = c.icon;
+        best_size = c.best_size;
+        min_size = c.min_size;
+        max_size = c.max_size;
+        floating_pos = c.floating_pos;
+        floating_size = c.floating_size;
         dock_proportion = c.dock_proportion;
-        buttons         = c.buttons;
-        rect            = c.rect;
-        m_tooltip       = c.m_tooltip;
-        m_dock_page     = c.m_dock_page;
+        buttons = c.buttons;
+        rect = c.rect;
+        m_tooltip = c.m_tooltip;
+        m_dock_page = c.m_dock_page;
         return *this;
     }
 #else // SWIG
@@ -556,42 +558,42 @@ public:
     // in the perspective loading code.
     enum wxAuiPaneState
     {
-        optionFloating             = 1 << 0,
-        optionHidden               = 1 << 1,
-        optionLeftDockable         = 1 << 2,
-        optionRightDockable        = 1 << 3,
-        optionTopDockable          = 1 << 4,
-        optionBottomDockable       = 1 << 5,
-        optionFloatable            = 1 << 6,
-        optionMovable              = 1 << 7,
-        optionResizable            = 1 << 8,
-        optionPaneBorder           = 1 << 9,
-        optionCaption              = 1 << 10,
-        optionGripper              = 1 << 11,
-        optionDestroyOnClose       = 1 << 12,
-        optionToolbar              = 1 << 13,
-        optionActive               = 1 << 14,
-        optionGripperTop           = 1 << 15,
-        optionMaximized            = 1 << 16,
-        optionDockFixed            = 1 << 17,
+        optionFloating        = 1 << 0,
+        optionHidden          = 1 << 1,
+        optionLeftDockable    = 1 << 2,
+        optionRightDockable   = 1 << 3,
+        optionTopDockable     = 1 << 4,
+        optionBottomDockable  = 1 << 5,
+        optionFloatable       = 1 << 6,
+        optionMovable         = 1 << 7,
+        optionResizable       = 1 << 8,
+        optionPaneBorder      = 1 << 9,
+        optionCaption         = 1 << 10,
+        optionGripper         = 1 << 11,
+        optionDestroyOnClose  = 1 << 12,
+        optionToolbar         = 1 << 13,
+        optionActive          = 1 << 14,
+        optionGripperTop      = 1 << 15,
+        optionMaximized       = 1 << 16,
+        optionDockFixed       = 1 << 17,
         optionActiveNotebook       = 1 << 18,
         optionAlwaysDockInNotebook = 1 << 19,
         optionCenterDockable       = 1 << 20,
 
-        buttonClose                = 1 << 21,
-        buttonMaximize             = 1 << 22,
-        buttonMinimize             = 1 << 23,
-        buttonPin                  = 1 << 24,
+        buttonClose           = 1 << 21,
+        buttonMaximize        = 1 << 22,
+        buttonMinimize        = 1 << 23,
+        buttonPin             = 1 << 24,
 
 		savedActiveNotebookState   = 1 << 25, // used internally
 		
-        buttonCustom1              = 1 << 26,
-        buttonCustom2              = 1 << 27,
-        buttonCustom3              = 1 << 28,
+        buttonCustom1         = 1 << 26,
+        buttonCustom2         = 1 << 27,
+        buttonCustom3         = 1 << 28,
 
-		optionCompactTab           = 1 << 29,
-        savedHiddenState           = 1 << 30, // used internally
-        actionPane                 = 1 << 31  // used internally
+		optionCompactTab      = 1 << 29,
+        savedHiddenState      = 1 << 30, // used internally
+        actionPane            = 1 << 31  // used internally
     };
 
 public:
@@ -856,40 +858,40 @@ protected:
     };
 
 
-    wxWindow* m_frame;               // the window being managed
-    wxAuiDockArt* m_art;             // dock art object which does all drawing
-    wxAuiTabArt* m_tab_art;          // tab art object which does all the drawing for notebooks.
-    unsigned int m_flags;            // manager flags wxAUI_MGR_*
+    wxWindow* m_frame;           // the window being managed
+    wxAuiDockArt* m_art;            // dock art object which does all drawing
+    wxAuiTabArt* m_tab_art;      // tab art object which does all the drawing for notebooks.
+    unsigned int m_flags;        // manager flags wxAUI_MGR_*
 
-    wxAuiPaneInfoArray m_panes;      // array of panes structures
-    wxAuiDockInfoArray m_docks;      // array of docks structures
-    wxAuiDockUIPartArray m_uiParts;  // array of UI parts (captions, buttons, etc)
+    wxAuiPaneInfoArray m_panes;     // array of panes structures
+    wxAuiDockInfoArray m_docks;     // array of docks structures
+    wxAuiDockUIPartArray m_uiParts; // array of UI parts (captions, buttons, etc)
 
-    int m_action;                    // current mouse action
-    wxPoint m_actionStart;           // position where the action click started
-    wxPoint m_actionOffset;          // offset from upper left of the item clicked
+    int m_action;                // current mouse action
+    wxPoint m_actionStart;      // position where the action click started
+    wxPoint m_actionOffset;     // offset from upper left of the item clicked
     wxRect* m_actionDeadZone;        // area of the screen in which movement should be temporarily ignored (up until the point the mouse has left this region) - this is used to prevent problems with e.g. differently sized tabs switching repeatedly on drag due to size differences
-    wxAuiDockUIPart* m_actionPart;   // ptr to the part the action happened to
-    wxWindow* m_actionWindow;        // action frame or window (NULL if none)
-    wxRect m_actionHintRect;         // hint rectangle for the action
+    wxAuiDockUIPart* m_actionPart; // ptr to the part the action happened to
+    wxWindow* m_actionWindow;   // action frame or window (NULL if none)
+    wxRect m_actionHintRect;    // hint rectangle for the action
     wxRect m_lastRect;
-    wxAuiDockUIPart* m_hoverButton;  // button uipart being hovered over
+    wxAuiDockUIPart* m_hoverButton;// button uipart being hovered over
     //temp: (MJM) - The following variable is only temporarily necessary until dynamic notebook buttons and normal pane buttons can be made more compatible. Remove this as well as forward declaration further up when possible.
     wxAuiTabContainerButton* m_hoverButton2;// button uipart being hovered over
-    wxPoint m_lastMouseMove;         // last mouse move position (see OnMotion)
+    wxPoint m_lastMouseMove;   // last mouse move position (see OnMotion)
     int  m_currentDragItem;
     bool m_skipping;
     bool m_hasMaximized;
     bool m_doingHintCalculation;     // set to true if we are in the process of calculating a hint.
 
-    double m_dockConstraintX;        // 0.0 .. 1.0; max pct of window width a dock can consume
-    double m_dockConstraintY;        // 0.0 .. 1.0; max pct of window height a dock can consume
+    double m_dockConstraintX;  // 0.0 .. 1.0; max pct of window width a dock can consume
+    double m_dockConstraintY;  // 0.0 .. 1.0; max pct of window height a dock can consume
 
-    wxFrame* m_hintWnd;              // transparent hint window, if supported by platform
-    wxTimer m_hintFadeTimer;         // transparent fade timer
-    wxByte m_hintFadeAmt;            // transparent fade amount
-    wxByte m_hintFadeMax;            // maximum value of hint fade
-    wxRect m_lastHint;               // position of last drawn hint, so that we can avoid drawing the same hint repeatedly.
+    wxFrame* m_hintWnd;         // transparent hint window, if supported by platform
+    wxTimer m_hintFadeTimer;    // transparent fade timer
+    wxByte m_hintFadeAmt;       // transparent fade amount
+    wxByte m_hintFadeMax;       // maximum value of hint fade
+    wxRect m_lastHint;          // position of last drawn hint, so that we can avoid drawing the same hint repeatedly.
 
     void* m_reserved;
 
@@ -953,7 +955,7 @@ public:
     wxAuiManager* manager;
     wxAuiPaneInfo* pane;
     wxAuiPaneInfo* target_pane;
-    int  button;
+    int button;
     bool veto_flag;
     bool canveto_flag;
     wxDC* dc;
@@ -1056,15 +1058,15 @@ public:
         typePaneTab
     };
 
-    int type;                            // ui part type (see enum above)
-    int orientation;                     // orientation (either wxHORIZONTAL or wxVERTICAL)
-    wxAuiDockInfo* dock;                 // which dock the item is associated with
-    wxAuiPaneInfo* pane;                 // which pane the item is associated with
-    wxAuiPaneButton* button;             // which pane button the item is associated with
-    wxSizer* cont_sizer;                 // the part's containing sizer
-    wxSizerItem* sizer_item;             // the sizer item of the part
+    int type;                // ui part type (see enum above)
+    int orientation;         // orientation (either wxHORIZONTAL or wxVERTICAL)
+    wxAuiDockInfo* dock;        // which dock the item is associated with
+    wxAuiPaneInfo* pane;        // which pane the item is associated with
+    wxAuiPaneButton* button;    // which pane button the item is associated with
+    wxSizer* cont_sizer;     // the part's containing sizer
+    wxSizerItem* sizer_item; // the sizer item of the part
     wxAuiTabContainer* m_tab_container;  // notebook pane is associated with (if any)
-    wxRect rect;                         // client coord rectangle of the part itself
+    wxRect rect;             // client coord rectangle of the part itself
 };
 
 

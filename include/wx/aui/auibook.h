@@ -61,6 +61,7 @@ enum wxAuiNotebookOption
 class wxAuiNotebook;
 
 // aui notebook event class
+
 class WXDLLIMPEXP_AUI wxAuiNotebookEvent : public wxBookCtrlEvent
 {
 public:
@@ -194,6 +195,7 @@ protected:
 
 class WXDLLIMPEXP_AUI wxAuiNotebook : public wxNavigationEnabled<wxBookCtrlBase>
 {
+
 public:
 
     void SetColour(const wxColour& colour);

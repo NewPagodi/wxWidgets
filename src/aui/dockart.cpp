@@ -159,8 +159,6 @@ wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size)
     return ret;
 }
 
-
-
 wxAuiDefaultDockArt::wxAuiDefaultDockArt()
 {
 #if defined( __WXMAC__ ) && wxOSX_USE_COCOA_OR_CARBON
@@ -509,7 +507,6 @@ void wxAuiDefaultDockArt::DrawBorder(wxDC& dc, wxWindow* window, const wxRect& _
     }
     else
     {
-
         // notebooks draw the border themselves, so they can use native rendering (e.g. tabartgtk)
         wxAuiTabArt* art = NULL;
 
