@@ -50,12 +50,12 @@ public:
     void DrawButton(wxDC& dc, wxWindow* wnd, const wxRect& in_rect, int bitmap_id,
                     int button_state, int orientation, wxRect* out_rect) wxOVERRIDE;
     wxSize GetBestTabSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages,
-                            const wxSize& required_bmp_size);
+                            const wxSize& required_bmp_size) wxOVERRIDE;
     int GetBestTabCtrlSize(wxWindow* wnd, const wxAuiPaneInfoPtrArray& pages)  wxOVERRIDE
                          {
                              return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                          }
-    int GetBorderWidth(wxWindow* wnd);
+    int GetBorderWidth(wxWindow* wnd) wxOVERRIDE;
     int GetAdditionalBorderSpace(wxWindow* wnd) wxOVERRIDE;
     virtual wxSize GetTabSize(wxDC& dc, wxWindow* wnd, const wxString& caption,
                               const wxBitmap& bitmap, bool active,
