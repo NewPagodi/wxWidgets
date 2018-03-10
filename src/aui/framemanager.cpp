@@ -639,6 +639,27 @@ static void RemovePaneFromDocks(wxAuiDockInfoArray& docks,
     }
 }
 
+/*
+// This function works fine, and may be used in the future
+
+// RenumberDockRows() takes a dock and assigns sequential numbers
+// to existing rows.  Basically it takes out the gaps; so if a
+// dock has rows with numbers 0,2,5, they will become 0,1,2
+static void RenumberDockRows(wxAuiDockInfoPtrArray& docks)
+{
+    int i, dock_count;
+    for (i = 0, dock_count = docks.GetCount(); i < dock_count; ++i)
+    {
+        wxAuiDockInfo& dock = *docks.Item(i);
+        dock.dock_row = i;
+
+        int j, pane_count;
+        for (j = 0, pane_count = dock.panes.GetCount(); j < pane_count; ++j)
+            dock.panes.Item(j)->dock_row = i;
+    }
+}
+*/
+
 
 // SetActivePane() sets the active pane, as well as cycles through
 // every other pane and makes sure that all others' active flags
@@ -3510,7 +3531,12 @@ void wxAuiManager::Update()
                     p.frame->SetSize(p.floating_pos.x, p.floating_pos.y,
                                      p.floating_size.x, p.floating_size.y,
                                      wxSIZE_USE_EXISTING);
-
+                /*
+                    p.frame->SetSize(p.floating_pos.x, p.floating_pos.y,
+                                     wxDefaultCoord, wxDefaultCoord,
+                                     wxSIZE_USE_EXISTING);
+                    //p.frame->Move(p.floating_pos.x, p.floating_pos.y);
+                */
                 }
 
                 if (p.GetFrame()->IsShown() != p.IsShown())
@@ -3654,6 +3680,26 @@ void wxAuiManager::Update()
 
     Repaint();
 
+    // set frame's minimum size
+
+/*
+    // N.B. More work needs to be done on frame minimum sizes;
+    // this is some interesting code that imposes the minimum size,
+    // but we may want to include a more flexible mechanism or
+    // options for multiple minimum-size modes, e.g. strict or lax
+    wxSize min_size = sizer->GetMinSize();
+    wxSize frame_size = m_frame->GetSize();
+    wxSize client_size = m_frame->GetClientSize();
+
+    wxSize minframe_size(min_size.x+frame_size.x-client_size.x,
+                         min_size.y+frame_size.y-client_size.y );
+
+    m_frame->SetMinSize(minframe_size);
+
+    if (frame_size.x < minframe_size.x ||
+        frame_size.y < minframe_size.y)
+            sizer->Fit(m_frame);
+*/
 }
 
 
@@ -5308,6 +5354,10 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
         if (part->type == wxAuiDockUIPart::typeDockSizer ||
             part->type == wxAuiDockUIPart::typePaneSizer)
         {
+            // Removing this restriction so that a centre pane can be resized
+            //if (part->dock && part->dock->dock_direction == wxAUI_DOCK_CENTER)
+            //    return;
+
             // a dock may not be resized if it has a single
             // pane which is not resizable
             if (part->type == wxAuiDockUIPart::typeDockSizer && part->dock &&

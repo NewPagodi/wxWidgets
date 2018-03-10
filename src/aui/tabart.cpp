@@ -484,6 +484,22 @@ void wxAuiGenericTabArt::DrawTab(wxDC& dc,
     ++clip_width;
     ++clip_height;
 
+/*
+    wxPoint clip_points[6];
+    clip_points[0] = wxPoint(tab_x,              tab_y+tab_height-3);
+    clip_points[1] = wxPoint(tab_x,              tab_y+2);
+    clip_points[2] = wxPoint(tab_x+2,            tab_y);
+    clip_points[3] = wxPoint(tab_x+clip_width-1, tab_y);
+    clip_points[4] = wxPoint(tab_x+clip_width+1, tab_y+2);
+    clip_points[5] = wxPoint(tab_x+clip_width+1, tab_y+tab_height-3);
+
+    // FIXME: these ports don't provide wxRegion ctor from array of points
+#if !defined(__WXDFB__)
+    // set the clipping region for the tab --
+    wxRegion clipping_region(WXSIZEOF(clip_points), clip_points);
+    dc.SetClippingRegion(clipping_region);
+#endif // !wxDFB && !wxCocoa
+*/
     // since the above code above doesn't play well with WXDFB or WXCOCOA,
     // we'll just use a rectangle for the clipping region for now --
     dc.SetClippingRegion(tab_x, tab_y, clip_width+1, clip_height+1);
@@ -1474,6 +1490,7 @@ void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
 
     dc.SetPen(*wxGREY_PEN);
 
+    //dc.DrawLines(active ? WXSIZEOF(points) - 1 : WXSIZEOF(points), points);
     dc.DrawLines(WXSIZEOF(points), points);
 
 
