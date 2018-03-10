@@ -3606,8 +3606,8 @@ void wxAuiManager::Update()
         wxRect r;
         wxAuiPaneInfo& p = m_panes.Item(i);
 
-        if (p.GetWindow() && p.IsShown() && p.IsDocked())
-            r = p.GetRect();
+        if (p.window && p.IsShown() && p.IsDocked())
+            r = p.rect;
 
         old_pane_rects.Add(r);
     }
@@ -5960,7 +5960,7 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
 
             int i, dock_pane_count = dock.panes.GetCount();
             for (i = 0; i < dock_pane_count; ++i)
-                dock.panes.Item(i)->Position(pane_positions[i]);
+                dock.panes.Item(i)->dock_pos = pane_positions[i];
         }
 
         pane.SetFlag(wxAuiPaneInfo::actionPane,false);
