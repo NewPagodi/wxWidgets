@@ -1550,7 +1550,7 @@ bool wxAuiManager::DetachPane(wxWindow* window)
                 p.window->SetSize(1,1);
 
                 if (p.frame->IsShown())
-                   ShowWnd(p.GetFrame(),false);
+                    p.frame->Show(false);
 
                 // reparent to m_frame and destroy the pane
                 if (m_actionWindow == p.frame)
@@ -1652,7 +1652,7 @@ bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
     // first, hide the window
     if (paneInfo.window && paneInfo.window->IsShown())
     {
-        ShowWnd(paneInfo.GetWindow(),false);
+        paneInfo.window->Show(false);
     }
 
     // make sure that we are the parent of this window
@@ -1728,7 +1728,7 @@ void wxAuiManager::MaximizePane(wxAuiPaneInfo& paneInfo)
     // last, show the window
     if (paneInfo.window && !paneInfo.window->IsShown())
     {
-        ShowWnd(paneInfo.GetWindow(),true);
+        paneInfo.window->Show(true);
     }
 }
 
@@ -1756,7 +1756,7 @@ void wxAuiManager::RestorePane(wxAuiPaneInfo& paneInfo)
     // last, show the window
     if (paneInfo.window && !paneInfo.window->IsShown())
     {
-        ShowWnd(paneInfo.GetWindow(),true);
+        paneInfo.window->Show(true);
     }
 }
 
@@ -3473,7 +3473,7 @@ void wxAuiManager::Update()
 
             // hide the frame
             if (p.frame->IsShown())
-                ShowWnd(p.GetFrame(),false);
+                p.frame->Show(false);
 
             // reparent to m_frame and destroy the pane
             if (m_actionWindow == p.frame)
@@ -3520,7 +3520,7 @@ void wxAuiManager::Update()
                 p.frame = frame;
 
                 if (p.IsShown() && !frame->IsShown())
-                    ShowWnd(frame,true);
+                    frame->Show();
             }
             else
             {
@@ -4386,7 +4386,7 @@ void wxAuiManager::ShowHint(const wxRect& rect)
         m_hintWnd->SetTransparent(m_hintFadeAmt);
 
         if (!m_hintWnd->IsShown())
-            ShowWnd(m_hintWnd,true);
+            m_hintWnd->Show();
 
         // if we are dragging a floating pane, set the focus
         // back to that floating pane (otherwise it becomes unfocused)
@@ -4468,7 +4468,7 @@ void wxAuiManager::HideHint()
     if (m_hintWnd)
     {
         if (m_hintWnd->IsShown())
-            ShowWnd(m_hintWnd,false);
+            m_hintWnd->Show(false);
         m_hintWnd->SetTransparent(0);
         m_hintFadeTimer.Stop();
         // In case this is called while a hint fade is going, we need to
