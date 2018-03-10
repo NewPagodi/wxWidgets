@@ -267,8 +267,8 @@ bool wxAuiTabContainer::MovePage(wxWindow* page,
 
 bool wxAuiTabContainer::RemovePage(wxWindow* wnd)
 {
-    size_t i, pageCount = m_pages.GetCount();
-    for (i = 0; i < pageCount; ++i)
+    size_t i, page_count = m_pages.GetCount();
+    for (i = 0; i < page_count; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
         if (page.window == wnd)
@@ -293,8 +293,8 @@ bool wxAuiTabContainer::SetActivePage(wxWindow* wnd)
 {
     bool found = false;
 
-    size_t i, pageCount = m_pages.GetCount();
-    for (i = 0; i < pageCount; ++i)
+    size_t i, page_count = m_pages.GetCount();
+    for (i = 0; i < page_count; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
         if (page.window == wnd)
@@ -326,8 +326,8 @@ bool wxAuiTabContainer::SetActivePage(wxWindow* wnd)
 
 void wxAuiTabContainer::SetNoneActive()
 {
-    size_t i, pageCount = m_pages.GetCount();
-    for (i = 0; i < pageCount; ++i)
+    size_t i, page_count = m_pages.GetCount();
+    for (i = 0; i < page_count; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
         page.SetFlag(wxAuiPaneInfo::optionActiveNotebook,false);
@@ -344,8 +344,8 @@ bool wxAuiTabContainer::SetActivePage(size_t page)
 
 int wxAuiTabContainer::GetActivePage() const
 {
-    size_t i, pageCount = m_pages.GetCount();
-    for (i = 0; i < pageCount; ++i)
+    size_t i, page_count = m_pages.GetCount();
+    for (i = 0; i < page_count; ++i)
     {
         wxAuiPaneInfo& page = *m_pages.Item(i);
         if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))

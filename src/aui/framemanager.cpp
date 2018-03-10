@@ -3405,12 +3405,12 @@ void wxAuiManager::Update()
     m_panes.Sort(PaneSortFunc);
 
     wxSizer* sizer;
-    int i, paneCount = m_panes.GetCount();
+    int i, pane_count = m_panes.GetCount();
 
 
     // destroy floating panes which have been
     // redocked or are becoming non-floating
-    for (i = 0; i < paneCount; ++i)
+    for (i = 0; i < pane_count; ++i)
     {
         wxAuiPaneInfo& p = m_panes.Item(i);
 
@@ -3461,7 +3461,7 @@ void wxAuiManager::Update()
 
     // hide or show panes as necessary,
     // and float panes as necessary
-    for (i = 0; i < paneCount; ++i)
+    for (i = 0; i < pane_count; ++i)
     {
         wxAuiPaneInfo& p = m_panes.Item(i);
 
@@ -3600,8 +3600,8 @@ void wxAuiManager::Update()
 
     // keep track of the old window rectangles so we can
     // refresh those windows whose rect has changed
-    wxAuiRectArray oldPaneRects;
-    for (i = 0; i < paneCount; ++i)
+    wxAuiRectArray old_pane_rects;
+    for (i = 0; i < pane_count; ++i)
     {
         wxRect r;
         wxAuiPaneInfo& p = m_panes.Item(i);
@@ -3609,7 +3609,7 @@ void wxAuiManager::Update()
         if (p.GetWindow() && p.IsShown() && p.IsDocked())
             r = p.GetRect();
 
-        oldPaneRects.Add(r);
+        old_pane_rects.Add(r);
     }
 
 
@@ -3626,12 +3626,12 @@ void wxAuiManager::Update()
     // the new pane rectangles against the old rectangles that
     // we saved a few lines above here.  If the rectangles have
     // changed, the corresponding panes must also be updated
-    for (i = 0; i < paneCount; ++i)
+    for (i = 0; i < pane_count; ++i)
     {
         wxAuiPaneInfo& p = m_panes.Item(i);
         if (p.window && p.window->IsShown() && p.IsDocked())
         {
-            if (p.rect != oldPaneRects[i])
+            if (p.rect != old_pane_rects[i])
             {
                 p.window->Refresh();
                 p.window->Update();
@@ -5100,8 +5100,8 @@ void wxAuiManager::OnFindManager(wxAuiManagerEvent& evt)
     // if we are managing a child frame, get the 'real' manager
     if (wxDynamicCast(window,wxAuiFloatingFrame))
     {
-        wxAuiFloatingFrame* floatFrame = static_cast<wxAuiFloatingFrame*>(window);
-        evt.SetManager(floatFrame->GetOwnerManager());
+        wxAuiFloatingFrame* float_frame = static_cast<wxAuiFloatingFrame*>(window);
+        evt.SetManager(float_frame->GetOwnerManager());
         return;
     }
 
@@ -5279,8 +5279,8 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
                 managed_wnd &&
                 wxDynamicCast(managed_wnd,wxAuiFloatingFrame))
             {
-                wxAuiFloatingFrame* floatingFrame = (wxAuiFloatingFrame*)managed_wnd;
-                wxAuiManager* owner_mgr = floatingFrame->GetOwnerManager();
+                wxAuiFloatingFrame* floating_frame = (wxAuiFloatingFrame*)managed_wnd;
+                wxAuiManager* owner_mgr = floating_frame->GetOwnerManager();
                 owner_mgr->StartPaneDrag(part->pane->GetWindow(), wxPoint(event.m_x - part->rect.x, event.m_y - part->rect.y));
                 return;
             }
@@ -5958,8 +5958,8 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
             wxArrayInt pane_positions, pane_sizes;
             GetPanePositionsAndSizes(dock, pane_positions, pane_sizes);
 
-            int i, dockPaneCount = dock.panes.GetCount();
-            for (i = 0; i < dockPaneCount; ++i)
+            int i, dock_pane_count = dock.panes.GetCount();
+            for (i = 0; i < dock_pane_count; ++i)
                 dock.panes.Item(i)->Position(pane_positions[i]);
         }
 
