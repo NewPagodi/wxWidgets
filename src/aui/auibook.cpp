@@ -1274,10 +1274,10 @@ void wxAuiTabContainer::OnChildKeyDown(wxKeyEvent& evt)
 
 
 // extern functions from framemanager.cpp
-extern void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray&,int,int);
-extern void wxAuiDoInsertDockRow(wxAuiPaneInfoArray&,int,int,int);
-extern void wxAuiDoInsertPane(wxAuiPaneInfoArray&,int,int,int,int);
-extern void wxAuiDoInsertPage(wxAuiPaneInfoArray&,int,int,int,int,int);
+extern void DoInsertDockLayer(wxAuiPaneInfoArray&,int,int);
+extern void DoInsertDockRow(wxAuiPaneInfoArray&,int,int,int);
+extern void DoInsertPane(wxAuiPaneInfoArray&,int,int,int,int);
+extern void DoInsertPage(wxAuiPaneInfoArray&,int,int,int,int,int);
 
 
 wxBEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
@@ -1449,7 +1449,7 @@ bool wxAuiNotebook::InsertPage(size_t page_idx,
         return false;
 
     // Shift other panes so that this one can go in between them if necessary
-    wxAuiDoInsertPage(m_mgr.GetAllPanes(),1,0,1,0,page_idx);
+    DoInsertPage(m_mgr.GetAllPanes(),1,0,1,0,page_idx);
 
     m_mgr.AddPane(page, wxAuiPaneInfo().Centre().Layer(0).Position(0).Caption(caption).Floatable(false).Movable().Page(page_idx).Icon(bitmap).Dockable(m_mgr.HasFlag(wxAUI_NB_TAB_SPLIT)).CloseButton(false).AlwaysDockInNotebook());
 
@@ -1711,7 +1711,7 @@ void wxAuiNotebook::Split(size_t page, int direction)
 
         panes[page].Direction(direction);
 
-        wxAuiDoInsertDockLayer(panes,direction,panes[page].GetLayer());
+        DoInsertDockLayer(panes,direction,panes[page].GetLayer());
 
         m_mgr.SetActivePane(panes[page].GetWindow());
 

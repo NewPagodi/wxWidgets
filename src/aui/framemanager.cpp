@@ -477,7 +477,7 @@ static int GetMaxRow(const wxAuiPaneInfoArray& panes, int direction, int layer)
 
 // wxAuiDoInsertDockLayer() is an internal function that inserts a new dock
 // layer by incrementing all existing dock layer values by one
-void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray& panes,
+void DoInsertDockLayer(wxAuiPaneInfoArray& panes,
                               int dock_direction,
                               int dock_layer)
 {
@@ -494,7 +494,7 @@ void wxAuiDoInsertDockLayer(wxAuiPaneInfoArray& panes,
 
 // wxAuiDoInsertDockRow() is an internal function that inserts a new dock
 // row by incrementing all existing dock row values by one
-void wxAuiDoInsertDockRow(wxAuiPaneInfoArray& panes,
+void DoInsertDockRow(wxAuiPaneInfoArray& panes,
                             int dock_direction,
                             int dock_layer,
                             int dock_row)
@@ -513,7 +513,7 @@ void wxAuiDoInsertDockRow(wxAuiPaneInfoArray& panes,
 
 // wxAuiDoInsertPane() is an internal function that inserts a space for
 // another dock pane by incrementing all existing dock position values by one
-void wxAuiDoInsertPane(wxAuiPaneInfoArray& panes,
+void DoInsertPane(wxAuiPaneInfoArray& panes,
                          int dock_direction,
                          int dock_layer,
                          int dock_row,
@@ -536,7 +536,7 @@ void wxAuiDoInsertPane(wxAuiPaneInfoArray& panes,
 
 // wxAuiDoInsertPane() is an internal function that inserts a space for
 // another notebook page by incrementing all existing page values by one
-void wxAuiDoInsertPage(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer, int dockRow, int dockPos, int dockPage)
+void DoInsertPage(wxAuiPaneInfoArray& panes, int dockDirection, int dockLayer, int dockRow, int dockPos, int dockPage)
 {
     int i, paneCount;
     for (i = 0, paneCount = panes.GetCount(); i < paneCount; ++i)
@@ -1456,20 +1456,20 @@ bool wxAuiManager::InsertPane(wxWindow* window, const wxAuiPaneInfo& paneInfo,
     switch (insert_level)
     {
         case wxAUI_INSERT_PANE:
-            wxAuiDoInsertPane(m_panes,
+            DoInsertPane(m_panes,
                  paneInfo.dock_direction,
                  paneInfo.dock_layer,
                  paneInfo.dock_row,
                  paneInfo.dock_pos);
             break;
         case wxAUI_INSERT_ROW:
-            wxAuiDoInsertDockRow(m_panes,
+            DoInsertDockRow(m_panes,
                  paneInfo.dock_direction,
                  paneInfo.dock_layer,
                  paneInfo.dock_row);
             break;
         case wxAUI_INSERT_DOCK:
-            wxAuiDoInsertDockLayer(m_panes,
+            DoInsertDockLayer(m_panes,
                  paneInfo.dock_direction,
                  paneInfo.dock_layer);
             break;
@@ -3972,14 +3972,14 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
                 (part->dock->dock_direction == wxAUI_DOCK_LEFT))
             {
                 int row = drop.dock_row;
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                DoInsertDockRow(panes, part->dock->dock_direction,
                                 part->dock->dock_layer,
                                 part->dock->dock_row);
                 drop.dock_row = row;
             }
             else
             {
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                DoInsertDockRow(panes, part->dock->dock_direction,
                                 part->dock->dock_layer,
                                 part->dock->dock_row+1);
                 drop.dock_row = part->dock->dock_row+1;
@@ -3994,7 +3994,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             if ((part->dock->dock_direction == wxAUI_DOCK_TOP) ||
                 (part->dock->dock_direction == wxAUI_DOCK_LEFT))
             {
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                DoInsertDockRow(panes, part->dock->dock_direction,
                                 part->dock->dock_layer,
                                 part->dock->dock_row+1);
                 drop.dock_row = part->dock->dock_row+1;
@@ -4002,7 +4002,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             else
             {
                 int row = drop.dock_row;
-                wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+                DoInsertDockRow(panes, part->dock->dock_direction,
                                 part->dock->dock_layer,
                                 part->dock->dock_row);
                 drop.dock_row = row;
@@ -4064,7 +4064,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             }
         }
 
-        wxAuiDoInsertPage(panes, hitPane->GetDirection(), hitPane->GetLayer(), hitPane->GetRow(), hitPane->GetPosition(), page);
+        DoInsertPage(panes, hitPane->GetDirection(), hitPane->GetLayer(), hitPane->GetRow(), hitPane->GetPosition(), page);
         drop.Dock().Direction(hitPane->GetDirection()).Layer(hitPane->GetLayer()).Row(hitPane->GetRow()).Position(hitPane->GetPosition()).Page(page);
         return ProcessDockResult(target, drop);
     }
@@ -4118,7 +4118,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
                     break;
             }
 
-            wxAuiDoInsertDockRow(panes, part->dock->dock_direction,
+            DoInsertDockRow(panes, part->dock->dock_direction,
                             layer, 0);
             drop.Dock().
                  Direction(part->dock->dock_direction).
@@ -4204,7 +4204,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
 
         if (insert_dock_row)
         {
-            wxAuiDoInsertDockRow(panes, insert_dir, insert_layer, insert_row);
+            DoInsertDockRow(panes, insert_dir, insert_layer, insert_row);
             drop.Dock().Direction(insert_dir).
                         Layer(insert_layer).
                         Row(insert_row).
@@ -4235,7 +4235,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         if (mouseOffset <= size/2)
         {
             drop_position = part->pane->GetPosition();
-            wxAuiDoInsertPane(panes,
+            DoInsertPane(panes,
                          part->pane->GetDirection(),
                          part->pane->GetLayer(),
                          part->pane->GetRow(),
@@ -4247,7 +4247,7 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         if (mouseOffset > size/2)
         {
             drop_position = part->pane->dock_pos+1;
-            wxAuiDoInsertPane(panes,
+            DoInsertPane(panes,
                          part->pane->GetDirection(),
                          part->pane->GetLayer(),
                          part->pane->GetRow(),
