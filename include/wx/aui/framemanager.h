@@ -893,9 +893,9 @@ public:
     bool CanVeto() const { return  canveto_flag && veto_flag; }
 
 public:
-    wxAuiManager  * manager;
-    wxAuiPaneInfo * pane;
-    wxAuiPaneInfo * target_pane;
+    wxAuiManager* manager;
+    wxAuiPaneInfo* pane;
+    wxAuiPaneInfo* target_pane;
     int  button;
     bool veto_flag;
     bool canveto_flag;

@@ -229,9 +229,9 @@ wxRect CalculateCloseButtonRect(wxRect const& inRect, int orientation)
 }
 
 wxRect DrawCloseButton(wxDC& dc,
-                       GtkWidget* widget,
+                       GtkWidget *widget,
                        int button_state,
-                       wxRect const& in_rect,
+                       wxRect const &in_rect,
                        int orientation,
                        GdkRectangle* clipRect)
 {

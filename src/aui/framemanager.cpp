@@ -1640,7 +1640,7 @@ bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
     // now we need to either destroy or hide the pane
     if (paneInfo.HasDestroyOnClose())
     {
-        wxWindow* window = paneInfo.window;
+        wxWindow * window = paneInfo.window;
         DetachPane(window);
         if (window)
         {
@@ -4910,7 +4910,7 @@ void wxAuiManager::OnFloatingPaneResized(wxWindow* wnd, const wxRect& rect)
 }
 
 
-void wxAuiManager::OnFloatingPaneClosed(wxWindow* wnd, wxCloseEvent&evt)
+void wxAuiManager::OnFloatingPaneClosed(wxWindow* wnd, wxCloseEvent& evt)
 {
     // try to find the pane
     wxAuiPaneInfo& pane = GetPane(wnd);
