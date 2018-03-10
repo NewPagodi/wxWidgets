@@ -736,6 +736,13 @@ public:
 
     void OnHintActivate(wxActivateEvent& event);
 
+public:
+
+    // deprecated -- please use SetManagedWindow() and
+    // and GetManagedWindow() instead
+
+    wxDEPRECATED( void SetFrame(wxFrame* frame) );
+    wxDEPRECATED( wxFrame* GetFrame() const );
 
 protected:
     //Layout helper functions.

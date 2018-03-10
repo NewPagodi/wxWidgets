@@ -1022,7 +1022,17 @@ bool wxAuiManager_HasLiveResize(wxAuiManager& manager)
 #endif
 }
 
+// don't use these anymore as they are deprecated
+// use Set/GetManagedFrame() instead
+void wxAuiManager::SetFrame(wxFrame* frame)
+{
+    SetManagedWindow((wxWindow*)frame);
+}
 
+wxFrame* wxAuiManager::GetFrame() const
+{
+    return (wxFrame*)m_frame;
+}
 
 
 // this function will return the aui manager for a given
