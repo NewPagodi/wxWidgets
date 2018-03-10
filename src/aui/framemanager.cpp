@@ -671,7 +671,7 @@ int wxAuiManager::SetActivePane(wxWindow* active_pane)
     for (i = 0, pane_count = m_panes.GetCount(); i < pane_count; ++i)
     {
         wxAuiPaneInfo& pane = m_panes.Item(i);
-        pane.SetFlag(wxAuiPaneInfo::optionActive, false);
+        pane.state &= ~wxAuiPaneInfo::optionActive;
         if (pane.window == active_pane)
         {
             active_paneinfo = &pane;
@@ -682,7 +682,7 @@ int wxAuiManager::SetActivePane(wxWindow* active_pane)
                 ctrl->SetActivePage(pane.GetWindow());
             }
 
-            pane.SetFlag(wxAuiPaneInfo::optionActive, true);
+            pane.state |= wxAuiPaneInfo::optionActive;
         }
     }
 
@@ -6088,7 +6088,7 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
                 dock.panes.Item(i)->dock_pos = pane_positions[i];
         }
 
-        pane.SetFlag(wxAuiPaneInfo::actionPane,false);
+        pane.state &= ~wxAuiPaneInfo::actionPane;
         Update();
     }
     else
@@ -6533,7 +6533,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
         // EVT_MOTION() events will move the floating pane
         if (pane.IsFloating())
         {
-            pane.SetFlag(wxAuiPaneInfo::actionPane,false);
+            pane.state &= ~wxAuiPaneInfo::actionPane;
             m_action = actionDragFloatingPane;
             m_actionWindow = pane.frame;
         }
