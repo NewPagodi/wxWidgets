@@ -600,11 +600,11 @@ void wxAuiDefaultDockArt::DrawCaption(wxDC& dc, wxWindow *WXUNUSED(window),
     DrawCaptionBackground(dc, rect, showActive);
 
     int caption_offset = 0;
-    if ( pane.GetIcon().IsOk() )
+    if ( pane.icon.IsOk() )
     {
         DrawIcon(dc, rect, pane);
 
-        caption_offset += pane.GetIcon().GetScaledWidth() + 3;
+        caption_offset += pane.icon.GetScaledWidth() + 3;
     }
 
 
