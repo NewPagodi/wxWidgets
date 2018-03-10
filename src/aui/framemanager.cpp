@@ -258,30 +258,30 @@ public:
     }
 
 #ifdef __WXGTK__
-    void OnWindowCreate(wxWindowCreateEvent& WXUNUSED(evt))
+    void OnWindowCreate(wxWindowCreateEvent& WXUNUSED(event))
     {
         m_canSetShape=true;
         SetTransparent(0);
     }
 #endif
 
-    void OnSize(wxSizeEvent& evt)
+    void OnSize(wxSizeEvent& event)
     {
         // We sometimes get surplus size events
-        if ((evt.GetSize().GetWidth() == m_lastWidth) &&
-            (evt.GetSize().GetHeight() == m_lastHeight))
+        if ((event.GetSize().GetWidth() == m_lastWidth) &&
+            (event.GetSize().GetHeight() == m_lastHeight))
         {
-            evt.Skip();
+            event.Skip();
             return;
         }
-        m_lastWidth = evt.GetSize().GetWidth();
-        m_lastHeight = evt.GetSize().GetHeight();
+        m_lastWidth = event.GetSize().GetWidth();
+        m_lastHeight = event.GetSize().GetHeight();
 
         SetTransparent(m_amount);
-        m_region.Intersect(0, 0, evt.GetSize().GetWidth(), evt.GetSize().GetHeight());
+        m_region.Intersect(0, 0, event.GetSize().GetWidth(), event.GetSize().GetHeight());
         SetShape(m_region);
         Refresh();
-        evt.Skip();
+        event.Skip();
     }
 
 private:
@@ -1220,16 +1220,16 @@ wxAuiTabArt* wxAuiManager::GetTabArtProvider() const
     return m_tab_art;
 }
 
-void wxAuiManager::ProcessMgrEvent(wxAuiManagerEvent& evt)
+void wxAuiManager::ProcessMgrEvent(wxAuiManagerEvent& event)
 {
     // first, give the owner frame a chance to override
     if (m_frame)
     {
-        if (m_frame->GetEventHandler()->ProcessEvent(evt))
+        if (m_frame->GetEventHandler()->ProcessEvent(event))
             return;
     }
 
-    ProcessEvent(evt);
+    ProcessEvent(event);
 }
 
 // SetArtProvider() instructs wxAuiManager to use the
@@ -4247,7 +4247,7 @@ bool wxAuiManager::DoDropExternal(wxAuiManager* otherMgr, wxWindow* otherWnd, wx
     return false;
 }
 
-void wxAuiManager::OnHintFadeTimer(wxTimerEvent& WXUNUSED(evt))
+void wxAuiManager::OnHintFadeTimer(wxTimerEvent& WXUNUSED(event))
 {
     if (!m_hintWnd || m_hintFadeAmt >= m_hintFadeMax)
     {
@@ -4376,7 +4376,7 @@ void wxAuiManager::HideHint()
     }
 }
 
-void wxAuiManager::OnHintActivate(wxActivateEvent& WXUNUSED(evt))
+void wxAuiManager::OnHintActivate(wxActivateEvent& WXUNUSED(event))
 {
     // Do nothing so this event isn't handled in the base handlers.
 
@@ -5045,22 +5045,22 @@ void wxAuiManager::Repaint(wxDC* dc)
         delete client_dc;
 }
 
-void wxAuiManager::OnPaint(wxPaintEvent& WXUNUSED(evt))
+void wxAuiManager::OnPaint(wxPaintEvent& WXUNUSED(event))
 {
     wxPaintDC dc(m_frame);
     Repaint(&dc);
 }
 
-void wxAuiManager::OnEraseBackground(wxEraseEvent& evt)
+void wxAuiManager::OnEraseBackground(wxEraseEvent& event)
 {
 #ifdef __WXMAC__
-    evt.Skip() ;
+    event.Skip() ;
 #else
-    wxUnusedVar(evt);
+    wxUnusedVar(event);
 #endif
 }
 
-void wxAuiManager::OnSize(wxSizeEvent& evt)
+void wxAuiManager::OnSize(wxSizeEvent& event)
 {
     if (m_frame)
     {
@@ -5078,7 +5078,7 @@ void wxAuiManager::OnSize(wxSizeEvent& evt)
         }
 #endif
     }
-    evt.Skip();
+    event.Skip();
 }
 
 void wxAuiManager::OnFindManager(wxAuiManagerEvent& evt)
@@ -5114,10 +5114,10 @@ void wxAuiManager::OnFindManager(wxAuiManagerEvent& evt)
 }
 
 
-void wxAuiManager::OnSetCursor(wxSetCursorEvent& evt)
+void wxAuiManager::OnSetCursor(wxSetCursorEvent& event)
 {
     // determine cursor
-    wxAuiDockUIPart* part = HitTest(evt.GetX(), evt.GetY());
+    wxAuiDockUIPart* part = HitTest(event.GetX(), event.GetY());
     wxCursor cursor = wxNullCursor;
 
     if (part)
@@ -5147,15 +5147,15 @@ void wxAuiManager::OnSetCursor(wxSetCursorEvent& evt)
         }
     }
 
-    evt.SetCursor(cursor);
+    event.SetCursor(cursor);
 }
 
 
 
 void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* button_ui_part,
-                                        const wxMouseEvent& evt)
+                                        const wxMouseEvent& event)
 {
-    wxAuiDockUIPart* hit_test = HitTest(evt.GetX(), evt.GetY());
+    wxAuiDockUIPart* hit_test = HitTest(event.GetX(), event.GetY());
     if (!hit_test || !button_ui_part)
         return;
 
@@ -5163,14 +5163,14 @@ void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* button_ui_part,
 
     if (hit_test == button_ui_part)
     {
-        if (evt.LeftIsDown())
+        if (event.LeftIsDown())
             state = wxAUI_BUTTON_STATE_PRESSED;
         else
             state = wxAUI_BUTTON_STATE_HOVER;
     }
     else
     {
-        if (evt.LeftIsDown())
+        if (event.LeftIsDown())
             state = wxAUI_BUTTON_STATE_HOVER;
     }
 
@@ -5193,18 +5193,18 @@ void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* button_ui_part,
     }
 }
 
-void wxAuiManager::OnLeftDClick(wxMouseEvent& evt)
+void wxAuiManager::OnLeftDClick(wxMouseEvent& event)
 {
-    wxAuiDockUIPart* part = HitTest(evt.GetX(), evt.GetY());
+    wxAuiDockUIPart* part = HitTest(event.GetX(), event.GetY());
     if(part)
     {
         if(part->type == wxAuiDockUIPart::typePaneTab)
         {
             wxAuiPaneInfo* hitPane;
             wxAuiTabContainerButton* hitbutton;
-            if(!part->m_tab_container->ButtonHitTest(evt.m_x,evt.m_y,&hitbutton)) {
+            if(!part->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&hitbutton)) {
 
-                if (part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
+                if (part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitPane))
                 {
                     wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_DCLICK, GetManagedWindow()->GetId());
                     e.SetEventObject(GetManagedWindow());
@@ -5228,11 +5228,11 @@ void wxAuiManager::OnLeftDClick(wxMouseEvent& evt)
     }
 }
 
-void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
+void wxAuiManager::OnLeftDown(wxMouseEvent& event)
 {
     m_currentDragItem = -1;
 
-    wxAuiDockUIPart* part = HitTest(evt.GetX(), evt.GetY());
+    wxAuiDockUIPart* part = HitTest(event.GetX(), event.GetY());
     if (part)
     {
         if (part->type == wxAuiDockUIPart::typeDockSizer || part->type == wxAuiDockUIPart::typePaneSizer)
@@ -5251,19 +5251,19 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
             m_action = actionResize;
             m_actionPart = part;
             m_actionHintRect = wxRect();
-            m_actionStart = wxPoint(evt.m_x, evt.m_y);
-            m_actionOffset = wxPoint(evt.m_x - part->rect.x,
-                                      evt.m_y - part->rect.y);
+            m_actionStart = wxPoint(event.m_x, event.m_y);
+            m_actionOffset = wxPoint(event.m_x - part->rect.x,
+                                      event.m_y - part->rect.y);
             m_frame->CaptureMouse();
         }
         else if (part->type == wxAuiDockUIPart::typePaneButton)
         {
             m_action = actionClickButton;
             m_actionPart = part;
-            m_actionStart = wxPoint(evt.m_x, evt.m_y);
+            m_actionStart = wxPoint(event.m_x, event.m_y);
             m_frame->CaptureMouse();
 
-            UpdateButtonOnScreen(part, evt);
+            UpdateButtonOnScreen(part, event);
         }
         else if (part->type == wxAuiDockUIPart::typeCaption || part->type == wxAuiDockUIPart::typeGripper)
         {
@@ -5279,7 +5279,7 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
             {
                 wxAuiFloatingFrame* floatingFrame = (wxAuiFloatingFrame*)managed_wnd;
                 wxAuiManager* owner_mgr = floatingFrame->GetOwnerManager();
-                owner_mgr->StartPaneDrag(part->pane->GetWindow(), wxPoint(evt.m_x - part->rect.x, evt.m_y - part->rect.y));
+                owner_mgr->StartPaneDrag(part->pane->GetWindow(), wxPoint(event.m_x - part->rect.x, event.m_y - part->rect.y));
                 return;
             }
 
@@ -5289,25 +5289,25 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
 
             m_action = actionClickCaption;
             m_actionPart = part;
-            m_actionStart = wxPoint(evt.m_x, evt.m_y);
-            m_actionOffset = wxPoint(evt.m_x - part->rect.x, evt.m_y - part->rect.y);
+            m_actionStart = wxPoint(event.m_x, event.m_y);
+            m_actionOffset = wxPoint(event.m_x - part->rect.x, event.m_y - part->rect.y);
             m_frame->CaptureMouse();
         }
         else if(part->type == wxAuiDockUIPart::typePaneTab)
         {
             wxAuiPaneInfo* hitPane;
-            if(part->m_tab_container->ButtonHitTest(evt.m_x,evt.m_y,&m_hoverButton2))
+            if(part->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&m_hoverButton2))
             {
                 m_action = actionClickButton;
                 m_actionPart = part;
-                m_actionStart = wxPoint(evt.m_x, evt.m_y);
+                m_actionStart = wxPoint(event.m_x, event.m_y);
                 m_frame->CaptureMouse();
                 part->pane = &part->m_tab_container->GetPage(part->m_tab_container->GetActivePage());
 
                 m_hoverButton2->curState = wxAUI_BUTTON_STATE_PRESSED;
                 Repaint();
             }
-            else if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
+            else if(part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitPane))
             {
                 int oldActivePaneIndex=GetActivePane(NULL);
                 int newActivePaneIndex=GetAllPanes().Index(*hitPane);
@@ -5329,12 +5329,12 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
                 {
                     SetActivePane(hitPane->GetWindow());
 
-                    m_actionOffset = wxPoint(evt.m_x-hitPane->GetRect().x,evt.m_y-part->rect.y);
+                    m_actionOffset = wxPoint(event.m_x-hitPane->GetRect().x,event.m_y-part->rect.y);
 
                     m_action = actionClickCaption;
                     m_actionPart = part;
                     m_actionPart->pane = hitPane;
-                    m_actionStart = wxPoint(evt.m_x, evt.m_y);
+                    m_actionStart = wxPoint(event.m_x, event.m_y);
                     m_frame->CaptureMouse();
 
                     DoFrameLayout();
@@ -5355,22 +5355,22 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& evt)
 #ifdef __WXMAC__
         else
         {
-            evt.Skip();
+            event.Skip();
         }
 #endif
     }
 #ifdef __WXMAC__
     else
     {
-        evt.Skip();
+        event.Skip();
     }
 #else
-    evt.Skip();
+    event.Skip();
 #endif
 }
 
 /// Ends a resize action, or for live update, resizes the sash
-bool wxAuiManager::DoEndResizeAction(wxMouseEvent& evt)
+bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
 {
     // resize the dock or the pane
     if (m_actionPart && m_actionPart->type==wxAuiDockUIPart::typeDockSizer)
@@ -5422,8 +5422,8 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& evt)
 
         wxRect& rect = m_actionPart->dock->rect;
 
-        wxPoint new_pos(evt.m_x - m_actionOffset.x,
-            evt.m_y - m_actionOffset.y);
+        wxPoint new_pos(event.m_x - m_actionOffset.x,
+            event.m_y - m_actionOffset.y);
         int new_size, old_size = m_actionPart->dock->size;
 
         switch (m_actionPart->dock->dock_direction)
@@ -5500,8 +5500,8 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& evt)
         int pane_borderSize = m_art->GetMetric(wxAUI_DOCKART_PANE_BORDER_SIZE);
         int sashSize = m_art->GetMetric(wxAUI_DOCKART_SASH_SIZE);
 
-        wxPoint new_pos(evt.m_x - m_actionOffset.x,
-            evt.m_y - m_actionOffset.y);
+        wxPoint new_pos(event.m_x - m_actionOffset.x,
+            event.m_y - m_actionOffset.y);
 
         // determine the pane rectangle by getting the pane part
         wxAuiDockUIPart* pane_part = GetPanePart(pane->GetWindow());
@@ -5718,7 +5718,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& evt)
     return true;
 }
 
-void wxAuiManager::OnLeftUp(wxMouseEvent& evt)
+void wxAuiManager::OnLeftUp(wxMouseEvent& event)
 {
     if (m_action == actionResize)
     {
@@ -5733,7 +5733,7 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& evt)
         if (m_currentDragItem != -1 && wxAuiManager_HasLiveResize(*this))
             m_actionPart = & (m_uiParts.Item(m_currentDragItem));
 
-        DoEndResizeAction(evt);
+        DoEndResizeAction(event);
 
         m_currentDragItem = -1;
 
@@ -5755,7 +5755,7 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& evt)
                 if (m_hoverButton2) { // Enter only if the pointer has not already fall off the action button
 
                     wxAuiTabContainerButton* hitbutton;
-                    if(m_actionPart->m_tab_container->ButtonHitTest(evt.m_x,evt.m_y,&hitbutton))
+                    if(m_actionPart->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&hitbutton))
                     {
                         passHitTest=( (hitbutton==m_hoverButton2) && (m_hoverButton2->curState==wxAUI_BUTTON_STATE_PRESSED) );
                     }
@@ -5768,8 +5768,8 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& evt)
             }
             else
             {
-                UpdateButtonOnScreen(m_actionPart, evt);
-                passHitTest = (m_actionPart == HitTest(evt.GetX(), evt.GetY()));
+                UpdateButtonOnScreen(m_actionPart, event);
+                passHitTest = (m_actionPart == HitTest(event.GetX(), event.GetY()));
                 buttonid=m_actionPart->button->button_id;
             }
             if (passHitTest)
@@ -5966,7 +5966,7 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& evt)
     }
     else
     {
-        evt.Skip();
+        event.Skip();
     }
 
     m_action = actionNone;
@@ -6107,7 +6107,7 @@ void wxAuiManager::HideToolTip()
     #endif
 }
 
-void wxAuiManager::OnMotion(wxMouseEvent& evt)
+void wxAuiManager::OnMotion(wxMouseEvent& event)
 {
     // sometimes when Update() is called from inside this method,
     // a spurious mouse move event is generated; this check will make
@@ -6115,7 +6115,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
     // this appears to be a bug somewhere, and I don't know where the
     // mouse move event is being generated.  only verified on MSW
 
-    wxPoint mouse_pos = evt.GetPosition();
+    wxPoint mouse_pos = event.GetPosition();
     if (m_lastMouseMove == mouse_pos)
         return;
     m_lastMouseMove = mouse_pos;
@@ -6149,16 +6149,16 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
         {
             wxPoint pos = m_actionPart->rect.GetPosition();
             if (m_actionPart->orientation == wxHORIZONTAL)
-                pos.y = wxMax(0, evt.m_y - m_actionOffset.y);
+                pos.y = wxMax(0, event.m_y - m_actionOffset.y);
             else
-                pos.x = wxMax(0, evt.m_x - m_actionOffset.x);
+                pos.x = wxMax(0, event.m_x - m_actionOffset.x);
 
             if (wxAuiManager_HasLiveResize(*this))
             {
                 bool capture = m_frame->HasCapture();
                 if (capture)
                     m_frame->ReleaseMouse();
-                DoEndResizeAction(evt);
+                DoEndResizeAction(event);
                 if (capture)
                     m_frame->CaptureMouse();
             }
@@ -6195,7 +6195,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
         // caption has been clicked.  we need to check if the mouse
         // is now being dragged. if it is, we need to change the
         // mouse action to 'drag'
-        if (m_actionPart && (abs(evt.m_x - m_actionStart.x) > drag_x_threshold || abs(evt.m_y - m_actionStart.y) > drag_y_threshold))
+        if (m_actionPart && (abs(event.m_x - m_actionStart.x) > drag_x_threshold || abs(event.m_y - m_actionStart.y) > drag_y_threshold))
         {
             wxAuiPaneInfo* paneInfo = m_actionPart->pane;
 
@@ -6214,7 +6214,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                 // Instead we want to move it around within the notebook.
                 if(m_actionPart->type==wxAuiDockUIPart::typePaneTab)
                 {
-                    wxAuiDockUIPart* hitpart = HitTest(evt.GetX(), evt.GetY());
+                    wxAuiDockUIPart* hitpart = HitTest(event.GetX(), event.GetY());
                     if(m_actionPart==hitpart)
                     {
                         wxAuiPaneInfo comp = *paneInfo;
@@ -6224,17 +6224,17 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                         {
                             Update();
                             Repaint();
-                            m_actionPart = HitTest(evt.GetX(), evt.GetY());
+                            m_actionPart = HitTest(event.GetX(), event.GetY());
                             m_actionPart->pane = paneInfo;
                             // Reset position of 'action start' otherwise we run the possibility of tabs 'jumping'
-                            mouse_pos.x=evt.m_x;
-                            mouse_pos.y=evt.m_y;
+                            mouse_pos.x=event.m_x;
+                            mouse_pos.y=event.m_y;
                             // If tabs are differently sized then we need to set a 'dead' zone in order to prevent the tab immediately switching around again on next mouse move event
                             if(!HasFlag(wxAUI_MGR_NB_TAB_FIXED_WIDTH))
                             {
                                 wxAuiPaneInfo*     hitPane   = NULL;
                                 wxAuiTabContainer *container = m_actionPart->m_tab_container;
-                                container->TabHitTest(evt.GetX(), evt.GetY(),&hitPane);
+                                container->TabHitTest(event.GetX(), event.GetY(),&hitPane);
                                 if( hitPane && hitPane->GetPage() != paneInfo->GetPage() )
                                 {
                                     // The dead zone is set to the area of the tab that has just exchanged it's position with the dragged one
@@ -6267,7 +6267,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                     m_action = actionDragFloatingPane;
 
                     // set initial float position
-                    wxPoint pt = m_frame->ClientToScreen(evt.GetPosition());
+                    wxPoint pt = m_frame->ClientToScreen(event.GetPosition());
                     paneInfo->FloatingPosition(wxPoint(pt.x - m_actionOffset.x,
                                                       pt.y - m_actionOffset.y));
 
@@ -6320,7 +6320,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                 m_actionWindow = pane.GetFrame();
             }
 
-            wxPoint pt = m_frame->ClientToScreen(evt.GetPosition());
+            wxPoint pt = m_frame->ClientToScreen(event.GetPosition());
             m_actionWindow->Move(pt.x - m_actionOffset.x,
                                 pt.y - m_actionOffset.y);
 
@@ -6342,7 +6342,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
         // event type back to a caption click so that we can move the actual tab around instead of drawing hints.
         if(m_actionPart && m_actionPart->type==wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiDockUIPart* hitpart = HitTest(evt.GetX(), evt.GetY());
+            wxAuiDockUIPart* hitpart = HitTest(event.GetX(), event.GetY());
             if(m_actionPart==hitpart)
             {
                 HideHint();
@@ -6357,7 +6357,7 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
         wxASSERT_MSG(pane.IsOk(), wxT("Pane window not found"));
 
         // Draw a hint for where the window will be moved.
-        wxPoint pt = evt.GetPosition();
+        wxPoint pt = event.GetPosition();
         DrawHintRect(m_actionWindow, pt, wxPoint(0,0));
 
         // Reduces flicker.
@@ -6381,14 +6381,14 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
 
         pane.SetFlag(wxAuiPaneInfo::actionPane, true);
 
-        wxPoint point = evt.GetPosition();
+        wxPoint point = event.GetPosition();
         DoDrop(m_docks, m_panes, pane, point, m_actionOffset);
 
         // if DoDrop() decided to float the pane, set up
         // the floating pane's initial position
         if (pane.IsFloating())
         {
-            wxPoint pt = m_frame->ClientToScreen(evt.GetPosition());
+            wxPoint pt = m_frame->ClientToScreen(event.GetPosition());
             pane.FloatingPosition(wxPoint(pt.x - m_actionOffset.x,
                                         pt.y - m_actionOffset.y));
         }
@@ -6411,14 +6411,14 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
     }
     else
     {
-        wxAuiDockUIPart* part = HitTest(evt.GetX(), evt.GetY());
+        wxAuiDockUIPart* part = HitTest(event.GetX(), event.GetY());
         if (part)
         {
             //For caption(s) and tab(s) set tooltip if one is present, for everything else cancel any existing tooltip.
             if(part->type == wxAuiDockUIPart::typePaneTab)
             {
                 wxAuiPaneInfo* hitPane=NULL;
-                if(part->m_tab_container->TabHitTest(evt.GetX(), evt.GetY(), &hitPane))
+                if(part->m_tab_container->TabHitTest(event.GetX(), event.GetY(), &hitPane))
                 {
                     ShowToolTip(hitPane);
                 }
@@ -6428,12 +6428,12 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                 }
 
                 wxAuiTabContainerButton* hitbutton;
-                if(part->m_tab_container->ButtonHitTest(evt.m_x,evt.m_y,&hitbutton))
+                if(part->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&hitbutton))
                 {
                     // make the old button normal
                     if (m_hoverButton)
                     {
-                        UpdateButtonOnScreen(m_hoverButton, evt);
+                        UpdateButtonOnScreen(m_hoverButton, event);
                         Repaint();
                     }
                     if(m_hoverButton2 != hitbutton)
@@ -6473,13 +6473,13 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
                         // make the old button normal
                         if (m_hoverButton)
                         {
-                            UpdateButtonOnScreen(m_hoverButton, evt);
+                            UpdateButtonOnScreen(m_hoverButton, event);
                             Repaint();
                         }
 
                         // mouse is over a button, so repaint the
                         // button in hover mode
-                        UpdateButtonOnScreen(part, evt);
+                        UpdateButtonOnScreen(part, event);
                         m_hoverButton = part;
                     }
                     return;
@@ -6503,19 +6503,19 @@ void wxAuiManager::OnMotion(wxMouseEvent& evt)
         }
         else
         {
-            evt.Skip();
+            event.Skip();
         }
     }
 }
 
-void wxAuiManager::OnLeaveWindow(wxMouseEvent& evt)
+void wxAuiManager::OnLeaveWindow(wxMouseEvent& event)
 {
     HideToolTip();
 
     if (m_hoverButton || m_hoverButton2)
     {
 		if (m_hoverButton) {
-			UpdateButtonOnScreen(m_hoverButton, evt);
+			UpdateButtonOnScreen(m_hoverButton, event);
 			m_hoverButton = NULL;
 		}
 
@@ -6528,7 +6528,7 @@ void wxAuiManager::OnLeaveWindow(wxMouseEvent& evt)
     }
 }
 
-void wxAuiManager::OnCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
+void wxAuiManager::OnCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(event))
 {
     HideToolTip();
 
@@ -6542,7 +6542,7 @@ void wxAuiManager::OnCaptureLost(wxMouseCaptureLostEvent& WXUNUSED(evt))
     }
 }
 
-void wxAuiManager::OnChildFocus(wxChildFocusEvent& evt)
+void wxAuiManager::OnChildFocus(wxChildFocusEvent& event)
 {
     bool refresh = false;
     // Ensure none of the notebook controls have focus set
@@ -6564,10 +6564,10 @@ void wxAuiManager::OnChildFocus(wxChildFocusEvent& evt)
     // pane's active state to reflect this. (this is only true if
     // active panes are allowed by the owner)
 
-    wxAuiPaneInfo& pane = GetPane(evt.GetWindow());
+    wxAuiPaneInfo& pane = GetPane(event.GetWindow());
     if (pane.IsOk() && !pane.HasFlag(wxAuiPaneInfo::optionActive))
     {
-        SetActivePane(evt.GetWindow());
+        SetActivePane(event.GetWindow());
         if (HasFlag(wxAUI_MGR_ALLOW_ACTIVE_PANE))
             refresh = true;
     }
@@ -6577,7 +6577,7 @@ void wxAuiManager::OnChildFocus(wxChildFocusEvent& evt)
         m_frame->Refresh();
     }
 
-    evt.Skip();
+    event.Skip();
 }
 
 
