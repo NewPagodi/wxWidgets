@@ -1286,7 +1286,11 @@ EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
 wxEND_EVENT_TABLE()
 
 // -- wxAuiNotebook class implementation --
-bool wxAuiNotebook::Create(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+bool wxAuiNotebook::Create(wxWindow* parent,
+                           wxWindowID id,
+                           const wxPoint& pos,
+                           const wxSize& size,
+                           long style)
 {
     if(!wxControl::Create(parent, id, pos, size, style))
         return false;

@@ -368,7 +368,9 @@ public:
     }
 
 protected:
-    virtual void DoSetSizeHints( int minW, int minH, int maxW, int maxH, int incW, int incH) wxOVERRIDE
+    virtual void DoSetSizeHints( int minW, int minH,
+                                 int maxW, int maxH,
+                                 int incW, int incH) wxOVERRIDE
     {
         // the real wxFrame method doesn't work for us because we're not really
         // a top level window so skip it
