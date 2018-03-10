@@ -911,7 +911,7 @@ bool wxAuiManager::CanDockPanel(const wxAuiPaneInfo & WXUNUSED(p))
 // info is modified, wxAuiManager::Update() must be called to
 // realize the changes in the UI.
 
-wxAuiPaneInfo& wxAuiManager::GetPane(wxWindow* window) const
+wxAuiPaneInfo& wxAuiManager::GetPane(wxWindow* window)
 {
     int i, pane_count;
     for (i = 0, pane_count = m_panes.GetCount(); i < pane_count; ++i)
@@ -925,7 +925,7 @@ wxAuiPaneInfo& wxAuiManager::GetPane(wxWindow* window) const
 
 // this version of GetPane() looks up a pane based on a
 // 'pane name', see above comment for more info
-wxAuiPaneInfo& wxAuiManager::GetPane(const wxString& name) const
+wxAuiPaneInfo& wxAuiManager::GetPane(const wxString& name)
 {
     int i, pane_count;
     for (i = 0, pane_count = m_panes.GetCount(); i < pane_count; ++i)
@@ -938,7 +938,7 @@ wxAuiPaneInfo& wxAuiManager::GetPane(const wxString& name) const
 }
 
 // This version of GetPane() looks up a pane based on its index position.
-wxAuiPaneInfo& wxAuiManager::GetPane(size_t paneIndex) const
+wxAuiPaneInfo& wxAuiManager::GetPane(size_t paneIndex)
 {
     size_t paneCount = m_panes.GetCount();
     if(paneCount>paneIndex)

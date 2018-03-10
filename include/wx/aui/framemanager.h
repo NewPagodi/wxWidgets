@@ -621,9 +621,9 @@ public:
     void SetTabArtProvider(wxAuiTabArt* artProvider);
     wxAuiTabArt* GetTabArtProvider() const;
 
-    wxAuiPaneInfo& GetPane(wxWindow* window) const;
-    wxAuiPaneInfo& GetPane(const wxString& name) const;
-    wxAuiPaneInfo& GetPane(size_t paneIndex) const;
+    wxAuiPaneInfo& GetPane(wxWindow* window);
+    wxAuiPaneInfo& GetPane(const wxString& name);
+    wxAuiPaneInfo& GetPane(size_t paneIndex);
     wxAuiPaneInfoArray& GetAllPanes();
     size_t GetPaneCount() const;
 
