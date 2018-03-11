@@ -1675,7 +1675,7 @@ void wxAuiNotebook::OnPaneDrop(wxAuiManagerEvent& evt)
 {
     // Fire our own notebook specific event in place of normal manager one.
     // This is for backwards compatibility with older notebook code, before the aui manager handled this.
-    wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_ALLOW_DND, m_mgr.GetManagedWindow()->GetId());
+    wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_ALLOW_DND, m_mgr.GetManagedWindow()->GetId());
     int selIndex=m_mgr.GetAllPanes().Index(*evt.GetPane());
     e.SetSelection(selIndex);
     e.SetOldSelection(selIndex);
@@ -1824,7 +1824,7 @@ bool wxAuiNotebook::ShowWindowMenu()
 
     if (idx != -1)
     {
-        wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, GetId());
+        wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_PAGE_CHANGING, GetId());
         e.SetSelection(idx);
         e.SetOldSelection(tabCtrl->GetActivePage());
         e.SetEventObject(this);
@@ -1930,7 +1930,7 @@ int wxAuiNotebook::DoModifySelection(size_t n, bool events)
 
     bool vetoed = false;
 
-    wxAuiNotebookEvent evt(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, m_windowId);
+    wxAuiNotebookEvent evt(wxEVT_AUINOTEBOOK_PAGE_CHANGING, m_windowId);
 
     if(events)
     {
@@ -1950,7 +1950,7 @@ int wxAuiNotebook::DoModifySelection(size_t n, bool events)
         // program allows the page change
         if(events)
         {
-            evt.SetEventType(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED);
+            evt.SetEventType(wxEVT_AUINOTEBOOK_PAGE_CHANGED);
             (void)GetEventHandler()->ProcessEvent(evt);
         }
     }

@@ -1556,7 +1556,7 @@ bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
 
     if (notebook)
     {
-        wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSE, GetManagedWindow()->GetId());
+        wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_PAGE_CLOSE, GetManagedWindow()->GetId());
         e.SetSelection(GetAllPanes().Index(paneInfo));
         e.SetEventObject(GetManagedWindow());
         GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -1637,7 +1637,7 @@ bool wxAuiManager::ClosePane(wxAuiPaneInfo& paneInfo)
     // If we are a wxAuiNotebook then we must fire off a EVT_AUINOTEBOOK_PAGE_CLOSED event to notify user of change.
     if (notebook)
     {
-        wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CLOSED, GetManagedWindow()->GetId());
+        wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_PAGE_CLOSED, GetManagedWindow()->GetId());
         e.SetSelection(GetAllPanes().Index(paneInfo));
         e.SetEventObject(GetManagedWindow());
         GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -4700,7 +4700,7 @@ void wxAuiManager::DrawHintRect(wxWindow* pane_window,
                 // find out from the destination control if it's ok to drop this tab here.
                 if(wxDynamicCast(targetCtrl,wxAuiNotebook))
                 {
-                    wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_ALLOW_DND, GetManagedWindow()->GetId());
+                    wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_ALLOW_DND, GetManagedWindow()->GetId());
                     int selIndex=GetAllPanes().Index(GetPane(pane_window));
                     e.SetSelection(selIndex);
                     e.SetOldSelection(selIndex);
@@ -5389,11 +5389,11 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
                 int oldActivePaneIndex=GetActivePane(NULL);
                 int newActivePaneIndex=GetAllPanes().Index(*hitPane);
 
-                // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING event and give the user an opportunity to veto it.
+                // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_PAGE_CHANGING event and give the user an opportunity to veto it.
                 bool vetoed=false;
                 if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
                 {
-                    wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGING, GetManagedWindow()->GetId());
+                    wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_PAGE_CHANGING, GetManagedWindow()->GetId());
                     e.SetSelection(newActivePaneIndex);
                     e.SetOldSelection(oldActivePaneIndex);
                     e.SetEventObject(GetManagedWindow());
@@ -5417,10 +5417,10 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
                     DoFrameLayout();
                     Repaint();
 
-                    // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED event.
+                    // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_PAGE_CHANGED event.
                     if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
                     {
-                        wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_PAGE_CHANGED, GetManagedWindow()->GetId());
+                        wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_PAGE_CHANGED, GetManagedWindow()->GetId());
                         e.SetSelection(newActivePaneIndex);
                         e.SetOldSelection(oldActivePaneIndex);
                         e.SetEventObject(GetManagedWindow());
@@ -5853,10 +5853,10 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
             }
             if (passHitTest)
             {
-                // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_BUTTON event to notify user of change.
+                // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_BUTTON event to notify user of change.
                 if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
                 {
-                    wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_BUTTON, GetManagedWindow()->GetId());
+                    wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_BUTTON, GetManagedWindow()->GetId());
                     e.SetSelection(GetAllPanes().Index(pane));
                     e.SetInt(buttonid);
                     e.SetEventObject(GetManagedWindow());
@@ -5883,10 +5883,10 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
     }
     else if (m_action == actionDragFloatingPane)
     {
-        // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_DRAG_DONE event to notify user of change.
+        // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_DRAG_DONE event to notify user of change.
         if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
         {
-            wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_DRAG_DONE, GetManagedWindow()->GetId());
+            wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_DRAG_DONE, GetManagedWindow()->GetId());
             e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
             e.SetEventObject(GetManagedWindow());
             GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -5894,10 +5894,10 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
 
         m_frame->ReleaseMouse();
 
-        // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_END_DRAG event to notify user of change.
+        // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_END_DRAG event to notify user of change.
         if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
         {
-            wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_END_DRAG, GetManagedWindow()->GetId());
+            wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_END_DRAG, GetManagedWindow()->GetId());
             e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
             e.SetEventObject(GetManagedWindow());
             GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -5905,10 +5905,10 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
     }
     else if (m_action == actionDragMovablePane)
     {
-        // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_DRAG_DONE event to notify user of change.
+        // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_DRAG_DONE event to notify user of change.
         if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
         {
-            wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_DRAG_DONE, GetManagedWindow()->GetId());
+            wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_DRAG_DONE, GetManagedWindow()->GetId());
             e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
             e.SetEventObject(GetManagedWindow());
             GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6008,10 +6008,10 @@ void wxAuiManager::OnLeftUp(wxMouseEvent& event)
         delete m_actionDeadZone;
         m_actionDeadZone = NULL;
 
-        // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_END_DRAG event to notify user of change.
+        // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_END_DRAG event to notify user of change.
         if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
         {
-            wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_END_DRAG, GetManagedWindow()->GetId());
+            wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_END_DRAG, GetManagedWindow()->GetId());
             e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
             e.SetEventObject(GetManagedWindow());
             GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6064,7 +6064,7 @@ void wxAuiManager::OnRightDown(wxMouseEvent& evt)
             wxAuiPaneInfo* hitPane;
             if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
             {
-                wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_DOWN, GetManagedWindow()->GetId());
+                wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
                 e.SetSelection(GetAllPanes().Index(*hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6083,7 +6083,7 @@ void wxAuiManager::OnRightUp(wxMouseEvent& evt)
             wxAuiPaneInfo* hitPane;
             if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
             {
-                wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_TAB_RIGHT_UP, GetManagedWindow()->GetId());
+                wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
                 e.SetSelection(GetAllPanes().Index(*hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6102,7 +6102,7 @@ void wxAuiManager::OnMiddleDown(wxMouseEvent& evt)
             wxAuiPaneInfo* hitPane;
             if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
             {
-                wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_TAB_MIDDLE_DOWN, GetManagedWindow()->GetId());
+                wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_MIDDLE_DOWN, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
                 e.SetSelection(GetAllPanes().Index(*hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6139,9 +6139,9 @@ void wxAuiManager::OnMiddleUp(wxMouseEvent& evt)
         return;
 
 
-    // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_TAB_MIDDLE_UP event and give the user an opportunity to veto it.
+    // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_TAB_MIDDLE_UP event and give the user an opportunity to veto it.
     {
-        wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_TAB_MIDDLE_UP, GetManagedWindow()->GetId());
+        wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_MIDDLE_UP, GetManagedWindow()->GetId());
         e.SetSelection(GetAllPanes().Index(*part->pane));
         e.SetEventObject(GetManagedWindow());
         if (GetManagedWindow()->GetEventHandler()->ProcessEvent(e))
@@ -6282,10 +6282,10 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
 
             if (!paneInfo->IsToolbar())
             {
-                // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_BEGIN_DRAG event to notify user of change.
+                // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_BEGIN_DRAG event to notify user of change.
                 if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
                 {
-                    wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_BEGIN_DRAG, GetManagedWindow()->GetId());
+                    wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_BEGIN_DRAG, GetManagedWindow()->GetId());
                     e.SetSelection(GetAllPanes().Index(*paneInfo));
                     e.SetEventObject(GetManagedWindow());
                     GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6405,10 +6405,10 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
             m_actionWindow->Move(pt.x - m_actionOffset.x,
                                 pt.y - m_actionOffset.y);
 
-            // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_DRAG_MOTION event to notify user of change.
+            // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_DRAG_MOTION event to notify user of change.
             if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
             {
-                wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_DRAG_MOTION, GetManagedWindow()->GetId());
+                wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_DRAG_MOTION, GetManagedWindow()->GetId());
                 e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
                 e.SetEventObject(GetManagedWindow());
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
@@ -6444,10 +6444,10 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
         // Reduces flicker.
         m_frame->Update();
 
-        // If we are a wxAuiNotebook then we must fire off a wxEVT_COMMAND_AUINOTEBOOK_DRAG_MOTION event to notify user of change.
+        // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_DRAG_MOTION event to notify user of change.
         if(wxDynamicCast(GetManagedWindow(),wxAuiNotebook))
         {
-            wxAuiNotebookEvent e(wxEVT_COMMAND_AUINOTEBOOK_DRAG_MOTION, GetManagedWindow()->GetId());
+            wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_DRAG_MOTION, GetManagedWindow()->GetId());
             e.SetSelection(GetAllPanes().Index(GetPane(m_actionWindow)));
             e.SetEventObject(GetManagedWindow());
             GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
