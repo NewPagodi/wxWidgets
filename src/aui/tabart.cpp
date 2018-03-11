@@ -92,7 +92,8 @@ static void DrawButtons(wxDC& dc,
         rect.y++;
     }
 
-    if (button_state == wxAUI_BUTTON_STATE_HOVER || button_state == wxAUI_BUTTON_STATE_PRESSED)
+    if (button_state == wxAUI_BUTTON_STATE_HOVER ||
+        button_state == wxAUI_BUTTON_STATE_PRESSED)
     {
         dc.SetBrush(wxBrush(bkcolour.ChangeLightness(120)));
         dc.SetPen(wxPen(bkcolour.ChangeLightness(75)));
