@@ -698,6 +698,7 @@ protected:
     void UpdateHintWindowConfig();
 
     void DoFrameLayout();
+
     void LayoutAddPane(wxSizer* container,
                        wxAuiDockInfo& dock,
                        wxAuiPaneInfo& pane,
