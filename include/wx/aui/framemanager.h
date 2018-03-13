@@ -233,9 +233,7 @@ public:
         m_dock_page = c.m_dock_page;
         return *this;
     }
-#else // SWIG
-    %typemap(out) wxAuiPaneInfo& { $result = $self; Py_INCREF($result); }
-#endif // !SWIG
+#endif // SWIG
 
     // Write the safe parts of a newly loaded PaneInfo structure "source" into "this"
     // used on loading perspectives etc.
@@ -279,6 +277,10 @@ public:
     bool HasMinimizeButton() const { return HasFlag(buttonMinimize); }
     bool HasPinButton() const { return HasFlag(buttonPin); }
     bool HasGripperTop() const { return HasFlag(optionGripperTop); }
+
+#ifdef SWIG
+    %typemap(out) wxAuiPaneInfo& { $result = $self; Py_INCREF($result); }
+#endif
     wxAuiPaneInfo& Window(wxWindow* w)
     {
         wxAuiPaneInfo test(*this);
