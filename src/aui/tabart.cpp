@@ -999,10 +999,10 @@ void wxAuiGenericTabArt::DrawButton(wxDC& dc,
 
     if (orientation == wxLEFT)
     {
-        rect.x = in_rect.x;
-        rect.y = ((in_rect.y + in_rect.height)/2) - (bmp.GetScaledHeight()/2);
-        rect.width = bmp.GetScaledWidth();
-        rect.height = bmp.GetScaledHeight();
+        rect.SetX(in_rect.x);
+        rect.SetY(((in_rect.y + in_rect.height)/2) - (bmp.GetScaledHeight()/2));
+        rect.SetWidth(bmp.GetScaledWidth());
+        rect.SetHeight(bmp.GetScaledHeight());
     }
     else if (orientation == wxUP)
     {
@@ -1694,10 +1694,10 @@ void wxAuiSimpleTabArt::DrawButton(wxDC& dc,
 
     if (orientation == wxLEFT)
     {
-        rect.x = in_rect.x;
-        rect.y = ((in_rect.y + in_rect.height)/2) - (bmp.GetScaledHeight()/2);
-        rect.width = bmp.GetScaledWidth();
-        rect.height = bmp.GetScaledHeight();
+        rect.SetX(in_rect.x);
+        rect.SetY(((in_rect.y + in_rect.height)/2) - (bmp.GetScaledHeight()/2));
+        rect.SetWidth(bmp.GetScaledWidth());
+        rect.SetHeight(bmp.GetScaledHeight());
     }
     else if (orientation == wxUP)
     {
