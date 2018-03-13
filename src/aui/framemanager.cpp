@@ -5534,11 +5534,11 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         m_actionPart->type == wxAuiDockUIPart::typePaneSizer)
     {
         wxAuiDockInfo& dock = *m_actionPart->dock;
-        wxAuiPaneInfo* pane = m_actionPart->pane;
+        wxAuiPaneInfo& pane = *m_actionPart->pane;
 
         // If the pane is part of a notebook then its window might not currently be the visible one within the notebook
         // So we must then find which window in the notebook is the visible one and use the pane for that instead.
-        if(!pane->GetWindow()->IsShown())
+        if(!pane.GetWindow()->IsShown())
         {
             int i;
             int dock_pane_count = dock.panes.GetCount();
@@ -5546,16 +5546,16 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
             for (i = 0; i < dock_pane_count; ++i)
             {
                 wxAuiPaneInfo& p = *dock.panes.Item(i);
-                if (p.GetWindow() == pane->GetWindow())
+                if (p.GetWindow() == pane.GetWindow())
                 {
                     // Our current pane will be the last pane in the notebook,
                     // so now search backwards through the notebook till we find the visible pane.
                     int j;
                     for (j = i - 1; j >= 0; --j)
                     {
-                        if(dock.panes.Item(j)->GetWindow()->IsShown() && dock.panes.Item(j)->GetPosition() == pane->GetPosition())
+                        if(dock.panes.Item(j)->GetWindow()->IsShown() && dock.panes.Item(j)->GetPosition() == pane.GetPosition())
                         {
-                            pane = dock.panes.Item(j);
+                            pane = *(dock.panes.Item(j));
                             break;
                         }
                     }
@@ -5576,7 +5576,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
             event.m_y - m_actionOffset.y);
 
         // determine the pane rectangle by getting the pane part
-        wxAuiDockUIPart* pane_part = GetPanePart(pane->window);
+        wxAuiDockUIPart* pane_part = GetPanePart(pane.window);
         wxASSERT_MSG(pane_part,
             wxT("Pane border part not found -- shouldn't happen"));
 
@@ -5601,7 +5601,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         for (i = 0; i < dock_pane_count; ++i)
         {
             wxAuiPaneInfo& p = *dock.panes.Item(i);
-            if (p.window == pane->window)
+            if (p.window == pane.window)
                 pane_position = i;
 
             // Don't include all the panes from a notebook in the calculation, only the first one.
@@ -5678,23 +5678,23 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         // that this is not enough to ensure that the minimum size will
         // not be violated, because the whole frame might later be shrunk,
         // causing the size of the pane to violate its minimum size
-        if (pane->min_size.IsFullySpecified())
+        if (pane.min_size.IsFullySpecified())
         {
             min_size = 0;
 
-            if (pane->HasBorder())
+            if (pane.HasBorder())
                 min_size += (pane_borderSize*2);
 
             // calculate minimum size with decorations (border,caption)
             if (pane_part->orientation == wxVERTICAL)
             {
-                min_size += pane->min_size.y;
-                if (pane->HasCaption())
+                min_size += pane.min_size.y;
+                if (pane.HasCaption())
                     min_size += caption_size;
             }
             else
             {
-                min_size += pane->min_size.x;
+                min_size += pane.min_size.x;
             }
         }
 
@@ -5712,7 +5712,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
 
 
 
-        int prop_diff = new_proportion - pane->dock_proportion;
+        int prop_diff = new_proportion - pane.dock_proportion;
 
         // borrow the space from our neighbor pane to the
         // right or bottom (depending on orientation);
@@ -5756,12 +5756,12 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
                 break;
             }
         }
-        pane->Proportion(new_proportion);
+        pane.dock_proportion = new_proportion;
         // If the above proportion change was to a pane in a notebook then all other panes in the notebook
         // must have the same change, so we do this below.
         for(i=pane_position-1;i>0;i--)
         {
-            if(AreInSameNotebook(*pane, *dock.panes.Item(i)))
+            if(AreInSameNotebook(pane, *dock.panes.Item(i)))
             {
                 dock.panes.Item(i)->Proportion(new_proportion);
             }
@@ -5772,7 +5772,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         }
         for(i=pane_position+1;i<dock_pane_count;i++)
         {
-            if(AreInSameNotebook(*pane, *dock.panes.Item(i)))
+            if(AreInSameNotebook(pane, *dock.panes.Item(i)))
             {
                 dock.panes.Item(i)->Proportion(new_proportion);
             }
