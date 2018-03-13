@@ -765,9 +765,9 @@ wxBEGIN_EVENT_TABLE(wxAuiManager, wxEvtHandler)
     EVT_ERASE_BACKGROUND(wxAuiManager::OnEraseBackground)
     EVT_SIZE(wxAuiManager::OnSize)
     EVT_SET_CURSOR(wxAuiManager::OnSetCursor)
-    EVT_LEFT_DCLICK(wxAuiManager::OnLeftDClick)
     EVT_LEFT_DOWN(wxAuiManager::OnLeftDown)
     EVT_LEFT_UP(wxAuiManager::OnLeftUp)
+    EVT_LEFT_DCLICK(wxAuiManager::OnLeftDClick)
     EVT_RIGHT_DOWN(wxAuiManager::OnRightDown)
     EVT_RIGHT_UP(wxAuiManager::OnRightUp)
     EVT_MIDDLE_DOWN(wxAuiManager::OnMiddleDown)
@@ -4944,10 +4944,10 @@ void wxAuiManager::OnFloatingPaneMoved(wxWindow* wnd, wxDirection dir)
         RestoreMaximizedPane();
     }
 
-    HideHint();
-
     // Update the layout to realize new position and e.g. form notebooks if needed.
     Update();
+
+    HideHint();
 
     // If a notebook formed we may have lost our active status so set it again.
     SetActivePane(pane.GetWindow());
