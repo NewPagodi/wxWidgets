@@ -5479,7 +5479,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
 #if wxUSE_STATUSBAR
         // if there's a status control, the available
         // height decreases accordingly
-        if (m_frame && wxDynamicCast(m_frame, wxFrame))
+        if (wxDynamicCast(m_frame, wxFrame))
         {
             wxFrame* frame = static_cast<wxFrame*>(m_frame);
             wxStatusBar* status = frame->GetStatusBar();
