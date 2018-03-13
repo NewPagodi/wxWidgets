@@ -55,6 +55,7 @@ static int s_CloseIconSize = 16; // default size
 wxString wxAuiChopText(wxDC& dc, const wxString& text, int max_size);
 
 wxAuiGtkTabArt::wxAuiGtkTabArt()
+
 {
 }
 
@@ -84,6 +85,7 @@ void wxAuiGtkTabArt::DrawBackground(wxDC& dc, wxWindow* WXUNUSED(wnd), const wxR
 
 void wxAuiGtkTabArt::DrawBorder(wxDC& WXUNUSED(dc), wxWindow* wnd, const wxRect& rect)
 {
+
     if (!wnd) return;
     if (!wnd->m_wxwindow) return;
     if (!gtk_widget_is_drawable(wnd->m_wxwindow)) return;

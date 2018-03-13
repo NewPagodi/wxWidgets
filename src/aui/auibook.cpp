@@ -1878,7 +1878,7 @@ int wxAuiNotebook::ChangeSelection(size_t n)
     return DoModifySelection(n, false);
 }
 
-bool wxAuiNotebook::AddPage(wxWindow *page, const wxString &text, bool select,
+bool wxAuiNotebook::AddPage(wxWindow *page, const wxString &text, bool select, 
                             int imageId)
 {
     if(HasImageList()) 
