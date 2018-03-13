@@ -1276,7 +1276,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
                                         wxAuiPaneInfo::optionBottomDockable;
         const unsigned int defaultDock = wxAuiPaneInfo().
                                             DefaultPane().state & dockMask;
-        if ((test.GetFlags() & dockMask) == defaultDock)
+        if ((test.state & dockMask) == defaultDock)
         {
             // set docking flags based on toolbar style
             if (toolbar->GetWindowStyleFlag() & wxAUI_TB_VERTICAL)
@@ -1292,7 +1292,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
         {
             // see whether non-default docking flags are valid
             test.window = window;
-            if (test.GetWindow() != window)
+            if (test.window != window)
                 return false;
         }
     }
@@ -1346,7 +1346,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
 
     if (pinfo.HasGripper())
     {
-        if (wxDynamicCast(pinfo.GetWindow(), wxAuiToolBar))
+        if (wxDynamicCast(pinfo.window, wxAuiToolBar))
         {
             // prevent duplicate gripper -- both wxAuiManager and wxAuiToolBar
             // have a gripper control.  The toolbar's built-in gripper
@@ -4231,12 +4231,12 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         // insert the pane before the pane being hovered over
         if (mouseOffset <= size/2)
         {
-            drop_position = part->pane->GetPosition();
+            drop_position = part->pane->dock_pos;
             DoInsertPane(panes,
-                         part->pane->GetDirection(),
-                         part->pane->GetLayer(),
-                         part->pane->GetRow(),
-                         part->pane->GetPosition());
+                         part->pane->dock_direction,
+                         part->pane->dock_layer,
+                         part->pane->dock_row,
+                         part->pane->dock_pos);
         }
 
         // if we are in the bottom/right part of the pane,
@@ -4245,10 +4245,10 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
         {
             drop_position = part->pane->dock_pos+1;
             DoInsertPane(panes,
-                         part->pane->GetDirection(),
-                         part->pane->GetLayer(),
-                         part->pane->GetRow(),
-                         part->pane->GetPosition()+1);
+                         part->pane->dock_direction,
+                         part->pane->dock_layer,
+                         part->pane->dock_row,
+                         part->pane->dock_pos+1);
         }
 
         drop.Dock().
@@ -5350,7 +5350,7 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
             {
                 wxAuiFloatingFrame* floating_frame = (wxAuiFloatingFrame*)managed_wnd;
                 wxAuiManager* owner_mgr = floating_frame->GetOwnerManager();
-                owner_mgr->StartPaneDrag(part->pane->GetWindow(),
+                owner_mgr->StartPaneDrag(part->pane->window,
                                              wxPoint(event.m_x - part->rect.x,
                                                      event.m_y - part->rect.y));
                 return;
