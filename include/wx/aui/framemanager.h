@@ -390,7 +390,6 @@ public:
         return *this;
     }
 
-    // get/set a property flag for this pane, used internally by other get/set functions.
     bool HasFlag(int flag) const
     {
         return (state & flag) != 0;
@@ -644,7 +643,6 @@ public:
     void SetDockSizeConstraint(double widthPct, double heightPct);
     void GetDockSizeConstraint(double* widthPct, double* heightPct) const;
 
-    //Close pane, return true if close successful or false otherwise (event vetoed)
     bool ClosePane(wxAuiPaneInfo& paneInfo);
     void MaximizePane(wxAuiPaneInfo& paneInfo);
     void RestorePane(wxAuiPaneInfo& paneInfo);
