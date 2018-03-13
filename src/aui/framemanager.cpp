@@ -726,7 +726,6 @@ static int DockPaneSortFunc(wxAuiPaneInfo** p1, wxAuiPaneInfo** p2)
 }
 
 
-
 bool wxAuiPaneInfo::IsValid() const
 {
     // Should this RTTI and function call be rewritten as
@@ -3376,6 +3375,7 @@ WX_DECLARE_STRING_HASH_MAP( int, NotebookOffsetHash );
 // Update() updates the layout.  Whenever changes are made to
 // one or more panes, this function should be called.  It is the
 // external entry point for running the layout engine.
+
 void wxAuiManager::Update()
 {
     m_hoverButton = NULL;
