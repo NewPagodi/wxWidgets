@@ -693,7 +693,7 @@ public:
     int SetActivePane(wxWindow* activePane);
 
 protected:
-    //Layout helper functions.
+
     void UpdateHintWindowConfig();
 
     void DoFrameLayout();
