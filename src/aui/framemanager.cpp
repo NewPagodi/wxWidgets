@@ -640,35 +640,6 @@ int wxAuiManager::SetActivePane(wxWindow* active_pane)
     return 0;
 }
 
-int wxAuiManager::GetActivePane(wxWindow* focus) const
-{
-    int i, paneCount;
-
-    // First try to find a pane that has the focus flag and whose window has actual focus.
-    // This allows us to pick the right pane in the event that multiple panes have the focus flag set.
-    for (i = 0, paneCount = m_panes.GetCount(); i < paneCount; ++i)
-    {
-        wxAuiPaneInfo& pane = m_panes[i];
-        if(pane.HasFlag(wxAuiPaneInfo::optionActive))
-        {
-            if(!focus || pane.GetWindow()==focus)
-            {
-                return i;
-            }
-        }
-    }
-    // If no panes had the focus flag and actual focus then fall back to returning the first pane with focus flag.
-    for (i = 0, paneCount = m_panes.GetCount(); i < paneCount; ++i)
-    {
-        wxAuiPaneInfo& pane = m_panes[i];
-        if(pane.HasFlag(wxAuiPaneInfo::optionActive))
-        {
-            return i;
-        }
-    }
-    return wxNOT_FOUND;
-}
-
 
 // this function is used to sort panes by Direction, Layer, Row, Position and then finally by Page
 static int PaneSortFunc(wxAuiPaneInfo** p1, wxAuiPaneInfo** p2)
@@ -878,6 +849,12 @@ wxAuiPaneInfo& wxAuiManager::GetPane(const wxString& name) const
     return wxAuiNullPaneInfo;
 }
 
+// GetAllPanes() returns a reference to all the pane info structures
+wxAuiPaneInfoArray& wxAuiManager::GetAllPanes()
+{
+    return m_panes;
+}
+
 // This version of GetPane() looks up a pane based on its index position.
 wxAuiPaneInfo& wxAuiManager::GetPane(size_t paneIndex) const
 {
@@ -889,12 +866,6 @@ wxAuiPaneInfo& wxAuiManager::GetPane(size_t paneIndex) const
 
     wxASSERT_MSG(0, wxT("Invalid pane index passed to wxAuiManager::GetPane"));
     return wxAuiNullPaneInfo;
-}
-
-// GetAllPanes() returns a reference to all the pane info structures
-wxAuiPaneInfoArray& wxAuiManager::GetAllPanes()
-{
-    return m_panes;
 }
 
 // GetPaneCount() returns the total number of pages managed by the multi-notebook.
@@ -925,6 +896,65 @@ bool wxAuiManager::FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx)
         }
     }
     return false;
+}
+
+// SetFlag() and HasFlag() allow the owner to set/get various
+// options which are global to wxAuiManager
+bool wxAuiManager::HasFlag(int flag) const
+{
+    return (m_flags & flag) != 0;
+}
+
+void wxAuiManager::SetFlag(int flag, bool optionState)
+{
+    if (optionState)
+        SetFlags(m_flags | flag);
+    else
+        SetFlags(m_flags & ~flag);
+}
+
+wxAuiTabArt* wxAuiManager::GetTabArtProvider() const
+{
+    return m_tab_art;
+}
+
+
+void wxAuiManager::SetTabArtProvider(wxAuiTabArt* artProvider)
+{
+    // delete the last art provider, if any
+    delete m_tab_art;
+
+    // assign the new art provider
+    m_tab_art = artProvider;
+}
+
+int wxAuiManager::GetActivePane(wxWindow* focus) const
+{
+    int i, paneCount;
+
+    // First try to find a pane that has the focus flag and whose window has actual focus.
+    // This allows us to pick the right pane in the event that multiple panes have the focus flag set.
+    for (i = 0, paneCount = m_panes.GetCount(); i < paneCount; ++i)
+    {
+        wxAuiPaneInfo& pane = m_panes[i];
+        if(pane.HasFlag(wxAuiPaneInfo::optionActive))
+        {
+            if(!focus || pane.GetWindow()==focus)
+            {
+                return i;
+            }
+        }
+    }
+    // If no panes had the focus flag and actual focus then fall back to returning the first pane with focus flag.
+    for (i = 0, paneCount = m_panes.GetCount(); i < paneCount; ++i)
+    {
+        wxAuiPaneInfo& pane = m_panes[i];
+        if(pane.HasFlag(wxAuiPaneInfo::optionActive))
+        {
+            return i;
+        }
+    }
+    return wxNOT_FOUND;
 }
 
 // HitTest() is an internal function which determines
@@ -988,22 +1018,6 @@ unsigned int wxAuiManager::GetFlags() const
 {
     return m_flags;
 }
-
-// SetFlag() and HasFlag() allow the owner to set/get various
-// options which are global to wxAuiManager
-bool wxAuiManager::HasFlag(int flag) const
-{
-    return (m_flags & flag) != 0;
-}
-
-void wxAuiManager::SetFlag(int flag, bool optionState)
-{
-    if (optionState)
-        SetFlags(m_flags | flag);
-    else
-        SetFlags(m_flags & ~flag);
-}
-
 
 // Convenience function
 bool wxAuiManager_HasLiveResize(wxAuiManager& manager)
@@ -1198,11 +1212,6 @@ wxAuiDockArt* wxAuiManager::GetArtProvider() const
     return m_art;
 }
 
-wxAuiTabArt* wxAuiManager::GetTabArtProvider() const
-{
-    return m_tab_art;
-}
-
 void wxAuiManager::ProcessMgrEvent(wxAuiManagerEvent& event)
 {
     // first, give the owner frame a chance to override
@@ -1227,15 +1236,6 @@ void wxAuiManager::SetArtProvider(wxAuiDockArt* art_provider)
 
     // assign the new art provider
     m_art = art_provider;
-}
-
-void wxAuiManager::SetTabArtProvider(wxAuiTabArt* artProvider)
-{
-    // delete the last art provider, if any
-    delete m_tab_art;
-
-    // assign the new art provider
-    m_tab_art = artProvider;
 }
 
 
