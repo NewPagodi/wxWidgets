@@ -657,8 +657,8 @@ public:
     void SetFlags(unsigned int flags);
     unsigned int GetFlags() const;
 
-    wxWindow* GetManagedWindow() const;
     void SetManagedWindow(wxWindow* window);
+    wxWindow* GetManagedWindow() const;
 
     static wxAuiManager* GetManager(wxWindow* window);
 
@@ -743,11 +743,13 @@ public:
 
     bool FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx);
 
-    int SetActivePane(wxWindow* activePane);
     int GetActivePane(wxWindow* focus) const;
+    int SetActivePane(wxWindow* activePane);
 
 protected:
     //Layout helper functions.
+    void UpdateHintWindowConfig();
+
     void DoFrameLayout();
     void LayoutAddPane(wxSizer* container,
                        wxAuiDockInfo& dock,
@@ -766,6 +768,9 @@ protected:
                           wxAuiDockUIPartArray& uiParts,
                        bool spacerOnly = false);
 
+    virtual bool ProcessDockResult(wxAuiPaneInfo& target,
+                                   const wxAuiPaneInfo& newPos);
+
     //Functions for handling pane drag and drop.
     bool DoDrop(wxAuiDockInfoArray& docks,
                 wxAuiPaneInfoArray& panes,
@@ -773,18 +778,19 @@ protected:
                 const wxPoint& pt,
                 const wxPoint& actionOffset = wxPoint(0,0));
 
-    virtual bool ProcessDockResult(wxAuiPaneInfo& target,
-                                   const wxAuiPaneInfo& newPos);
-
+    wxAuiDockUIPart* HitTest(int x, int y);
+    wxAuiDockUIPart* GetPanePart(wxWindow* pane);
+    int GetDockPixelOffset(wxAuiPaneInfo& test);
+    void OnFloatingPaneMoveStart(wxWindow* window);
+    void OnFloatingPaneMoving(wxWindow* window, wxDirection dir );
+    void OnFloatingPaneMoved(wxWindow* window, wxDirection dir);
+    void OnFloatingPaneActivated(wxWindow* window);
+    void OnFloatingPaneClosed(wxWindow* window, wxCloseEvent& evt);
+    void OnFloatingPaneResized(wxWindow* window, const wxRect& rect);
     //Functions to handle rendering
     void Render(wxDC* dc);
     void Repaint(wxDC* dc = NULL);
 
-    void UpdateHintWindowConfig();
-
-    wxAuiDockUIPart* HitTest(int x, int y);
-    wxAuiDockUIPart* GetPanePart(wxWindow* pane);
-    int GetDockPixelOffset(wxAuiPaneInfo& test);
 
     void ProcessMgrEvent(wxAuiManagerEvent& event);
     void UpdateButtonOnScreen(wxAuiDockUIPart* buttonUiPart,
@@ -821,12 +827,6 @@ public:
 protected:
 
     // protected events
-    void OnFloatingPaneMoveStart(wxWindow* window);
-    void OnFloatingPaneMoving(wxWindow* window, wxDirection dir );
-    void OnFloatingPaneMoved(wxWindow* window, wxDirection dir);
-    void OnFloatingPaneActivated(wxWindow* window);
-    void OnFloatingPaneClosed(wxWindow* window, wxCloseEvent& evt);
-    void OnFloatingPaneResized(wxWindow* window, const wxRect& rect);
     void OnPaint(wxPaintEvent& evt);
     void OnEraseBackground(wxEraseEvent& evt);
     void OnSize(wxSizeEvent& evt);
@@ -874,6 +874,7 @@ protected:
     wxRect m_actionHintRect;    // hint rectangle for the action
     wxRect m_lastRect;
     wxAuiDockUIPart* m_hoverButton;// button uipart being hovered over
+    wxRect m_lastHint;          // position of last drawn hint, so that we can avoid drawing the same hint repeatedly.
     wxPoint m_lastMouseMove;   // last mouse move position (see OnMotion)
     int  m_currentDragItem;
     bool m_skipping;
@@ -886,7 +887,6 @@ protected:
     wxTimer m_hintFadeTimer;    // transparent fade timer
     wxByte m_hintFadeAmt;       // transparent fade amount
     wxByte m_hintFadeMax;       // maximum value of hint fade
-    wxRect m_lastHint;          // position of last drawn hint, so that we can avoid drawing the same hint repeatedly.
 
     void* m_reserved;
     wxAuiTabArt* m_tab_art;      // tab art object which does all the drawing for notebooks.
