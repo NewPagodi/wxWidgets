@@ -555,8 +555,7 @@ static void FindDocks(wxAuiDockInfoArray& docks,
 // If found, the corresponding wxAuiPaneInfo pointer is returned, otherwise NULL.
 static wxAuiPaneInfo* FindPaneInDock(const wxAuiDockInfo& dock, wxWindow* window)
 {
-    int i;
-    int count = dock.panes.GetCount();
+    int i, count = dock.panes.GetCount();
     for (i = 0; i < count; ++i)
     {
         wxAuiPaneInfo* p = dock.panes.Item(i);
@@ -5602,8 +5601,7 @@ bool wxAuiManager::DoEndResizeAction(wxMouseEvent& event)
         // determine the total proportion of all resizable panes,
         // and the total size of the dock minus the size of all
         // the fixed panes
-        int i;
-        int dock_pane_count = dock.panes.GetCount();
+        int i, dock_pane_count = dock.panes.GetCount();
         int pane_position = -1;
         for (i = 0; i < dock_pane_count; ++i)
         {
