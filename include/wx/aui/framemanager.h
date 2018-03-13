@@ -657,10 +657,6 @@ public:
     void SetFlags(unsigned int flags);
     unsigned int GetFlags() const;
 
-    // get/set a style property flag for this manager
-    bool HasFlag(int flag) const;
-    void SetFlag(int flag, bool optionState);
-
     wxWindow* GetManagedWindow() const;
     void SetManagedWindow(wxWindow* window);
 
@@ -669,16 +665,9 @@ public:
     void SetArtProvider(wxAuiDockArt* artProvider);
     wxAuiDockArt* GetArtProvider() const;
 
-    void SetTabArtProvider(wxAuiTabArt* artProvider);
-    wxAuiTabArt* GetTabArtProvider() const;
-
     wxAuiPaneInfo& GetPane(wxWindow* window) const;
     wxAuiPaneInfo& GetPane(const wxString& name) const;
-    wxAuiPaneInfo& GetPane(size_t paneIndex) const;
     wxAuiPaneInfoArray& GetAllPanes();
-    size_t GetPaneCount() const;
-
-    bool FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx);
 
     bool AddPane(wxWindow* window,
                  const wxAuiPaneInfo& paneInfo);
@@ -713,9 +702,6 @@ public:
     void RestorePane(wxAuiPaneInfo& paneInfo);
     void RestoreMaximizedPane();
 
-    int SetActivePane(wxWindow* activePane);
-    int GetActivePane(wxWindow* focus) const;
-
     virtual wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo& p);
     virtual bool CanDockPanel(const wxAuiPaneInfo& p);
 
@@ -746,12 +732,23 @@ public:
     wxDEPRECATED( void SetFrame(wxFrame* frame) );
     wxDEPRECATED( wxFrame* GetFrame() const );
 
+    // get/set a style property flag for this manager
+    bool HasFlag(int flag) const;
+    void SetFlag(int flag, bool optionState);
+
+    void SetTabArtProvider(wxAuiTabArt* artProvider);
+    wxAuiTabArt* GetTabArtProvider() const;
+    wxAuiPaneInfo& GetPane(size_t paneIndex) const;
+    size_t GetPaneCount() const;
+
+    bool FindTab(wxWindow* page, wxAuiTabContainer** ctrl, int* idx);
+
+    int SetActivePane(wxWindow* activePane);
+    int GetActivePane(wxWindow* focus) const;
+
 protected:
     //Layout helper functions.
     void DoFrameLayout();
-    bool CanDockOver(const wxAuiPaneInfo & pane, const wxAuiPaneInfo & covered_pane);
-    bool MustDockInNotebook(const wxAuiPaneInfo &pane) const;
-	bool AreInSameNotebook(const wxAuiPaneInfo &pane0, const wxAuiPaneInfo &pane1);
     void LayoutAddPane(wxSizer* container,
                        wxAuiDockInfo& dock,
                        wxAuiPaneInfo& pane,
@@ -764,7 +761,6 @@ protected:
                        wxAuiDockUIPartArray& uiParts,
                        bool spacerOnly);
 
-    void LayoutAddNotebook(wxAuiTabArt* tabArt, wxAuiTabContainer* notebookContainer, wxSizer* notebookSizer, wxAuiDockUIPart& part, wxAuiDockInfo& dock, wxAuiDockUIPartArray& uiparts, wxAuiTabContainerPointerArray& tabContainerRecalcList, wxAuiSizerItemPointerArray& tabContainerRecalcSizers, wxAuiPaneInfo* pane, int orient);
     wxSizer* LayoutAll(wxAuiPaneInfoArray& panes,
                        wxAuiDockInfoArray& docks,
                           wxAuiDockUIPartArray& uiParts,
@@ -777,22 +773,12 @@ protected:
                 const wxPoint& pt,
                 const wxPoint& actionOffset = wxPoint(0,0));
 
-    bool DoDropExternal(wxAuiManager* otherMgr,
-                        wxWindow* otherWnd,
-                        wxAuiPaneInfo& drop,
-                        const wxPoint& screenPt,
-                        const wxPoint& actionOffset = wxPoint(0,0));
-
     virtual bool ProcessDockResult(wxAuiPaneInfo& target,
                                    const wxAuiPaneInfo& newPos);
 
     //Functions to handle rendering
     void Render(wxDC* dc);
     void Repaint(wxDC* dc = NULL);
-
-    //Tooltip related functions
-    void ShowToolTip(wxAuiPaneInfo* pane);
-    void HideToolTip();
 
     void UpdateHintWindowConfig();
 
@@ -809,6 +795,20 @@ protected:
 
     /// Ends a resize action, or for live update, resizes the sash
     bool DoEndResizeAction(wxMouseEvent& event);
+
+    void LayoutAddNotebook(wxAuiTabArt* tabArt, wxAuiTabContainer* notebookContainer, wxSizer* notebookSizer, wxAuiDockUIPart& part, wxAuiDockInfo& dock, wxAuiDockUIPartArray& uiparts, wxAuiTabContainerPointerArray& tabContainerRecalcList, wxAuiSizerItemPointerArray& tabContainerRecalcSizers, wxAuiPaneInfo* pane, int orient);
+    bool CanDockOver(const wxAuiPaneInfo & pane, const wxAuiPaneInfo & covered_pane);
+    bool MustDockInNotebook(const wxAuiPaneInfo &pane) const;
+	bool AreInSameNotebook(const wxAuiPaneInfo &pane0, const wxAuiPaneInfo &pane1);
+    bool DoDropExternal(wxAuiManager* otherMgr,
+                        wxWindow* otherWnd,
+                        wxAuiPaneInfo& drop,
+                        const wxPoint& screenPt,
+                        const wxPoint& actionOffset = wxPoint(0,0));
+
+    //Tooltip related functions
+    void ShowToolTip(wxAuiPaneInfo* pane);
+    void HideToolTip();
 
     int GetNotebookFlags();
 
@@ -831,19 +831,19 @@ protected:
     void OnEraseBackground(wxEraseEvent& evt);
     void OnSize(wxSizeEvent& evt);
     void OnSetCursor(wxSetCursorEvent& evt);
-    void OnLeftDClick(wxMouseEvent& evt);
     void OnLeftDown(wxMouseEvent& evt);
     void OnLeftUp(wxMouseEvent& evt);
-    void OnRightDown(wxMouseEvent& evt);
-    void OnRightUp(wxMouseEvent& evt);
-    void OnMiddleDown(wxMouseEvent& evt);
-    void OnMiddleUp(wxMouseEvent& evt);
     void OnMotion(wxMouseEvent& evt);
     void OnCaptureLost(wxMouseCaptureLostEvent& evt);
     void OnLeaveWindow(wxMouseEvent& evt);
     void OnChildFocus(wxChildFocusEvent& evt);
     void OnHintFadeTimer(wxTimerEvent& evt);
     void OnFindManager(wxAuiManagerEvent& evt);
+    void OnLeftDClick(wxMouseEvent& evt);
+    void OnRightDown(wxMouseEvent& evt);
+    void OnRightUp(wxMouseEvent& evt);
+    void OnMiddleDown(wxMouseEvent& evt);
+    void OnMiddleUp(wxMouseEvent& evt);
 
 
     enum
@@ -860,7 +860,6 @@ protected:
 
     wxWindow* m_frame;           // the window being managed
     wxAuiDockArt* m_art;            // dock art object which does all drawing
-    wxAuiTabArt* m_tab_art;      // tab art object which does all the drawing for notebooks.
     unsigned int m_flags;        // manager flags wxAUI_MGR_*
 
     wxAuiPaneInfoArray m_panes;     // array of panes structures
@@ -870,19 +869,15 @@ protected:
     int m_action;                // current mouse action
     wxPoint m_actionStart;      // position where the action click started
     wxPoint m_actionOffset;     // offset from upper left of the item clicked
-    wxRect* m_actionDeadZone;        // area of the screen in which movement should be temporarily ignored (up until the point the mouse has left this region) - this is used to prevent problems with e.g. differently sized tabs switching repeatedly on drag due to size differences
     wxAuiDockUIPart* m_actionPart; // ptr to the part the action happened to
     wxWindow* m_actionWindow;   // action frame or window (NULL if none)
     wxRect m_actionHintRect;    // hint rectangle for the action
     wxRect m_lastRect;
     wxAuiDockUIPart* m_hoverButton;// button uipart being hovered over
-    //temp: (MJM) - The following variable is only temporarily necessary until dynamic notebook buttons and normal pane buttons can be made more compatible. Remove this as well as forward declaration further up when possible.
-    wxAuiTabContainerButton* m_hoverButton2;// button uipart being hovered over
     wxPoint m_lastMouseMove;   // last mouse move position (see OnMotion)
     int  m_currentDragItem;
     bool m_skipping;
     bool m_hasMaximized;
-    bool m_doingHintCalculation;     // set to true if we are in the process of calculating a hint.
 
     double m_dockConstraintX;  // 0.0 .. 1.0; max pct of window width a dock can consume
     double m_dockConstraintY;  // 0.0 .. 1.0; max pct of window height a dock can consume
@@ -894,6 +889,11 @@ protected:
     wxRect m_lastHint;          // position of last drawn hint, so that we can avoid drawing the same hint repeatedly.
 
     void* m_reserved;
+    wxAuiTabArt* m_tab_art;      // tab art object which does all the drawing for notebooks.
+    wxRect* m_actionDeadZone;        // area of the screen in which movement should be temporarily ignored (up until the point the mouse has left this region) - this is used to prevent problems with e.g. differently sized tabs switching repeatedly on drag due to size differences
+    //temp: (MJM) - The following variable is only temporarily necessary until dynamic notebook buttons and normal pane buttons can be made more compatible. Remove this as well as forward declaration further up when possible.
+    wxAuiTabContainerButton* m_hoverButton2;// button uipart being hovered over
+    bool m_doingHintCalculation;     // set to true if we are in the process of calculating a hint.
 
 #ifndef SWIG
     wxDECLARE_EVENT_TABLE();
@@ -934,22 +934,22 @@ public:
 
     void SetManager(wxAuiManager* mgr) { manager = mgr; }
     void SetPane(wxAuiPaneInfo* p) { pane = p; }
-    void SetTargetPane(wxAuiPaneInfo *p) { target_pane = p; }
     void SetButton(int b) { button = b; }
     void SetDC(wxDC* pdc) { dc = pdc; }
 
     wxAuiManager* GetManager() const { return manager; }
     wxAuiPaneInfo* GetPane() const { return pane; }
-    wxAuiPaneInfo* GetTargetPane() const { return target_pane; }
     int GetButton() const { return button; }
     wxDC* GetDC() const { return dc; }
 
-    void Allow(bool allow = true) { veto_flag = !allow; }
-    bool IsAllowed() const { return !CanVeto(); }
     void Veto(bool veto = true) { veto_flag = veto; }
     bool GetVeto() const { return veto_flag; }
     void SetCanVeto(bool can_veto) { canveto_flag = can_veto; }
     bool CanVeto() const { return  canveto_flag && veto_flag; }
+    void SetTargetPane(wxAuiPaneInfo *p) { target_pane = p; }
+    wxAuiPaneInfo* GetTargetPane() const { return target_pane; }
+    void Allow(bool allow = true) { veto_flag = !allow; }
+    bool IsAllowed() const { return !CanVeto(); }
 
 public:
     wxAuiManager* manager;
@@ -1085,9 +1085,9 @@ wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_CLOSE, wxAuiManagerEve
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_RESTORE, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_ACTIVATED, wxAuiManagerEvent );
-wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_DOCK_OVER, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_RENDER, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_FIND_MANAGER, wxAuiManagerEvent );
+wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_DOCK_OVER, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_ALLOW_DND, wxAuiManagerEvent );
 
 
@@ -1106,12 +1106,12 @@ typedef void (wxEvtHandler::*wxAuiManagerEventFunction)(wxAuiManagerEvent&);
    wx__DECLARE_EVT0(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(func))
 #define EVT_AUI_PANE_ACTIVATED(func) \
    wx__DECLARE_EVT0(wxEVT_AUI_PANE_ACTIVATED, wxAuiManagerEventHandler(func))
-#define EVT_AUI_PANE_DOCK_OVER(func) \
-   wx__DECLARE_EVT0(wxEVT_AUI_PANE_DOCK_OVER, wxAuiManagerEventHandler(func))
 #define EVT_AUI_RENDER(func) \
    wx__DECLARE_EVT0(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(func))
 #define EVT_AUI_FIND_MANAGER(func) \
    wx__DECLARE_EVT0(wxEVT_AUI_FIND_MANAGER, wxAuiManagerEventHandler(func))
+#define EVT_AUI_PANE_DOCK_OVER(func) \
+   wx__DECLARE_EVT0(wxEVT_AUI_PANE_DOCK_OVER, wxAuiManagerEventHandler(func))
 #define EVT_AUI_ALLOW_DND(func) \
    wx__DECLARE_EVT0(wxEVT_AUI_ALLOW_DND, wxAuiManagerEventHandler(func))
 
@@ -1122,9 +1122,9 @@ typedef void (wxEvtHandler::*wxAuiManagerEventFunction)(wxAuiManagerEvent&);
 %constant wxEventType wxEVT_AUI_PANE_MAXIMIZE;
 %constant wxEventType wxEVT_AUI_PANE_RESTORE;
 %constant wxEventType wxEVT_AUI_PANE_ACTIVATED;
-%constant wxEventType wxEVT_AUI_PANE_DOCK_OVER;
 %constant wxEventType wxEVT_AUI_RENDER;
 %constant wxEventType wxEVT_AUI_FIND_MANAGER;
+%constant wxEventType wxEVT_AUI_PANE_DOCK_OVER;
 %constant wxEventType wxEVT_AUI_ALLOW_DND;
 
 %pythoncode {
@@ -1133,9 +1133,9 @@ typedef void (wxEvtHandler::*wxAuiManagerEventFunction)(wxAuiManagerEvent&);
     EVT_AUI_PANE_MAXIMIZE = wx.PyEventBinder( wxEVT_AUI_PANE_MAXIMIZE )
     EVT_AUI_PANE_RESTORE = wx.PyEventBinder( wxEVT_AUI_PANE_RESTORE )
     EVT_AUI_PANE_ACTIVATED = wx.PyEventBinder( wxEVT_AUI_PANE_ACTIVATED )
-    EVT_AUI_PANE_DOCK_OVER = wx.PyEventBinder( wxEVT_AUI_PANE_DOCK_OVER )
     EVT_AUI_RENDER = wx.PyEventBinder( wxEVT_AUI_RENDER )
     EVT_AUI_FIND_MANAGER = wx.PyEventBinder( wxEVT_AUI_FIND_MANAGER )
+    EVT_AUI_PANE_DOCK_OVER = wx.PyEventBinder( wxEVT_AUI_PANE_DOCK_OVER )
     EVT_AUI_ALLOW_DND = wx.PyEventBinder( wxEVT_AUI_ALLOW_DND )
 }
 #endif // SWIG
