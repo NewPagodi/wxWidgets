@@ -1034,7 +1034,7 @@ void wxAuiGenericTabArt::DrawButton(wxDC& dc,
 
 int wxAuiGenericTabArt::ShowDropDown(wxWindow* wnd,
                                      const wxAuiPaneInfoPtrArray& pages,
-                                     int WXUNUSED(activeIndex))
+                                     int /*active_idx*/)
 {
     wxMenu menuPopup;
 
