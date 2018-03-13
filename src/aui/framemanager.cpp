@@ -752,28 +752,28 @@ wxEND_EVENT_TABLE()
 
 
 wxAuiManager::wxAuiManager(wxWindow* managed_wnd, unsigned int flags)
-: m_frame(NULL)
-, m_actionDeadZone(NULL)
-, m_actionPart(NULL)
-, m_actionWindow(NULL)
-, m_hoverButton(NULL)
-, m_hoverButton2(NULL)
-, m_hintWnd(NULL)
-, m_reserved(NULL)
 {
     m_action = actionNone;
     m_lastMouseMove = wxPoint();
-
+    m_hoverButton = NULL;
     m_art = new wxAuiDefaultDockArt;
-    m_tab_art = new wxAuiDefaultTabArt;
+    m_hintWnd = NULL;
     m_flags = flags;
     m_skipping = false;
     m_hasMaximized = false;
-    m_doingHintCalculation = false;
-
+    m_frame = NULL;
     m_dockConstraintX = 0.3;
     m_dockConstraintY = 0.3;
+    m_reserved = NULL;
     m_currentDragItem = -1;
+
+    m_tab_art = new wxAuiDefaultTabArt;
+    m_doingHintCalculation = false;
+    m_actionWindow = NULL;
+    m_actionDeadZone = NULL;
+    m_actionPart = NULL;
+    m_actionWindow = NULL;
+    m_hoverButton2 = NULL;
 
     if (managed_wnd)
     {
