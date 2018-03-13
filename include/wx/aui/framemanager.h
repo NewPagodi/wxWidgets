@@ -251,7 +251,6 @@ public:
         *this = source;
     }
 
-
     bool IsOk() const { return window != NULL; }
     bool IsFixed() const { return !HasFlag(optionResizable); }
     bool IsResizable() const { return HasFlag(optionResizable); }
@@ -282,20 +281,20 @@ public:
     bool HasGripperTop() const { return HasFlag(optionGripperTop); }
     wxAuiPaneInfo& Window(wxWindow* w)
     {
-      wxAuiPaneInfo test(*this);
-      test.window = w;
-      wxCHECK_MSG(test.IsValid(), *this,
-                  "window settings and pane settings are incompatible");
-      this->window = w;
-      return *this;
+        wxAuiPaneInfo test(*this);
+        test.window = w;
+        wxCHECK_MSG(test.IsValid(), *this,
+                    "window settings and pane settings are incompatible");
+        this->window = w;
+        return *this;
     }
 
     wxAuiPaneInfo& Name(const wxString& n) { name = n; return *this; }
     wxAuiPaneInfo& Caption(const wxString& c) { caption = c; return *this; }
     wxAuiPaneInfo& Icon(wxBitmap bitmap) { icon = bitmap; return *this; }
-    wxAuiPaneInfo& Left()   { dock_direction = wxAUI_DOCK_LEFT; return *this; }
-    wxAuiPaneInfo& Right()  { dock_direction = wxAUI_DOCK_RIGHT; return *this; }
-    wxAuiPaneInfo& Top()    { dock_direction = wxAUI_DOCK_TOP; return *this; }
+    wxAuiPaneInfo& Left() { dock_direction = wxAUI_DOCK_LEFT; return *this; }
+    wxAuiPaneInfo& Right() { dock_direction = wxAUI_DOCK_RIGHT; return *this; }
+    wxAuiPaneInfo& Top() { dock_direction = wxAUI_DOCK_TOP; return *this; }
     wxAuiPaneInfo& Bottom() { dock_direction = wxAUI_DOCK_BOTTOM; return *this; }
     wxAuiPaneInfo& Center() { dock_direction = wxAUI_DOCK_CENTER; return *this; }
     wxAuiPaneInfo& Centre() { dock_direction = wxAUI_DOCK_CENTRE; return *this; }
@@ -306,14 +305,14 @@ public:
     wxAuiPaneInfo& BestSize(const wxSize& size) { best_size = size; return *this; }
     wxAuiPaneInfo& MinSize(const wxSize& size) { min_size = size; return *this; }
     wxAuiPaneInfo& MaxSize(const wxSize& size) { max_size = size; return *this; }
-   wxAuiPaneInfo& BestSize(int x, int y) { best_size.Set(x,y); return *this; }
+    wxAuiPaneInfo& BestSize(int x, int y) { best_size.Set(x,y); return *this; }
     wxAuiPaneInfo& MinSize(int x, int y) { min_size.Set(x,y); return *this; }
     wxAuiPaneInfo& MaxSize(int x, int y) { max_size.Set(x,y); return *this; }
     wxAuiPaneInfo& FloatingPosition(const wxPoint& pos) { floating_pos = pos; return *this; }
     wxAuiPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
     wxAuiPaneInfo& FloatingSize(const wxSize& size) { floating_size = size; return *this; }
     wxAuiPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
-     wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
+    wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
     wxAuiPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
     wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
     wxAuiPaneInfo& Float() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionFloating, true); }
@@ -334,21 +333,19 @@ public:
     wxAuiPaneInfo& BottomDockable(bool b = true) { return SetFlag(optionBottomDockable, b); }
     wxAuiPaneInfo& LeftDockable(bool b = true) { return SetFlag(optionLeftDockable, b); }
     wxAuiPaneInfo& RightDockable(bool b = true) { return SetFlag(optionRightDockable, b); }
-
     wxAuiPaneInfo& Floatable(bool b = true) { return SetFlag(optionFloatable, b); }
-
     wxAuiPaneInfo& Movable(bool b = true) { return SetFlag(optionMovable, b); }
-
-
-
     wxAuiPaneInfo& DockFixed(bool b = true) { return SetFlag(optionDockFixed, b); }
+
     wxAuiPaneInfo& Dockable(bool b = true)
     {
         return TopDockable(b).BottomDockable(b).LeftDockable(b).RightDockable(b).CenterDockable(b);
-    }    wxAuiPaneInfo& DefaultPane()
+    }
+
+    wxAuiPaneInfo& DefaultPane()
     {
-       wxAuiPaneInfo test(*this);
-       test.state |= optionTopDockable | optionBottomDockable |
+        wxAuiPaneInfo test(*this);
+        test.state |= optionTopDockable | optionBottomDockable |
                  optionLeftDockable | optionRightDockable |
                  optionFloatable | optionMovable | optionResizable |
                  optionCaption | optionPaneBorder | buttonClose;
@@ -360,13 +357,13 @@ public:
         return *this;
     }
 
-
     wxAuiPaneInfo& CentrePane() { return CenterPane(); }
     wxAuiPaneInfo& CenterPane()
     {
         state = 0;
         return Center().PaneBorder().Resizable();
     }
+
     wxAuiPaneInfo& ToolbarPane()
     {
         DefaultPane();
@@ -398,6 +395,7 @@ public:
     {
         return (state & flag) != 0;
     }
+
     bool IsValid() const;
     // get/set the name of the pane.
     wxString GetName() const { return name; }
@@ -572,10 +570,12 @@ public:
 
     wxPoint floating_pos; // position while floating
     wxSize floating_size; // size while floating
+    int dock_proportion;  // proportion while docked
 
-    int dock_proportion;          // proportion while docked
     wxAuiPaneButtonArray buttons; // buttons on the pane
-    wxRect rect;                  // current rectangle (populated by wxAUI)
+
+
+    wxRect rect;              // current rectangle (populated by wxAUI)
 
 private:
 
@@ -736,8 +736,6 @@ protected:
     void OnFloatingPaneResized(wxWindow* window, const wxRect& rect);
     void Render(wxDC* dc);
     void Repaint(wxDC* dc = NULL);
-
-
     void ProcessMgrEvent(wxAuiManagerEvent& event);
     void UpdateButtonOnScreen(wxAuiDockUIPart* buttonUiPart,
                               const wxMouseEvent& event);
