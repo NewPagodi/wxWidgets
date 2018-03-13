@@ -130,6 +130,9 @@ public:
     virtual wxSize GetRequiredBitmapSize() const = 0;
 
     unsigned int m_flags;
+    int m_fixedTabSize;
+    int m_tabCtrlHeight;
+    int m_tabCtrlWidth;
 };
 
 
@@ -244,9 +247,6 @@ protected:
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
 
-    int m_fixedTabSize;
-    int m_tabCtrlHeight;
-    int m_tabCtrlWidth;
     wxSize m_requiredBitmapSize;
     wxSize m_requestedSize;
     wxBitmap m_activeUpBmp;
@@ -367,9 +367,6 @@ protected:
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
 
-    int m_fixedTabSize;
-    int m_tabCtrlHeight;
-    int m_tabCtrlWidth;
     wxSize m_requiredBitmapSize;
     wxSize m_requestedSize;
     wxBitmap m_activeUpBmp;
