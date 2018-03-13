@@ -651,6 +651,8 @@ public:
     void RestorePane(wxAuiPaneInfo& paneInfo);
     void RestoreMaximizedPane();
 
+public:
+
     virtual wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo& p);
     virtual bool CanDockPanel(const wxAuiPaneInfo & p);
 
@@ -791,6 +793,7 @@ protected:
     void OnMiddleDown(wxMouseEvent& evt);
     void OnMiddleUp(wxMouseEvent& evt);
 
+protected:
 
     enum
     {
@@ -803,6 +806,7 @@ protected:
         actionDragMovablePane
     };
 
+protected:
 
     wxWindow* m_frame;           // the window being managed
     wxAuiDockArt* m_art;            // dock art object which does all drawing
