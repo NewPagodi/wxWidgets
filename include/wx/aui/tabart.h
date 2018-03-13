@@ -128,11 +128,6 @@ public:
     // this should return -1,-1 if there is no requested width \ height
     virtual wxSize GetRequestedSize() const = 0;
     virtual wxSize GetRequiredBitmapSize() const = 0;
-
-    int m_fixedTabSize;
-    int m_tabCtrlHeight;
-    int m_tabCtrlWidth;
-    unsigned int m_flags;
 };
 
 
@@ -246,6 +241,11 @@ protected:
     wxBitmap m_disabledRightBmp;
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
+
+    int m_fixedTabSize;
+    int m_tabCtrlHeight;
+    int m_tabCtrlWidth;
+    unsigned int m_flags;
     wxSize m_requiredBitmapSize;
     wxSize m_requestedSize;
     wxBitmap m_activeUpBmp;
@@ -364,6 +364,11 @@ protected:
     wxBitmap m_disabledRightBmp;
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
+
+    int m_fixedTabSize;
+    int m_tabCtrlHeight;
+    int m_tabCtrlWidth;
+    unsigned int m_flags;
     wxSize m_requiredBitmapSize;
     wxSize m_requestedSize;
     wxBitmap m_activeUpBmp;
