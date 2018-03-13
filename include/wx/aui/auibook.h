@@ -13,7 +13,6 @@
 
 
 
-
 #ifndef _WX_AUINOTEBOOK_H_
 #define _WX_AUINOTEBOOK_H_
 
@@ -199,6 +198,7 @@ class WXDLLIMPEXP_AUI wxAuiNotebook : public wxNavigationEnabled<wxBookCtrlBase>
 public:
 
     wxAuiNotebook() { }
+
     wxAuiNotebook(wxWindow* parent,
                   wxWindowID id = wxID_ANY,
                   const wxPoint& pos = wxDefaultPosition,
