@@ -637,7 +637,7 @@ public:
     void Update();
 
     wxString SavePaneInfo(wxAuiPaneInfo& pane);
-    void LoadPaneInfo(wxString panePart, wxAuiPaneInfo& pane);
+    void LoadPaneInfo(wxString panePart, wxAuiPaneInfo &pane);
     wxString SavePerspective();
     bool LoadPerspective(const wxString& perspective, bool update = true);
 
@@ -650,7 +650,7 @@ public:
     void RestoreMaximizedPane();
 
     virtual wxAuiFloatingFrame* CreateFloatingFrame(wxWindow* parent, const wxAuiPaneInfo& p);
-    virtual bool CanDockPanel(const wxAuiPaneInfo& p);
+    virtual bool CanDockPanel(const wxAuiPaneInfo & p);
 
     void StartPaneDrag(
                  wxWindow* paneWindow,
@@ -712,7 +712,7 @@ protected:
 
     wxSizer* LayoutAll(wxAuiPaneInfoArray& panes,
                        wxAuiDockInfoArray& docks,
-                          wxAuiDockUIPartArray& uiParts,
+                          wxAuiDockUIPartArray & uiParts,
                        bool spacerOnly = false);
 
     virtual bool ProcessDockResult(wxAuiPaneInfo& target,
