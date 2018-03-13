@@ -122,10 +122,6 @@ public:
 
     void SetFlags(unsigned int flags);
     unsigned int GetFlags() const;
-    bool HasFlag(int flag) const;
-
-    // returns true if we have wxAUI_NB_TOP or wxAUI_NB_BOTTOM style
-    bool IsHorizontal() const;
 
     bool AddPage(wxAuiPaneInfo& info);
     bool InsertPage(wxWindow* page, wxAuiPaneInfo& info, size_t idx);
@@ -147,7 +143,6 @@ public:
     void SetSelectedFont(const wxFont& selectedFont);
     void SetMeasuringFont(const wxFont& measuringFont);
     void SetRect(const wxRect& rect);
-    wxRect GetRect() const { return m_targetRect; }
 
     void RemoveButton(int id);
     void AddButton(int id,
@@ -157,9 +152,6 @@ public:
 
     size_t GetTabOffset() const;
     void SetTabOffset(size_t offset);
-
-    bool HasFocus(){ return m_focus; };
-    void SetFocus(bool focus){ m_focus = focus; };
 
     // Is the tab visible?
     bool IsTabVisible(int tabPage, int tabOffset, wxDC* dc, wxWindow* wnd);
@@ -171,6 +163,14 @@ public:
 
     void CalculateRequiredWidth(wxDC& dc,wxWindow* wnd,int& totalSize,int& visibleSize) const;
     void CalculateRequiredHeight(wxDC& dc,wxWindow* wnd,int& totalSize,int& visibleSize) const;
+    bool HasFlag(int flag) const;
+
+    // returns true if we have wxAUI_NB_TOP or wxAUI_NB_BOTTOM style
+    bool IsHorizontal() const;
+    wxRect GetRect() const { return m_targetRect; }
+    bool HasFocus(){ return m_focus; };
+    void SetFocus(bool focus){ m_focus = focus; };
+
 protected:
 
     virtual void Render(wxDC* dc, wxWindow* wnd);
@@ -179,16 +179,16 @@ protected:
     void OnChildKeyDown(wxKeyEvent& evt);
 
 protected:
-    bool m_focus;
-    wxAuiManager* m_mgr;
     wxAuiTabArt* m_art;
     wxAuiPaneInfoPtrArray m_pages;
     wxAuiTabContainerButtonArray m_buttons;
     wxAuiTabContainerButtonArray m_tabCloseButtons;
     wxRect m_rect;
-    wxRect m_targetRect;
     size_t m_tabOffset;
     unsigned int m_flags;
+    bool m_focus;
+    wxAuiManager* m_mgr;
+    wxRect m_targetRect;
     friend class wxAuiManager;
 };
 
@@ -197,10 +197,6 @@ class WXDLLIMPEXP_AUI wxAuiNotebook : public wxNavigationEnabled<wxBookCtrlBase>
 {
 
 public:
-
-    void SetColour(const wxColour& colour);
-    void SetActiveColour(const wxColour& colour);
-
 
     wxAuiNotebook() { }
     wxAuiNotebook(wxWindow* parent,
@@ -226,7 +222,6 @@ public:
 
     virtual void SetUniformBitmapSize(const wxSize& size);
     virtual void SetTabCtrlHeight(int height);
-    virtual void SetTabCtrlWidth(int width);
 
     bool AddPage(wxWindow* page,
                  const wxString& caption,
@@ -277,17 +272,8 @@ public:
     // Gets the tab control height
     int GetTabCtrlHeight() const;
 
-    // Gets the tab control width
-    int GetTabCtrlWidth() const;
-
     // Gets the height of the notebook for a given page height
     int GetHeightForPageHeight(int pageHeight);
-
-    // Gets the width of the notebook for a given page width
-    int GetWidthForPageWidth(int pageWidth);
-
-    // Advances the selection, generation page selection events
-    void AdvanceSelection(bool forward = true);
 
     // Shows the window menu
     bool ShowWindowMenu();
@@ -306,8 +292,6 @@ public:
     virtual int GetPageImage(size_t n) const wxOVERRIDE;
     virtual bool SetPageImage(size_t n, int imageId) wxOVERRIDE;
 
-    wxWindow* GetCurrentPage() const;
-
     virtual int ChangeSelection(size_t n) wxOVERRIDE;
 
     virtual bool AddPage(wxWindow *page, const wxString &text, bool select, 
@@ -320,6 +304,22 @@ public:
     bool HasFlag(int flag) const    { return m_mgr.HasFlag(flag); }
     // returns true if we have wxAUI_NB_TOP or wxAUI_NB_BOTTOM style
     bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
+
+    void SetColour(const wxColour& colour);
+    void SetActiveColour(const wxColour& colour);
+
+    virtual void SetTabCtrlWidth(int width);
+
+    // Gets the tab control width
+    int GetTabCtrlWidth() const;
+
+    // Gets the width of the notebook for a given page width
+    int GetWidthForPageWidth(int pageWidth);
+
+    // Advances the selection, generation page selection events
+    void AdvanceSelection(bool forward = true);
+
+    wxWindow* GetCurrentPage() const;
 
 protected:
     // choose the default border for this window
