@@ -252,10 +252,7 @@ public:
     }
 
 
-    // returns true if the pane contains a toolbar.
     bool IsToolbar() const { return HasFlag(optionToolbar); }
-
-    // returns true if the wxAuiPaneInfo structure is valid. A pane structure is valid if it has an associated window.
     bool IsOk() const { return window != NULL; }
     wxAuiPaneInfo& Window(wxWindow* w)
     {
@@ -266,42 +263,25 @@ public:
       this->window = w;
       return *this;
     }
-
-    // get/set if the pane is resizable.
-    // opposite of Is/SetFixed.
     bool IsResizable() const { return HasFlag(optionResizable); }
     wxAuiPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
-    // get/set whether the pane is not resizable.
-    // opposite of Is/SetResizable.
-    bool IsFixed() const { return !HasFlag(optionResizable); }
+     bool IsFixed() const { return !HasFlag(optionResizable); }
     wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
-
-    // get/set if the pane is visible.
     bool IsShown() const { return !HasFlag(optionHidden); }
     wxAuiPaneInfo& Hide() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionHidden, true); }
     wxAuiPaneInfo& Show(bool show = true) { if (!show) SetFlag(wxAuiPaneInfo::optionActiveNotebook, false); return SetFlag(optionHidden, !show); }
-
-    // get/set if the pane is floating.
-    // opposite of IsDocked.
     bool IsFloating() const { return HasFlag(optionFloating); }
     wxAuiPaneInfo& Float() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionFloating, true); }
-    // get/set if the pane is docked.
-    // opposite of IsFloating.
     bool IsDocked() const { return !HasFlag(optionFloating); }
     wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
-    // get/set whether the pane can be docked at the top of the frame.
     bool IsTopDockable() const { return HasFlag(optionTopDockable); }
     wxAuiPaneInfo& TopDockable(bool b = true) { return SetFlag(optionTopDockable, b); }
-    // get/set whether the pane can be docked at the bottom of the frame.
     bool IsBottomDockable() const { return HasFlag(optionBottomDockable); }
     wxAuiPaneInfo& BottomDockable(bool b = true) { return SetFlag(optionBottomDockable, b); }
-    // get/set whether the pane can be docked at the left of the frame.
     bool IsLeftDockable() const { return HasFlag(optionLeftDockable); }
     wxAuiPaneInfo& LeftDockable(bool b = true) { return SetFlag(optionLeftDockable, b); }
-    // get/set whether the pane can be docked at the right of the frame.
     bool IsRightDockable() const { return HasFlag(optionRightDockable); }
     wxAuiPaneInfo& RightDockable(bool b = true) { return SetFlag(optionRightDockable, b); }
-    // convenience function to set all of the above at once.
     wxAuiPaneInfo& Dockable(bool b = true)
     {
         return TopDockable(b).BottomDockable(b).LeftDockable(b).RightDockable(b).CenterDockable(b);
@@ -311,61 +291,37 @@ public:
         return HasFlag(optionTopDockable | optionBottomDockable |
                         optionLeftDockable | optionRightDockable | optionCenterDockable);
     }
-
-
-    // get/set if pane can be undocked and displayed as a floating window.
     bool IsFloatable() const { return HasFlag(optionFloatable); }
     wxAuiPaneInfo& Floatable(bool b = true) { return SetFlag(optionFloatable, b); }
 
-    // get/set if pane can be undocked or moved to another dock position.
     bool IsMovable() const { return HasFlag(optionMovable); }
     wxAuiPaneInfo& Movable(bool b = true) { return SetFlag(optionMovable, b); }
 
-    // get/set if pane is maximized.
     bool IsMaximized() const { return HasFlag(optionMaximized); }
     wxAuiPaneInfo& Maximize() { return SetFlag(optionMaximized, true); }
     wxAuiPaneInfo& Restore() { return SetFlag(optionMaximized, false); }
-
-    // get/set whether a pane should be destroyed when closed, instead of the default behaviour of hiding a closed pane.
     bool HasDestroyOnClose() const { return HasFlag(optionDestroyOnClose); }
     wxAuiPaneInfo& DestroyOnClose(bool b = true) { return SetFlag(optionDestroyOnClose, b); }
-
-    // get/set if pane displays a caption.
     bool HasCaption() const { return HasFlag(optionCaption); }
     wxAuiPaneInfo& CaptionVisible(bool visible = true) { return SetFlag(optionCaption, visible); }
-
-    // get/set if pane displays a gripper.
     bool HasGripper() const { return HasFlag(optionGripper); }
     wxAuiPaneInfo& Gripper(bool visible = true) { return SetFlag(optionGripper, visible); }
-    // get/set if pane displays a gripper at the top.
     bool HasGripperTop() const { return HasFlag(optionGripperTop); }
     wxAuiPaneInfo& GripperTop(bool attop = true) { return SetFlag(optionGripperTop, attop); }
-
-    // get/set if pane displays a border.
     bool HasBorder() const { return HasFlag(optionPaneBorder); }
     wxAuiPaneInfo& PaneBorder(bool visible = true) { return SetFlag(optionPaneBorder, visible); }
-
-    // get/set if pane displays a close button.
     bool HasCloseButton() const { return HasFlag(buttonClose); }
     wxAuiPaneInfo& CloseButton(bool visible = true) { return SetFlag(buttonClose, visible); }
-
-    // get/set if pane displays a maximize button.
     bool HasMaximizeButton() const { return HasFlag(buttonMaximize); }
     wxAuiPaneInfo& MaximizeButton(bool visible = true) { return SetFlag(buttonMaximize, visible); }
-
-    // get/set if pane displays a minimize button.
     bool HasMinimizeButton() const { return HasFlag(buttonMinimize); }
     wxAuiPaneInfo& MinimizeButton(bool visible = true) { return SetFlag(buttonMinimize, visible); }
-
-    // get/set if pane displays a pin button, pin button is a button which is used to float a panel.
     bool HasPinButton() const { return HasFlag(buttonPin); }
     wxAuiPaneInfo& PinButton(bool visible = true) { return SetFlag(buttonPin, visible); }
 
     wxAuiPaneInfo& Name(const wxString& n) { name = n; return *this; }
     wxAuiPaneInfo& Caption(const wxString& c) { caption = c; return *this; }
     wxAuiPaneInfo& Direction(int direction) { dock_direction = direction; return *this; }
-
-    // Convenience functions to the above
     wxAuiPaneInfo& Left()   { dock_direction = wxAUI_DOCK_LEFT; return *this; }
     wxAuiPaneInfo& Right()  { dock_direction = wxAUI_DOCK_RIGHT; return *this; }
     wxAuiPaneInfo& Top()    { dock_direction = wxAUI_DOCK_TOP; return *this; }
@@ -388,15 +344,12 @@ public:
     wxAuiPaneInfo& MaxSize(const wxSize& size) { max_size = size; return *this; }
 
     wxAuiPaneInfo& DockFixed(bool b = true) { return SetFlag(optionDockFixed, b); }
-    // adopt the default center pane settings for this pane.
     wxAuiPaneInfo& CentrePane() { return CenterPane(); }
     wxAuiPaneInfo& CenterPane()
     {
         state = 0;
         return Center().PaneBorder().Resizable();
     }
-
-    // adopt the default pane settings for this pane.
     wxAuiPaneInfo& DefaultPane()
     {
        wxAuiPaneInfo test(*this);
@@ -412,7 +365,6 @@ public:
         return *this;
     }
 
-    // adopt the toolbar pane settings for this pane.
     wxAuiPaneInfo& ToolbarPane()
     {
         DefaultPane();
@@ -598,12 +550,6 @@ public:
     };
 
 public:
-
-    // All the variables in this section are present for backward compatibility
-    // but should not be used anymore.
-    // Use the accessors methods to get their value. These variables may
-    // be removed or modified in the future.
-
     wxString name;        // name of the pane
     wxString caption;     // caption displayed on the window
 
@@ -654,7 +600,6 @@ public:
     virtual ~wxAuiManager();
     void UnInit();
 
-    // get/set all style property flags for this manager
     void SetFlags(unsigned int flags);
     unsigned int GetFlags() const;
 
@@ -772,7 +717,6 @@ protected:
     virtual bool ProcessDockResult(wxAuiPaneInfo& target,
                                    const wxAuiPaneInfo& newPos);
 
-    //Functions for handling pane drag and drop.
     bool DoDrop(wxAuiDockInfoArray& docks,
                 wxAuiPaneInfoArray& panes,
                 wxAuiPaneInfo& drop,
@@ -788,7 +732,6 @@ protected:
     void OnFloatingPaneActivated(wxWindow* window);
     void OnFloatingPaneClosed(wxWindow* window, wxCloseEvent& evt);
     void OnFloatingPaneResized(wxWindow* window, const wxRect& rect);
-    //Functions to handle rendering
     void Render(wxDC* dc);
     void Repaint(wxDC* dc = NULL);
 
