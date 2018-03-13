@@ -395,7 +395,6 @@ public:
         return (state & flag) != 0;
     }
 
-    bool IsValid() const;
     // get/set the name of the pane.
     wxString GetName() const { return name; }
 
@@ -551,6 +550,8 @@ public:
 public:
     wxString name;        // name of the pane
     wxString caption;     // caption displayed on the window
+    wxBitmap icon;        // bitmap associated with the pane, shown on tab(if in a notebook) or on titlebar(if one is present)
+
 
     wxWindow* window;     // window that is in this pane
     wxFrame* frame;       // floating frame window that holds the pane
@@ -560,8 +561,6 @@ public:
     int dock_layer;       // layer number (0 = innermost layer)
     int dock_row;         // row number on the docking bar (0 = first row)
     int dock_pos;         // position inside the row (0 = first position)
-
-    wxBitmap icon;        // bitmap associated with the pane, shown on tab(if in a notebook) or on titlebar(if one is present)
 
     wxSize best_size;     // size that the layout engine will prefer
     wxSize min_size;      // minimum size the pane window can tolerate
@@ -576,6 +575,7 @@ public:
 
     wxRect rect;              // current rectangle (populated by wxAUI)
 
+    bool IsValid() const;
 private:
 
     wxString m_tooltip;     // tooltip displayed when hovering over title/tab of window
