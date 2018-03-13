@@ -1408,7 +1408,9 @@ void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
         texty = normal_texty;
     }
 
+
     // -- draw line --
+
     wxPoint points[7];
     if (HasFlag(wxAUI_NB_LEFT))
     {
