@@ -473,9 +473,7 @@ void DoInsertPane(wxAuiPaneInfoArray& panes,
             pane.dock_layer == dock_layer &&
             pane.dock_row == dock_row &&
             pane.dock_pos >= dock_pos)
-        {
                 pane.dock_pos++;
-        }
     }
 }
 
