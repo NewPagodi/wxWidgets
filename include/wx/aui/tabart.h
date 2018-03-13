@@ -58,12 +58,6 @@ public:
     virtual void SetMeasuringFont(const wxFont& font) = 0;
     virtual void SetColour(const wxColour& colour) = 0;
     virtual void SetActiveColour(const wxColour& colour) = 0;
-    // this should actually set the requested size
-    virtual void SetTabCtrlHeight(int size) = 0;
-    // this should actually set the requested size
-    virtual void SetTabCtrlWidth(int size) = 0;
-
-    virtual void SetUniformBitmapSize(const wxSize& size) = 0;
 
     virtual void DrawBorder(
                  wxDC& dc,
@@ -124,6 +118,12 @@ public:
                          wxWindow* wnd,
                          const wxAuiPaneInfoPtrArray& pages) = 0;
 
+    // this should actually set the requested size
+    virtual void SetTabCtrlHeight(int size) = 0;
+    // this should actually set the requested size
+    virtual void SetTabCtrlWidth(int size) = 0;
+
+    virtual void SetUniformBitmapSize(const wxSize& size) = 0;
     // this should return -1,-1 if there is no requested width \ height
     virtual wxSize GetRequestedSize() const = 0;
     virtual wxSize GetRequiredBitmapSize() const = 0;
@@ -153,9 +153,6 @@ public:
     void SetMeasuringFont(const wxFont& font) wxOVERRIDE;
     void SetColour(const wxColour& colour) wxOVERRIDE;
     void SetActiveColour(const wxColour& colour) wxOVERRIDE;
-    void SetTabCtrlHeight(int size) wxOVERRIDE;
-    void SetTabCtrlWidth(int size) wxOVERRIDE;
-    void SetUniformBitmapSize(const wxSize& size) wxOVERRIDE;
 
     void DrawBorder(
                  wxDC& dc,
@@ -218,6 +215,9 @@ public:
                      return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                  }
 
+    void SetTabCtrlHeight(int size) wxOVERRIDE;
+    void SetTabCtrlWidth(int size) wxOVERRIDE;
+    void SetUniformBitmapSize(const wxSize& size) wxOVERRIDE;
 
     wxSize GetRequiredBitmapSize() const  wxOVERRIDE;
     wxSize GetRequestedSize() const  wxOVERRIDE;
@@ -228,8 +228,6 @@ public:
     bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
 
 protected:
-    wxSize m_requiredBitmapSize;
-    wxSize m_requestedSize;
 
     wxFont m_normalFont;
     wxFont m_selectedFont;
@@ -243,14 +241,16 @@ protected:
     wxBitmap m_disabledCloseBmp;
     wxBitmap m_activeLeftBmp;
     wxBitmap m_disabledLeftBmp;
-    wxBitmap m_activeUpBmp;
-    wxBitmap m_disabledUpBmp;
-    wxBitmap m_activeDownBmp;
-    wxBitmap m_disabledDownBmp;
     wxBitmap m_activeRightBmp;
     wxBitmap m_disabledRightBmp;
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
+    wxSize m_requiredBitmapSize;
+    wxSize m_requestedSize;
+    wxBitmap m_activeUpBmp;
+    wxBitmap m_disabledUpBmp;
+    wxBitmap m_activeDownBmp;
+    wxBitmap m_disabledDownBmp;
 };
 
 
@@ -273,9 +273,6 @@ public:
     void SetMeasuringFont(const wxFont& font) wxOVERRIDE;
     void SetColour(const wxColour& colour) wxOVERRIDE;
     void SetActiveColour(const wxColour& colour) wxOVERRIDE;
-    void SetTabCtrlHeight(int size) wxOVERRIDE;
-    void SetTabCtrlWidth(int size) wxOVERRIDE;
-    void SetUniformBitmapSize(const wxSize& size) wxOVERRIDE;
 
     void DrawBorder(
                  wxDC& dc,
@@ -337,6 +334,9 @@ public:
                  {
                      return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                  }
+    void SetTabCtrlHeight(int size) wxOVERRIDE;
+    void SetTabCtrlWidth(int size) wxOVERRIDE;
+    void SetUniformBitmapSize(const wxSize& size) wxOVERRIDE;
 
     wxSize GetRequiredBitmapSize() const wxOVERRIDE;
     wxSize GetRequestedSize() const wxOVERRIDE;
@@ -347,8 +347,6 @@ public:
     bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
 
 protected:
-    wxSize m_requiredBitmapSize;
-    wxSize m_requestedSize;
     wxFont m_normalFont;
     wxFont m_selectedFont;
     wxFont m_measuringFont;
@@ -361,14 +359,16 @@ protected:
     wxBitmap m_disabledCloseBmp;
     wxBitmap m_activeLeftBmp;
     wxBitmap m_disabledLeftBmp;
-    wxBitmap m_activeUpBmp;
-    wxBitmap m_disabledUpBmp;
-    wxBitmap m_activeDownBmp;
-    wxBitmap m_disabledDownBmp;
     wxBitmap m_activeRightBmp;
     wxBitmap m_disabledRightBmp;
     wxBitmap m_activeWindowListBmp;
     wxBitmap m_disabledWindowListBmp;
+    wxSize m_requiredBitmapSize;
+    wxSize m_requestedSize;
+    wxBitmap m_activeUpBmp;
+    wxBitmap m_disabledUpBmp;
+    wxBitmap m_activeDownBmp;
+    wxBitmap m_disabledDownBmp;
 };
 
 #ifndef __WXUNIVERSAL__
