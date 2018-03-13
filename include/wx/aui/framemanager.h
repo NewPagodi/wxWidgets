@@ -237,6 +237,20 @@ public:
     %typemap(out) wxAuiPaneInfo& { $result = $self; Py_INCREF($result); }
 #endif // !SWIG
 
+    // Write the safe parts of a newly loaded PaneInfo structure "source" into "this"
+    // used on loading perspectives etc.
+    void SafeSet(wxAuiPaneInfo source)
+    {
+        // note source is not passed by reference so we can overwrite, to keep the
+        // unsafe bits of "dest"
+        source.window  = window;
+        source.frame   = frame;
+        source.buttons = buttons;
+        source.icon    = icon;
+        // now assign
+        *this = source;
+    }
+
 
     // return a string serializing the state of this pane.
     wxString GetInfo() const;
@@ -462,27 +476,6 @@ public:
     // Move a pane over another one, creating a notebook if allowed.
     // The pane is set in the page immediatly after the targetted one
     wxAuiPaneInfo &MoveOver(const wxAuiPaneInfo &target);
-
-    // get/set a property flag for this pane, used internally by other get/set functions.
-    bool HasFlag(int flag) const
-    {
-        return (state & flag) != 0;
-    }
-    wxAuiPaneInfo& SetFlag(int flag, bool optionState)
-    {
-        wxAuiPaneInfo test(*this);
-        if (optionState)
-             test.state |= flag;
-        else
-            test.state &= ~flag;
-        wxCHECK_MSG(test.IsValid(), *this,
-                    "window settings and pane settings are incompatible");
-        if (optionState)
-             this->state |= flag;
-        else
-            this->state &= ~flag;
-        return *this;
-    }
     unsigned int GetFlags() const
     {
         return state;
@@ -528,25 +521,32 @@ public:
         return *this;
     }
 
+    wxAuiPaneInfo& SetFlag(int flag, bool optionState)
+    {
+        wxAuiPaneInfo test(*this);
+        if (optionState)
+             test.state |= flag;
+        else
+            test.state &= ~flag;
+        wxCHECK_MSG(test.IsValid(), *this,
+                    "window settings and pane settings are incompatible");
+        if (optionState)
+             this->state |= flag;
+        else
+            this->state &= ~flag;
+        return *this;
+    }
+
+    // get/set a property flag for this pane, used internally by other get/set functions.
+    bool HasFlag(int flag) const
+    {
+        return (state & flag) != 0;
+    }
     bool IsValid() const;
     bool IsActive() const { return HasFlag(wxAuiPaneInfo::optionActive); }
 #ifdef SWIG
     %typemap(out) wxAuiPaneInfo& ;
 #endif
-
-    // Write the safe parts of a newly loaded PaneInfo structure "source" into "this"
-    // used on loading perspectives etc.
-    void SafeSet(wxAuiPaneInfo source)
-    {
-        // note source is not passed by reference so we can overwrite, to keep the
-        // unsafe bits of "dest"
-        source.window  = window;
-        source.frame   = frame;
-        source.buttons = buttons;
-        source.icon    = icon;
-        // now assign
-        *this = source;
-    }
 
 public:
 
