@@ -348,6 +348,7 @@ public:
     bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
 
 protected:
+
     wxFont m_normalFont;
     wxFont m_selectedFont;
     wxFont m_measuringFont;
