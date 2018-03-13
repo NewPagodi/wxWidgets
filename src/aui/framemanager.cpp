@@ -5225,14 +5225,14 @@ void wxAuiManager::UpdateButtonOnScreen(wxAuiDockUIPart* button_ui_part,
 
     if (hit_test == button_ui_part)
     {
-        if (event.LeftIsDown())
+        if (event.LeftDown())
             state = wxAUI_BUTTON_STATE_PRESSED;
         else
             state = wxAUI_BUTTON_STATE_HOVER;
     }
     else
     {
-        if (event.LeftIsDown())
+        if (event.LeftDown())
             state = wxAUI_BUTTON_STATE_HOVER;
     }
 
