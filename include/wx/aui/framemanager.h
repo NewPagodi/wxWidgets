@@ -252,11 +252,6 @@ public:
     }
 
 
-    // return a string serializing the state of this pane.
-    wxString GetInfo() const;
-    // load the pane state from a serialized string.
-    void LoadInfo(wxString& info);
-
     // returns true if the pane contains a toolbar.
     bool IsToolbar() const { return HasFlag(optionToolbar); }
 
@@ -271,8 +266,6 @@ public:
       this->window = w;
       return *this;
     }
-
-    wxAuiPaneInfo& Frame(wxFrame* f) { frame = f; return *this; }
 
     // get/set if the pane is resizable.
     // opposite of Is/SetFixed.
@@ -296,10 +289,6 @@ public:
     // opposite of IsFloating.
     bool IsDocked() const { return !HasFlag(optionFloating); }
     wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
-
-    // get/set whether the pane can be docked at the center of the frame.
-    bool IsCenterDockable() const { return HasFlag(optionCenterDockable); }
-    wxAuiPaneInfo& CenterDockable(bool b = true) { return SetFlag(optionCenterDockable, b); }
     // get/set whether the pane can be docked at the top of the frame.
     bool IsTopDockable() const { return HasFlag(optionTopDockable); }
     wxAuiPaneInfo& TopDockable(bool b = true) { return SetFlag(optionTopDockable, b); }
@@ -374,10 +363,6 @@ public:
 
     wxAuiPaneInfo& Name(const wxString& n) { name = n; return *this; }
     wxAuiPaneInfo& Caption(const wxString& c) { caption = c; return *this; }
-
-    // get/set the tooltip of the pane.
-    wxString GetToolTip() const { return m_tooltip; }
-    wxAuiPaneInfo& ToolTip(const wxString& t) { m_tooltip = t; return *this; }
     wxAuiPaneInfo& Direction(int direction) { dock_direction = direction; return *this; }
 
     // Convenience functions to the above
@@ -390,12 +375,7 @@ public:
     wxAuiPaneInfo& Layer(int layer) { dock_layer = layer; return *this; }
     wxAuiPaneInfo& Row(int row) { dock_row = row; return *this; }
     wxAuiPaneInfo& Position(int pos) { dock_pos = pos; return *this; }
-
-    // get/set the tab position of the pane when in a notebook.
-    int GetPage() const { return m_dock_page; }
-    wxAuiPaneInfo& Page(int page) { m_dock_page = page; return *this; }
     wxAuiPaneInfo& Icon(wxBitmap bitmap) { icon = bitmap; return *this; }
-    wxAuiPaneInfo& Proportion(int proportion) { dock_proportion = proportion; return *this; }
     wxAuiPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
     wxAuiPaneInfo& FloatingPosition(const wxPoint& pos) { floating_pos = pos; return *this; }
     wxAuiPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
@@ -406,30 +386,8 @@ public:
     wxAuiPaneInfo& MinSize(const wxSize& size) { min_size = size; return *this; }
     wxAuiPaneInfo& MaxSize(int x, int y) { max_size.Set(x,y); return *this; }
     wxAuiPaneInfo& MaxSize(const wxSize& size) { max_size = size; return *this; }
-    wxAuiPaneInfo& Rect(const wxRect& r) { rect = r; return *this; }
 
-    // get/set whether the containing dock can have a resize sash.
-    // when DockFixed is true no sash will be available.
-    bool IsDockFixed() const { return HasFlag(optionDockFixed); }
     wxAuiPaneInfo& DockFixed(bool b = true) { return SetFlag(optionDockFixed, b); }
-
-    // get/set whether the pane should always dock in a notebook, even if not stacked with another pane
-    bool IsAlwaysDockInNotebook() const { return HasFlag(optionAlwaysDockInNotebook); }
-    wxAuiPaneInfo &AlwaysDockInNotebook(bool b = true) { return SetFlag(optionAlwaysDockInNotebook, b); }
-	
-	// get/set wether the pane should be compacted when in a notebook
-	// If this is set, the tab only shows its icon if it is not active.
-	bool IsCompactTab() const { return HasFlag(optionCompactTab); }
-	wxAuiPaneInfo &CompactTab(bool b = true) { return SetFlag(optionCompactTab, b); }
-
-    // Move a pane over another one, creating a notebook if allowed.
-    // The pane is set in the page immediatly after the targetted one
-    wxAuiPaneInfo &MoveOver(const wxAuiPaneInfo &target);
-    wxAuiPaneInfo& Flags(unsigned int f)
-    {
-    state = f; return *this;
-    }
-
     // adopt the default center pane settings for this pane.
     wxAuiPaneInfo& CentrePane() { return CenterPane(); }
     wxAuiPaneInfo& CenterPane()
@@ -487,7 +445,6 @@ public:
         return (state & flag) != 0;
     }
     bool IsValid() const;
-    bool IsActive() const { return HasFlag(wxAuiPaneInfo::optionActive); }
     // get/set the name of the pane.
     wxString GetName() const { return name; }
 
@@ -543,6 +500,50 @@ public:
 
     // get/set the current rectangle (populated by wxAUI).
     wxRect GetRect() const { return rect; };
+
+    // get/set whether the containing dock can have a resize sash.
+    // when DockFixed is true no sash will be available.
+    bool IsDockFixed() const { return HasFlag(optionDockFixed); }
+    bool IsActive() const { return HasFlag(wxAuiPaneInfo::optionActive); }
+    wxAuiPaneInfo& Proportion(int proportion) { dock_proportion = proportion; return *this; }
+
+    wxAuiPaneInfo& Frame(wxFrame* f) { frame = f; return *this; }
+    wxAuiPaneInfo& Rect(const wxRect& r) { rect = r; return *this; }
+    wxAuiPaneInfo& Flags(unsigned int f)
+    {
+    state = f; return *this;
+    }
+
+    // get/set the tooltip of the pane.
+    wxString GetToolTip() const { return m_tooltip; }
+    wxAuiPaneInfo& ToolTip(const wxString& t) { m_tooltip = t; return *this; }
+
+
+    // get/set the tab position of the pane when in a notebook.
+    int GetPage() const { return m_dock_page; }
+    wxAuiPaneInfo& Page(int page) { m_dock_page = page; return *this; }
+
+    // get/set whether the pane can be docked at the center of the frame.
+    bool IsCenterDockable() const { return HasFlag(optionCenterDockable); }
+    wxAuiPaneInfo& CenterDockable(bool b = true) { return SetFlag(optionCenterDockable, b); }
+
+    // get/set whether the pane should always dock in a notebook, even if not stacked with another pane
+    bool IsAlwaysDockInNotebook() const { return HasFlag(optionAlwaysDockInNotebook); }
+    wxAuiPaneInfo &AlwaysDockInNotebook(bool b = true) { return SetFlag(optionAlwaysDockInNotebook, b); }
+	
+	// get/set wether the pane should be compacted when in a notebook
+	// If this is set, the tab only shows its icon if it is not active.
+	bool IsCompactTab() const { return HasFlag(optionCompactTab); }
+	wxAuiPaneInfo &CompactTab(bool b = true) { return SetFlag(optionCompactTab, b); }
+
+    // return a string serializing the state of this pane.
+    wxString GetInfo() const;
+    // load the pane state from a serialized string.
+    void LoadInfo(wxString& info);
+
+    // Move a pane over another one, creating a notebook if allowed.
+    // The pane is set in the page immediatly after the targetted one
+    wxAuiPaneInfo &MoveOver(const wxAuiPaneInfo &target);
  
 #ifdef SWIG
     %typemap(out) wxAuiPaneInfo& ;
