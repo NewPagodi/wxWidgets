@@ -252,8 +252,34 @@ public:
     }
 
 
-    bool IsToolbar() const { return HasFlag(optionToolbar); }
     bool IsOk() const { return window != NULL; }
+    bool IsFixed() const { return !HasFlag(optionResizable); }
+    bool IsResizable() const { return HasFlag(optionResizable); }
+    bool IsShown() const { return !HasFlag(optionHidden); }
+    bool IsFloating() const { return HasFlag(optionFloating); }
+    bool IsDocked() const { return !HasFlag(optionFloating); }
+    bool IsToolbar() const { return HasFlag(optionToolbar); }
+    bool IsTopDockable() const { return HasFlag(optionTopDockable); }
+    bool IsBottomDockable() const { return HasFlag(optionBottomDockable); }
+    bool IsLeftDockable() const { return HasFlag(optionLeftDockable); }
+    bool IsRightDockable() const { return HasFlag(optionRightDockable); }
+    bool IsDockable() const
+    {
+        return HasFlag(optionTopDockable | optionBottomDockable |
+                        optionLeftDockable | optionRightDockable | optionCenterDockable);
+    }
+    bool IsFloatable() const { return HasFlag(optionFloatable); }
+    bool IsMovable() const { return HasFlag(optionMovable); }
+    bool HasDestroyOnClose() const { return HasFlag(optionDestroyOnClose); }
+    bool IsMaximized() const { return HasFlag(optionMaximized); }
+    bool HasCaption() const { return HasFlag(optionCaption); }
+    bool HasGripper() const { return HasFlag(optionGripper); }
+    bool HasBorder() const { return HasFlag(optionPaneBorder); }
+    bool HasCloseButton() const { return HasFlag(buttonClose); }
+    bool HasMaximizeButton() const { return HasFlag(buttonMaximize); }
+    bool HasMinimizeButton() const { return HasFlag(buttonMinimize); }
+    bool HasPinButton() const { return HasFlag(buttonPin); }
+    bool HasGripperTop() const { return HasFlag(optionGripperTop); }
     wxAuiPaneInfo& Window(wxWindow* w)
     {
       wxAuiPaneInfo test(*this);
@@ -263,94 +289,63 @@ public:
       this->window = w;
       return *this;
     }
-    bool IsResizable() const { return HasFlag(optionResizable); }
-    wxAuiPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
-     bool IsFixed() const { return !HasFlag(optionResizable); }
-    wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
-    bool IsShown() const { return !HasFlag(optionHidden); }
-    wxAuiPaneInfo& Hide() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionHidden, true); }
-    wxAuiPaneInfo& Show(bool show = true) { if (!show) SetFlag(wxAuiPaneInfo::optionActiveNotebook, false); return SetFlag(optionHidden, !show); }
-    bool IsFloating() const { return HasFlag(optionFloating); }
-    wxAuiPaneInfo& Float() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionFloating, true); }
-    bool IsDocked() const { return !HasFlag(optionFloating); }
-    wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
-    bool IsTopDockable() const { return HasFlag(optionTopDockable); }
-    wxAuiPaneInfo& TopDockable(bool b = true) { return SetFlag(optionTopDockable, b); }
-    bool IsBottomDockable() const { return HasFlag(optionBottomDockable); }
-    wxAuiPaneInfo& BottomDockable(bool b = true) { return SetFlag(optionBottomDockable, b); }
-    bool IsLeftDockable() const { return HasFlag(optionLeftDockable); }
-    wxAuiPaneInfo& LeftDockable(bool b = true) { return SetFlag(optionLeftDockable, b); }
-    bool IsRightDockable() const { return HasFlag(optionRightDockable); }
-    wxAuiPaneInfo& RightDockable(bool b = true) { return SetFlag(optionRightDockable, b); }
-    wxAuiPaneInfo& Dockable(bool b = true)
-    {
-        return TopDockable(b).BottomDockable(b).LeftDockable(b).RightDockable(b).CenterDockable(b);
-    }
-    bool IsDockable() const
-    {
-        return HasFlag(optionTopDockable | optionBottomDockable |
-                        optionLeftDockable | optionRightDockable | optionCenterDockable);
-    }
-    bool IsFloatable() const { return HasFlag(optionFloatable); }
-    wxAuiPaneInfo& Floatable(bool b = true) { return SetFlag(optionFloatable, b); }
-
-    bool IsMovable() const { return HasFlag(optionMovable); }
-    wxAuiPaneInfo& Movable(bool b = true) { return SetFlag(optionMovable, b); }
-
-    bool IsMaximized() const { return HasFlag(optionMaximized); }
-    wxAuiPaneInfo& Maximize() { return SetFlag(optionMaximized, true); }
-    wxAuiPaneInfo& Restore() { return SetFlag(optionMaximized, false); }
-    bool HasDestroyOnClose() const { return HasFlag(optionDestroyOnClose); }
-    wxAuiPaneInfo& DestroyOnClose(bool b = true) { return SetFlag(optionDestroyOnClose, b); }
-    bool HasCaption() const { return HasFlag(optionCaption); }
-    wxAuiPaneInfo& CaptionVisible(bool visible = true) { return SetFlag(optionCaption, visible); }
-    bool HasGripper() const { return HasFlag(optionGripper); }
-    wxAuiPaneInfo& Gripper(bool visible = true) { return SetFlag(optionGripper, visible); }
-    bool HasGripperTop() const { return HasFlag(optionGripperTop); }
-    wxAuiPaneInfo& GripperTop(bool attop = true) { return SetFlag(optionGripperTop, attop); }
-    bool HasBorder() const { return HasFlag(optionPaneBorder); }
-    wxAuiPaneInfo& PaneBorder(bool visible = true) { return SetFlag(optionPaneBorder, visible); }
-    bool HasCloseButton() const { return HasFlag(buttonClose); }
-    wxAuiPaneInfo& CloseButton(bool visible = true) { return SetFlag(buttonClose, visible); }
-    bool HasMaximizeButton() const { return HasFlag(buttonMaximize); }
-    wxAuiPaneInfo& MaximizeButton(bool visible = true) { return SetFlag(buttonMaximize, visible); }
-    bool HasMinimizeButton() const { return HasFlag(buttonMinimize); }
-    wxAuiPaneInfo& MinimizeButton(bool visible = true) { return SetFlag(buttonMinimize, visible); }
-    bool HasPinButton() const { return HasFlag(buttonPin); }
-    wxAuiPaneInfo& PinButton(bool visible = true) { return SetFlag(buttonPin, visible); }
 
     wxAuiPaneInfo& Name(const wxString& n) { name = n; return *this; }
     wxAuiPaneInfo& Caption(const wxString& c) { caption = c; return *this; }
-    wxAuiPaneInfo& Direction(int direction) { dock_direction = direction; return *this; }
+    wxAuiPaneInfo& Icon(wxBitmap bitmap) { icon = bitmap; return *this; }
     wxAuiPaneInfo& Left()   { dock_direction = wxAUI_DOCK_LEFT; return *this; }
     wxAuiPaneInfo& Right()  { dock_direction = wxAUI_DOCK_RIGHT; return *this; }
     wxAuiPaneInfo& Top()    { dock_direction = wxAUI_DOCK_TOP; return *this; }
     wxAuiPaneInfo& Bottom() { dock_direction = wxAUI_DOCK_BOTTOM; return *this; }
     wxAuiPaneInfo& Center() { dock_direction = wxAUI_DOCK_CENTER; return *this; }
     wxAuiPaneInfo& Centre() { dock_direction = wxAUI_DOCK_CENTRE; return *this; }
+    wxAuiPaneInfo& Direction(int direction) { dock_direction = direction; return *this; }
     wxAuiPaneInfo& Layer(int layer) { dock_layer = layer; return *this; }
     wxAuiPaneInfo& Row(int row) { dock_row = row; return *this; }
     wxAuiPaneInfo& Position(int pos) { dock_pos = pos; return *this; }
-    wxAuiPaneInfo& Icon(wxBitmap bitmap) { icon = bitmap; return *this; }
-    wxAuiPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
-    wxAuiPaneInfo& FloatingPosition(const wxPoint& pos) { floating_pos = pos; return *this; }
-    wxAuiPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
-    wxAuiPaneInfo& FloatingSize(const wxSize& size) { floating_size = size; return *this; }
-   wxAuiPaneInfo& BestSize(int x, int y) { best_size.Set(x,y); return *this; }
     wxAuiPaneInfo& BestSize(const wxSize& size) { best_size = size; return *this; }
-    wxAuiPaneInfo& MinSize(int x, int y) { min_size.Set(x,y); return *this; }
     wxAuiPaneInfo& MinSize(const wxSize& size) { min_size = size; return *this; }
-    wxAuiPaneInfo& MaxSize(int x, int y) { max_size.Set(x,y); return *this; }
     wxAuiPaneInfo& MaxSize(const wxSize& size) { max_size = size; return *this; }
+   wxAuiPaneInfo& BestSize(int x, int y) { best_size.Set(x,y); return *this; }
+    wxAuiPaneInfo& MinSize(int x, int y) { min_size.Set(x,y); return *this; }
+    wxAuiPaneInfo& MaxSize(int x, int y) { max_size.Set(x,y); return *this; }
+    wxAuiPaneInfo& FloatingPosition(const wxPoint& pos) { floating_pos = pos; return *this; }
+    wxAuiPaneInfo& FloatingPosition(int x, int y) { floating_pos.x = x; floating_pos.y = y; return *this; }
+    wxAuiPaneInfo& FloatingSize(const wxSize& size) { floating_size = size; return *this; }
+    wxAuiPaneInfo& FloatingSize(int x, int y) { floating_size.Set(x,y); return *this; }
+     wxAuiPaneInfo& Fixed() { return SetFlag(optionResizable, false); }
+    wxAuiPaneInfo& Resizable(bool resizable = true) { return SetFlag(optionResizable, resizable); }
+    wxAuiPaneInfo& Dock() { return SetFlag(optionFloating, false); }
+    wxAuiPaneInfo& Float() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionFloating, true); }
+    wxAuiPaneInfo& Hide() { SetFlag(wxAuiPaneInfo::optionActiveNotebook,false); return SetFlag(optionHidden, true); }
+    wxAuiPaneInfo& Show(bool show = true) { if (!show) SetFlag(wxAuiPaneInfo::optionActiveNotebook, false); return SetFlag(optionHidden, !show); }
+    wxAuiPaneInfo& CaptionVisible(bool visible = true) { return SetFlag(optionCaption, visible); }
+    wxAuiPaneInfo& Maximize() { return SetFlag(optionMaximized, true); }
+    wxAuiPaneInfo& Restore() { return SetFlag(optionMaximized, false); }
+    wxAuiPaneInfo& PaneBorder(bool visible = true) { return SetFlag(optionPaneBorder, visible); }
+    wxAuiPaneInfo& Gripper(bool visible = true) { return SetFlag(optionGripper, visible); }
+    wxAuiPaneInfo& GripperTop(bool attop = true) { return SetFlag(optionGripperTop, attop); }
+    wxAuiPaneInfo& CloseButton(bool visible = true) { return SetFlag(buttonClose, visible); }
+    wxAuiPaneInfo& MaximizeButton(bool visible = true) { return SetFlag(buttonMaximize, visible); }
+    wxAuiPaneInfo& MinimizeButton(bool visible = true) { return SetFlag(buttonMinimize, visible); }
+    wxAuiPaneInfo& PinButton(bool visible = true) { return SetFlag(buttonPin, visible); }
+    wxAuiPaneInfo& DestroyOnClose(bool b = true) { return SetFlag(optionDestroyOnClose, b); }
+    wxAuiPaneInfo& TopDockable(bool b = true) { return SetFlag(optionTopDockable, b); }
+    wxAuiPaneInfo& BottomDockable(bool b = true) { return SetFlag(optionBottomDockable, b); }
+    wxAuiPaneInfo& LeftDockable(bool b = true) { return SetFlag(optionLeftDockable, b); }
+    wxAuiPaneInfo& RightDockable(bool b = true) { return SetFlag(optionRightDockable, b); }
+
+    wxAuiPaneInfo& Floatable(bool b = true) { return SetFlag(optionFloatable, b); }
+
+    wxAuiPaneInfo& Movable(bool b = true) { return SetFlag(optionMovable, b); }
+
+
 
     wxAuiPaneInfo& DockFixed(bool b = true) { return SetFlag(optionDockFixed, b); }
-    wxAuiPaneInfo& CentrePane() { return CenterPane(); }
-    wxAuiPaneInfo& CenterPane()
+    wxAuiPaneInfo& Dockable(bool b = true)
     {
-        state = 0;
-        return Center().PaneBorder().Resizable();
-    }
-    wxAuiPaneInfo& DefaultPane()
+        return TopDockable(b).BottomDockable(b).LeftDockable(b).RightDockable(b).CenterDockable(b);
+    }    wxAuiPaneInfo& DefaultPane()
     {
        wxAuiPaneInfo test(*this);
        test.state |= optionTopDockable | optionBottomDockable |
@@ -365,6 +360,13 @@ public:
         return *this;
     }
 
+
+    wxAuiPaneInfo& CentrePane() { return CenterPane(); }
+    wxAuiPaneInfo& CenterPane()
+    {
+        state = 0;
+        return Center().PaneBorder().Resizable();
+    }
     wxAuiPaneInfo& ToolbarPane()
     {
         DefaultPane();
