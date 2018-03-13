@@ -77,7 +77,7 @@ WX_DEFINE_OBJARRAY(wxAuiTabContainerButtonArray)
 wxAuiTabContainer::wxAuiTabContainer(wxAuiTabArt* artProvider,wxAuiManager* mgr)
 : m_focus(false)
 , m_mgr(mgr)
-, m_tab_art(artProvider)
+, m_art(artProvider)
 {
     m_tabOffset = 0;
     m_flags = 0;
@@ -99,17 +99,17 @@ wxAuiTabContainer::~wxAuiTabContainer()
 
 void wxAuiTabContainer::SetArtProvider(wxAuiTabArt* art)
 {
-    m_tab_art = art;
+    m_art = art;
 
-    if (m_tab_art)
+    if (m_art)
     {
-        m_tab_art->SetFlags(m_flags);
+        m_art->SetFlags(m_flags);
     }
 }
 
 wxAuiTabArt* wxAuiTabContainer::GetArtProvider() const
 {
-    return m_tab_art;
+    return m_art;
 }
 
 void wxAuiTabContainer::SetFlags(unsigned int flags)
@@ -161,9 +161,9 @@ void wxAuiTabContainer::SetFlags(unsigned int flags)
             AddButton(wxAUI_BUTTON_CLOSE, wxUP);
         }
     }
-    if (m_tab_art)
+    if (m_art)
     {
-        m_tab_art->SetFlags(m_flags);
+        m_art->SetFlags(m_flags);
     }
 }
 
@@ -185,17 +185,17 @@ bool wxAuiTabContainer::IsHorizontal() const
 
 void wxAuiTabContainer::SetNormalFont(const wxFont& font)
 {
-    m_tab_art->SetNormalFont(font);
+    m_art->SetNormalFont(font);
 }
 
 void wxAuiTabContainer::SetSelectedFont(const wxFont& font)
 {
-    m_tab_art->SetSelectedFont(font);
+    m_art->SetSelectedFont(font);
 }
 
 void wxAuiTabContainer::SetMeasuringFont(const wxFont& font)
 {
-    m_tab_art->SetMeasuringFont(font);
+    m_art->SetMeasuringFont(font);
 }
 
 void wxAuiTabContainer::SetRect(const wxRect& rect)
@@ -206,9 +206,9 @@ void wxAuiTabContainer::SetRect(const wxRect& rect)
     m_rect.width = rect.width;
     m_rect.height = rect.height;
 
-    if (m_tab_art)
+    if (m_art)
     {
-        m_tab_art->SetSizingInfo(rect.GetSize(), m_pages.GetCount());
+        m_art->SetSizingInfo(rect.GetSize(), m_pages.GetCount());
     }
 }
 
@@ -235,9 +235,9 @@ bool wxAuiTabContainer::InsertPage(wxWindow* page,
     }
 
     // let the art provider know how many pages we have
-    if (m_tab_art)
+    if (m_art)
     {
-        m_tab_art->SetSizingInfo(m_rect.GetSize(), m_pages.GetCount());
+        m_art->SetSizingInfo(m_rect.GetSize(), m_pages.GetCount());
     }
 
     return true;
@@ -273,9 +273,9 @@ bool wxAuiTabContainer::RemovePage(wxWindow* wnd)
             m_pages.RemoveAt(i);
 
             // let the art provider know how many pages we have
-            if (m_tab_art)
+            if (m_art)
             {
-                m_tab_art->SetSizingInfo(m_rect.GetSize(), m_pages.GetCount());
+                m_art->SetSizingInfo(m_rect.GetSize(), m_pages.GetCount());
             }
 
             wnd->Disconnect( wxEVT_KEY_DOWN, wxKeyEventHandler(wxAuiTabContainer::OnChildKeyDown) );
@@ -461,7 +461,7 @@ void wxAuiTabContainer::CalculateRequiredHeight(wxDC& dc,wxWindow* wnd,int& tota
 		bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
 
         int extent = 0;
-        wxSize size = m_tab_art->GetTabSize(dc,
+        wxSize size = m_art->GetTabSize(dc,
                             wnd,
                             isCompact ? wxString() : page.GetCaption(),
                             page.GetIcon(),
@@ -516,7 +516,7 @@ void wxAuiTabContainer::CalculateRequiredWidth(wxDC& dc,wxWindow* wnd,int& total
 		bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
 
         int extent = 0;
-        wxSize size = m_tab_art->GetTabSize(dc,
+        wxSize size = m_art->GetTabSize(dc,
                             wnd,
                             isCompact ? wxString() : page.GetCaption(),
                             page.GetIcon(),
@@ -582,7 +582,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
         return;
 
     // draw background
-    m_tab_art->DrawBackground(dc, wnd, m_rect);
+    m_art->DrawBackground(dc, wnd, m_rect);
 
     // first we create all buttons on the right/bottom, except the forward arrows
     // so we can determine, whether we need the backward- and forward-arrows
@@ -631,7 +631,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
         button_rect.SetX(1);
         button_rect.SetY(1);
 
-        m_tab_art->DrawButton(dc,
+        m_art->DrawButton(dc,
                           wnd,
                           button_rect,
                           button.id,
@@ -675,7 +675,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
         wxAuiTabContainerButton& button = m_buttons.Item(i);
         if (button.id == idBtnArrowRightUp || button.id == idBtnLeftBottom)
         {
-            if (totalSize > (testSize - btn_size - m_tab_art->GetIndentSize()) || m_tabOffset != 0)
+            if (totalSize > (testSize - btn_size - m_art->GetIndentSize()) || m_tabOffset != 0)
                 button.curState &= ~wxAUI_BUTTON_STATE_HIDDEN;
             else
                 button.curState |= wxAUI_BUTTON_STATE_HIDDEN;
@@ -719,7 +719,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
             forw_btn_rect = button_rect;
         }
 
-        m_tab_art->DrawButton(dc,
+        m_art->DrawButton(dc,
                           wnd,
                           button_rect,
                           button.id,
@@ -759,7 +759,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
             forw_btn_rect = button_rect;
         }
 
-        m_tab_art->DrawButton(dc,
+        m_art->DrawButton(dc,
                           wnd,
                           button_rect,
                           button.id,
@@ -781,7 +781,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
     int offset = backwButtonsSize;
 
     if (offset == 0)
-        offset += m_tab_art->GetIndentSize();
+        offset += m_art->GetIndentSize();
 
 
     // prepare the tab-close-button array
@@ -817,7 +817,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
             else
                 button.curState &= ~wxAUI_BUTTON_STATE_DISABLED;
 
-            m_tab_art->DrawButton(dc,
+            m_art->DrawButton(dc,
                               wnd,
                               forw_btn_rect,
                               button.id,
@@ -882,7 +882,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
         }
 
         wxRect page_rect = page.GetRect();
-        m_tab_art->DrawTab(dc,
+        m_art->DrawTab(dc,
                        wnd,
                        page,
                        rect,
@@ -921,7 +921,7 @@ void wxAuiTabContainer::Render(wxDC* raw_dc, wxWindow* wnd)
         rect.x = active_offset;
         
         wxRect page_rect = page.GetRect();
-        m_tab_art->DrawTab(dc,
+        m_art->DrawTab(dc,
                        wnd,
                        page,
                        active_rect,
@@ -1057,7 +1057,7 @@ bool wxAuiTabContainer::IsTabVisible(int tabPage, int tabOffset, wxDC* dc, wxWin
 
     // calculate size of the buttons on the left/top side
     if (offset == 0)
-        offset += m_tab_art->GetIndentSize();
+        offset += m_art->GetIndentSize();
 
     // See if the given page is visible at the given tab offset (effectively scroll position)
     for (i = tabOffset; i < page_count; ++i)
@@ -1070,7 +1070,7 @@ bool wxAuiTabContainer::IsTabVisible(int tabPage, int tabOffset, wxDC* dc, wxWin
             return false; // haven't found the tab, and we've run out of space, so return false
 
         int extent = 0;
-        wxSize size = m_tab_art->GetTabSize(*dc,
+        wxSize size = m_art->GetTabSize(*dc,
                             wnd,
                             isCompact ? wxString() : page.GetCaption(),
                             page.GetIcon(),

@@ -181,7 +181,7 @@ protected:
 protected:
     bool m_focus;
     wxAuiManager* m_mgr;
-    wxAuiTabArt* m_tab_art;
+    wxAuiTabArt* m_art;
     wxAuiPaneInfoPtrArray m_pages;
     wxAuiTabContainerButtonArray m_buttons;
     wxAuiTabContainerButtonArray m_tabCloseButtons;
