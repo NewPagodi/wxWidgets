@@ -374,16 +374,16 @@ public:
         return *this;
     }
 
-    wxAuiPaneInfo& SetFlag(int flag, bool optionState)
+    wxAuiPaneInfo& SetFlag(int flag, bool option_state)
     {
         wxAuiPaneInfo test(*this);
-        if (optionState)
+        if (option_state)
             test.state |= flag;
         else
             test.state &= ~flag;
         wxCHECK_MSG(test.IsValid(), *this,
                     "window settings and pane settings are incompatible");
-        if (optionState)
+        if (option_state)
              this->state |= flag;
         else
             this->state &= ~flag;
@@ -604,7 +604,7 @@ public:
     void SetFlags(unsigned int flags);
     unsigned int GetFlags() const;
 
-    void SetManagedWindow(wxWindow* window);
+    void SetManagedWindow(wxWindow* managedWnd);
     wxWindow* GetManagedWindow() const;
 
     static wxAuiManager* GetManager(wxWindow* window);
