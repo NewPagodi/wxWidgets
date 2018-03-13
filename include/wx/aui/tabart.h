@@ -383,7 +383,6 @@ protected:
         #define wxHAS_NATIVE_TABART
         #include "wx/aui/tabartgtk.h"
         #define wxAuiDefaultTabArt wxAuiGtkTabArt
-        #define wxAuiNativeTabArt wxAuiGtkTabArt
     #endif
 #endif // !__WXUNIVERSAL__
 
