@@ -1310,7 +1310,7 @@ bool wxAuiManager::AddPane(wxWindow* window, const wxAuiPaneInfo& paneInfo)
     if (pinfo.name.empty() || already_exists)
     {
         pinfo.name.Printf(wxT("%08lx%08x%08x%08lx"),
-             (unsigned long)wxPtrToUInt(pinfo.GetWindow()) & 0xffffffff,
+             (unsigned long)(wxPtrToUInt(pinfo.GetWindow()) & 0xffffffff),
              (unsigned int)time(NULL),
 #ifdef __WXWINCE__
              (unsigned int)GetTickCount(),
@@ -4329,7 +4329,7 @@ void wxAuiManager::ShowHint(const wxRect& rect)
         m_hintFadeAmt = m_hintFadeMax;
 
         if ((m_flags & wxAUI_MGR_HINT_FADE)
-            && !(wxDynamicCast(m_hintWnd, wxPseudoTransparentFrame) &&
+            && !((wxDynamicCast(m_hintWnd, wxPseudoTransparentFrame)) &&
                  (m_flags & wxAUI_MGR_NO_VENETIAN_BLINDS_FADE))
             )
             m_hintFadeAmt = 0;
