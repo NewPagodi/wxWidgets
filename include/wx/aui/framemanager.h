@@ -243,8 +243,8 @@ public:
     {
         // note source is not passed by reference so we can overwrite, to keep the
         // unsafe bits of "dest"
-        source.window  = window;
-        source.frame   = frame;
+        source.window = window;
+        source.frame = frame;
         source.buttons = buttons;
         source.icon    = icon;
         // now assign
@@ -378,7 +378,7 @@ public:
     {
         wxAuiPaneInfo test(*this);
         if (optionState)
-             test.state |= flag;
+            test.state |= flag;
         else
             test.state &= ~flag;
         wxCHECK_MSG(test.IsValid(), *this,
@@ -552,7 +552,6 @@ public:
     wxString caption;     // caption displayed on the window
     wxBitmap icon;        // bitmap associated with the pane, shown on tab(if in a notebook) or on titlebar(if one is present)
 
-
     wxWindow* window;     // window that is in this pane
     wxFrame* frame;       // floating frame window that holds the pane
     unsigned int state;   // a combination of wxPaneState values
@@ -576,6 +575,7 @@ public:
     wxRect rect;              // current rectangle (populated by wxAUI)
 
     bool IsValid() const;
+
 private:
 
     wxString m_tooltip;     // tooltip displayed when hovering over title/tab of window
@@ -1031,7 +1031,6 @@ wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_RENDER, wxAuiManagerEvent )
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_FIND_MANAGER, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_PANE_DOCK_OVER, wxAuiManagerEvent );
 wxDECLARE_EXPORTED_EVENT( WXDLLIMPEXP_AUI, wxEVT_AUI_ALLOW_DND, wxAuiManagerEvent );
-
 
 typedef void (wxEvtHandler::*wxAuiManagerEventFunction)(wxAuiManagerEvent&);
 
