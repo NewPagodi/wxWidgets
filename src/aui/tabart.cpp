@@ -410,7 +410,7 @@ void wxAuiGenericTabArt::DrawTab(wxDC& dc,
 	bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
 
     // if the caption is empty, measure some temporary text
-	wxString actualCaption = isCompact ? wxString() : page.GetCaption();
+	wxString actualCaption = isCompact ? wxString() : page.caption;
     wxString caption = actualCaption;
     if (caption.empty())
         caption = wxT("Xj");
@@ -1042,7 +1042,7 @@ int wxAuiGenericTabArt::ShowDropDown(wxWindow* wnd,
     for (i = 0; i < count; ++i)
     {
         const wxAuiPaneInfo& page = *pages.Item(i);
-        wxString caption = page.GetCaption();
+        wxString caption = page.caption;
 
         // if there is no caption, make it a space.  This will prevent
         // an assert in the menu code.
@@ -1108,7 +1108,7 @@ wxSize wxAuiGenericTabArt::GetBestTabSize(wxWindow* wnd,
         int ext = 0;
         wxSize s = GetTabSize(dc,
                               wnd,
-                              isCompact ? wxString() : page.GetCaption(),
+                              isCompact ? wxString() : page.caption,
                               bmp,
                               true,
                               wxAUI_BUTTON_STATE_HIDDEN,
@@ -1357,7 +1357,7 @@ void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
 
     // if the caption is empty, measure some temporary text
 	bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
-	wxString actualCaption = isCompact ? wxString() : page.GetCaption();
+	wxString actualCaption = isCompact ? wxString() : page.caption;
     wxString caption = actualCaption;
     if (caption.empty())
         caption = wxT("Xj");
@@ -1738,7 +1738,7 @@ int wxAuiSimpleTabArt::ShowDropDown(wxWindow* wnd,
     for (i = 0; i < count; ++i)
     {
         const wxAuiPaneInfo& page = *pages.Item(i);
-        menuPopup.AppendCheckItem(1000+i, page.GetCaption());
+        menuPopup.AppendCheckItem(1000+i, page.caption);
     }
 
     if (active_idx != -1)
@@ -1781,7 +1781,7 @@ wxSize wxAuiSimpleTabArt::GetBestTabSize(wxWindow* wnd,
         int ext = 0;
         wxSize s = GetTabSize(dc,
                               wnd,
-                              isCompact ? wxString() : page->GetCaption(),
+                              isCompact ? wxString() : page->caption,
                               wxNullBitmap,
                               true,
                               wxAUI_BUTTON_STATE_HIDDEN,
