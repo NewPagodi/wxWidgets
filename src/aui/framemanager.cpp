@@ -1139,7 +1139,7 @@ void wxAuiManager::UpdateHintWindowConfig()
 
 // SetManagedWindow() is usually called once when the frame
 // manager class is being initialized.  "frame" specifies
-// the frame which should be managed by the frame mananger
+// the frame which should be managed by the frame manager
 void wxAuiManager::SetManagedWindow(wxWindow* wnd)
 {
     wxASSERT_MSG(wnd, wxT("specified window must be non-NULL"));
