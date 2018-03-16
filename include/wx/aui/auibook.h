@@ -30,6 +30,9 @@
 #include "wx/containr.h"
 
 
+class wxAuiNotebook;
+
+
 enum wxAuiNotebookOption
 {
     wxAUI_NB_TOP                 = wxAUI_MGR_NB_TOP,
@@ -58,7 +61,7 @@ enum wxAuiNotebookOption
 };
 
 
-class wxAuiNotebook;
+
 
 // aui notebook event class
 
