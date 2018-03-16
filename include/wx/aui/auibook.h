@@ -178,11 +178,10 @@ public:
 protected:
 
     virtual void Render(wxDC* dc, wxWindow* wnd);
-
-
     void OnChildKeyDown(wxKeyEvent& evt);
 
 protected:
+
     wxAuiTabArt* m_art;
     wxAuiNotebookPageArray m_pages;
     wxAuiTabContainerButtonArray m_buttons;
