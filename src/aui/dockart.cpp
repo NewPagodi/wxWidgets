@@ -35,7 +35,6 @@
 #ifndef WX_PRECOMP
     #include "wx/settings.h"
     #include "wx/dcclient.h"
-    #include "wx/dcmemory.h"
     #include "wx/image.h"
 #endif
 
@@ -47,6 +46,7 @@
 
 #ifdef __WXGTK__
 #include <gtk/gtk.h>
+#include "wx/renderer.h"
 #ifdef __WXGTK20__
    #include "wx/gtk/private/gtk2-compat.h"
 #else
@@ -58,8 +58,6 @@
 #endif
 #endif
 
-#include "wx/renderer.h"
-#include "wx/arrimpl.cpp"
 
 // -- wxAuiDefaultDockArt class implementation --
 
