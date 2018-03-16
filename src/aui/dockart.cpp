@@ -506,7 +506,7 @@ void wxAuiDefaultDockArt::DrawBorder(wxDC& dc, wxWindow* window, const wxRect& _
     else
     {
         // notebooks draw the border themselves, so they can use native rendering (e.g. tabartgtk)
-        wxAuiTabArt* art = NULL;
+        wxAuiTabArt* art = 0;
 
         // find if the pane is in a notebook
         wxAuiManager*      mgr = wxAuiManager::GetManager(pane.GetWindow());
@@ -517,9 +517,7 @@ void wxAuiDefaultDockArt::DrawBorder(wxDC& dc, wxWindow* window, const wxRect& _
             art = mgr->GetTabArtProvider();
 
         if (art)
-        {
             art->DrawBorder(dc, window, rect);
-        }
         else
         {
             for (i = 0; i < border_width; ++i)
