@@ -31,10 +31,11 @@
 #include "wx/bitmap.h"
 
 
+typedef class wxAuiPaneInfo wxAuiNotebookPage;
+class wxAuiNotebookPageArray;
 class wxWindow;
 class wxDC;
-class wxAuiPaneInfo;
-class wxAuiPaneInfoPtrArray;
+
 
 // tab art class
 
@@ -69,7 +70,7 @@ public:
 
     virtual void DrawTab(wxDC& dc,
                          wxWindow* wnd,
-                         const wxAuiPaneInfo& pane,
+                         const wxAuiNotebookPage& pane,
                          const wxRect& inRect,
                          int closeButtonState,
                          bool haveFocus,
@@ -97,7 +98,7 @@ public:
 
     virtual int ShowDropDown(
                          wxWindow* wnd,
-                         const wxAuiPaneInfoPtrArray& items,
+                         const wxAuiNotebookPageArray& items,
                          int activeIdx) = 0;
 
     virtual int GetIndentSize() = 0;
@@ -110,12 +111,12 @@ public:
 
     virtual wxSize GetBestTabSize(
                          wxWindow* wnd,
-                         const wxAuiPaneInfoPtrArray& pages,
+                         const wxAuiNotebookPageArray& pages,
                          const wxSize& requiredBmpSize) = 0;
 
     virtual int GetBestTabCtrlSize(
                          wxWindow* wnd,
-                         const wxAuiPaneInfoPtrArray& pages) = 0;
+                         const wxAuiNotebookPageArray& pages) = 0;
 
     // this should actually set the requested size
     virtual void SetTabCtrlHeight(int size) = 0;
@@ -165,7 +166,7 @@ public:
 
     void DrawTab(wxDC& dc,
                  wxWindow* wnd,
-                 const wxAuiPaneInfo& pane,
+                 const wxAuiNotebookPage& pane,
                  const wxRect& inRect,
                  int closeButtonState,
                  bool haveFocus,
@@ -201,15 +202,15 @@ public:
 
     int ShowDropDown(
                  wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& items,
+                 const wxAuiNotebookPageArray& items,
                  int activeIdx) wxOVERRIDE;
 
     wxSize GetBestTabSize(wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& pages,
+                 const wxAuiNotebookPageArray& pages,
                  const wxSize& requiredBmpSize) wxOVERRIDE;
 
     int GetBestTabCtrlSize(wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& pages)  wxOVERRIDE
+                 const wxAuiNotebookPageArray& pages)  wxOVERRIDE
                  {
                      return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                  }
@@ -286,7 +287,7 @@ public:
 
     void DrawTab(wxDC& dc,
                  wxWindow* wnd,
-                 const wxAuiPaneInfo& pane,
+                 const wxAuiNotebookPage& pane,
                  const wxRect& inRect,
                  int closeButtonState,
                  bool haveFocus,
@@ -322,15 +323,15 @@ public:
 
     int ShowDropDown(
                  wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& items,
+                 const wxAuiNotebookPageArray& items,
                  int activeIdx) wxOVERRIDE;
 
    wxSize GetBestTabSize(wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& pages,
+                 const wxAuiNotebookPageArray& pages,
                  const wxSize& requiredBmpSize) wxOVERRIDE;
 
     int GetBestTabCtrlSize(wxWindow* wnd,
-                 const wxAuiPaneInfoPtrArray& pages) wxOVERRIDE
+                 const wxAuiNotebookPageArray& pages) wxOVERRIDE
                  {
                      return GetBestTabSize(wnd, pages, m_requiredBitmapSize).GetHeight();
                  }

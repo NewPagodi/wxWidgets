@@ -394,7 +394,7 @@ void wxAuiGenericTabArt::DrawBackground(wxDC& dc,
 
 void wxAuiGenericTabArt::DrawTab(wxDC& dc,
                                  wxWindow* wnd,
-                                 const wxAuiPaneInfo& page,
+                                 const wxAuiNotebookPage& page,
                                  const wxRect& in_rect,
                                  int close_button_state,
                                  bool haveFocus,
@@ -1032,7 +1032,7 @@ void wxAuiGenericTabArt::DrawButton(wxDC& dc,
 }
 
 int wxAuiGenericTabArt::ShowDropDown(wxWindow* wnd,
-                                     const wxAuiPaneInfoPtrArray& pages,
+                                     const wxAuiNotebookPageArray& pages,
                                      int /*active_idx*/)
 {
     wxMenu menuPopup;
@@ -1040,7 +1040,7 @@ int wxAuiGenericTabArt::ShowDropDown(wxWindow* wnd,
     size_t i, count = pages.GetCount();
     for (i = 0; i < count; ++i)
     {
-        const wxAuiPaneInfo& page = *pages.Item(i);
+        const wxAuiPaneInfo& page = pages.Item(i);
         wxString caption = page.caption;
 
         // if there is no caption, make it a space.  This will prevent
@@ -1071,7 +1071,7 @@ int wxAuiGenericTabArt::ShowDropDown(wxWindow* wnd,
 }
 
 wxSize wxAuiGenericTabArt::GetBestTabSize(wxWindow* wnd,
-                                           const wxAuiPaneInfoPtrArray& pages,
+                                           const wxAuiNotebookPageArray& pages,
                                            const wxSize& requiredBmp_size)
 {
     wxClientDC dc(wnd);
@@ -1094,7 +1094,7 @@ wxSize wxAuiGenericTabArt::GetBestTabSize(wxWindow* wnd,
     size_t i, page_count = pages.GetCount();
     for (i = 0; i < page_count; ++i)
     {
-        wxAuiPaneInfo& page = *pages.Item(i);
+        wxAuiPaneInfo& page = pages.Item(i);
 
 		bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
 		
@@ -1347,7 +1347,7 @@ void wxAuiSimpleTabArt::DrawBackground(wxDC& dc,
 
 void wxAuiSimpleTabArt::DrawTab(wxDC& dc,
                                 wxWindow* wnd,
-                                const wxAuiPaneInfo& page,
+                                const wxAuiNotebookPage& page,
                                 const wxRect& in_rect,
                                 int close_button_state,
                                 bool haveFocus,
@@ -1733,7 +1733,7 @@ void wxAuiSimpleTabArt::DrawButton(wxDC& dc,
 }
 
 int wxAuiSimpleTabArt::ShowDropDown(wxWindow* wnd,
-                                    const wxAuiPaneInfoPtrArray& pages,
+                                    const wxAuiNotebookPageArray& pages,
                                     int active_idx)
 {
     wxMenu menuPopup;
@@ -1741,7 +1741,7 @@ int wxAuiSimpleTabArt::ShowDropDown(wxWindow* wnd,
     size_t i, count = pages.GetCount();
     for (i = 0; i < count; ++i)
     {
-        const wxAuiPaneInfo& page = *pages.Item(i);
+        const wxAuiPaneInfo& page = pages.Item(i);
         menuPopup.AppendCheckItem(1000+i, page.caption);
     }
 
@@ -1767,7 +1767,7 @@ int wxAuiSimpleTabArt::ShowDropDown(wxWindow* wnd,
 }
 
 wxSize wxAuiSimpleTabArt::GetBestTabSize(wxWindow* wnd,
-                                          const wxAuiPaneInfoPtrArray& pages,
+                                          const wxAuiNotebookPageArray& pages,
                                           const wxSize& WXUNUSED(requiredBmp_size))
 {
     wxClientDC dc(wnd);
@@ -1779,13 +1779,13 @@ wxSize wxAuiSimpleTabArt::GetBestTabSize(wxWindow* wnd,
     size_t i, pageCount = pages.GetCount();
     for (i = 0; i < pageCount; ++i)
     {
-        wxAuiPaneInfo* page = pages.Item(i);
-		bool isCompact = page->IsCompactTab() && !page->HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page->GetIcon().IsOk();
+        wxAuiPaneInfo page = pages.Item(i);
+		bool isCompact = page.IsCompactTab() && !page.HasFlag(wxAuiPaneInfo::optionActiveNotebook) && page.GetIcon().IsOk();
 
         int ext = 0;
         wxSize s = GetTabSize(dc,
                               wnd,
-                              isCompact ? wxString() : page->caption,
+                              isCompact ? wxString() : page.caption,
                               wxNullBitmap,
                               true,
                               wxAUI_BUTTON_STATE_HIDDEN,

@@ -106,6 +106,7 @@ public:
 
 
 #ifndef SWIG
+WX_DECLARE_USER_EXPORTED_OBJARRAY(wxAuiNotebookPage, wxAuiNotebookPageArray, WXDLLIMPEXP_AUI);
 WX_DECLARE_USER_EXPORTED_OBJARRAY(wxAuiTabContainerButton, wxAuiTabContainerButtonArray, WXDLLIMPEXP_AUI);
 #endif
 
@@ -138,7 +139,7 @@ public:
     size_t GetPageCount() const;
     wxAuiPaneInfo& GetPage(size_t idx);
     const wxAuiPaneInfo& GetPage(size_t idx) const;
-    wxAuiPaneInfoPtrArray& GetPages();
+    wxAuiNotebookPageArray& GetPages();
     void SetNormalFont(const wxFont& normalFont);
     void SetSelectedFont(const wxFont& selectedFont);
     void SetMeasuringFont(const wxFont& measuringFont);
@@ -180,7 +181,7 @@ protected:
 
 protected:
     wxAuiTabArt* m_art;
-    wxAuiPaneInfoPtrArray m_pages;
+    wxAuiNotebookPageArray m_pages;
     wxAuiTabContainerButtonArray m_buttons;
     wxAuiTabContainerButtonArray m_tabCloseButtons;
     wxRect m_rect;
