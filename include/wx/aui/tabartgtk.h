@@ -25,7 +25,6 @@
 
 #include "wx/aui/tabart.h"
 #include "wx/gdicmn.h"
-#include "wx/aui/auibook.h"
 
 class wxWindow;
 class wxDC;

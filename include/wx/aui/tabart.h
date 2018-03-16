@@ -23,8 +23,6 @@
 
 #if wxUSE_AUI
 
-#include "wx/aui/auibook.h"
-
 #include "wx/colour.h"
 #include "wx/gdicmn.h"
 #include "wx/font.h"
@@ -226,7 +224,7 @@ public:
     // Returns true if the tabart has the given flag bit set
     bool HasFlag(int flag) const    { return (m_flags & flag) != 0; }
     // returns true if we have wxAUI_NB_TOP or wxAUI_NB_BOTTOM style
-    bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
+    bool IsHorizontal() const;
 
 protected:
 
@@ -346,7 +344,7 @@ public:
     // Returns true if the tabart has the given flag bit set
     bool HasFlag(int flag) const    { return (m_flags & flag) != 0; }
     // returns true if we have wxAUI_NB_TOP or wxAUI_NB_BOTTOM style
-    bool IsHorizontal() const { return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM); }
+    bool IsHorizontal() const;
 
 protected:
 

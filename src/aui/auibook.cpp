@@ -24,10 +24,6 @@
 #if wxUSE_AUI
 
 #include "wx/aui/auibook.h"
-#include "wx/aui/dockart.h"
-#include "wx/aui/framemanager.h"
-#include "wx/aui/tabart.h"
-#include "wx/aui/tabmdi.h"
 
 #ifndef WX_PRECOMP
     #include "wx/settings.h"
@@ -35,6 +31,11 @@
     #include "wx/dcmemory.h"
 #endif
 
+#include "wx/aui/tabmdi.h"
+
+#ifdef __WXMAC__
+#include "wx/osx/private.h"
+#endif
 
 #include "wx/arrimpl.cpp"
 

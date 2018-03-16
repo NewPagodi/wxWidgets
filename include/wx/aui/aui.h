@@ -17,7 +17,6 @@
 #include "wx/aui/auibar.h"
 #include "wx/aui/auibook.h"
 #include "wx/aui/tabmdi.h"
-#include "wx/aui/tabart.h"
 
 #endif // _WX_AUI_H_
 

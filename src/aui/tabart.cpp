@@ -33,7 +33,6 @@
 
 #include "wx/renderer.h"
 #include "wx/aui/auibook.h"
-#include "wx/aui/tabart.h"
 #include "wx/aui/framemanager.h"
 #include "wx/aui/dockart.h"
 
@@ -1156,6 +1155,11 @@ wxSize wxAuiGenericTabArt::GetRequiredBitmapSize() const
     return m_requiredBitmapSize;
 }
 
+bool wxAuiGenericTabArt::IsHorizontal() const
+{
+    return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM);
+}
+
 // -- wxAuiSimpleTabArt class implementation --
 
 wxAuiSimpleTabArt::wxAuiSimpleTabArt()
@@ -1833,6 +1837,11 @@ wxSize wxAuiSimpleTabArt::GetRequestedSize() const
 wxSize wxAuiSimpleTabArt::GetRequiredBitmapSize() const
 {
     return m_requiredBitmapSize;
+}
+
+bool wxAuiSimpleTabArt::IsHorizontal() const
+{
+    return HasFlag(wxAUI_NB_TOP | wxAUI_NB_BOTTOM);
 }
 
 #endif // wxUSE_AUI
