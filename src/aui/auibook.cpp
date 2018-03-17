@@ -1357,13 +1357,13 @@ extern void DoInsertDockRow(wxAuiPaneInfoArray&,int,int,int);
 extern void DoInsertPane(wxAuiPaneInfoArray&,int,int,int,int);
 extern void DoInsertPage(wxAuiPaneInfoArray&,int,int,int,int,int);
 
+// -- wxAuiNotebook class implementation --
 
 wxBEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
     EVT_SIZE(wxAuiNotebook::OnSize)
     EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
 wxEND_EVENT_TABLE()
 
-// -- wxAuiNotebook class implementation --
 bool wxAuiNotebook::Create(wxWindow* parent,
                            wxWindowID id,
                            const wxPoint& pos,
