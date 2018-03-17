@@ -146,6 +146,9 @@ public:
     void SetNormalFont(const wxFont& normalFont);
     void SetSelectedFont(const wxFont& selectedFont);
     void SetMeasuringFont(const wxFont& measuringFont);
+    void SetColour(const wxColour& colour);
+    void SetActiveColour(const wxColour& colour);
+    void DoShowHide();
     void SetRect(const wxRect& rect);
 
     void RemoveButton(int id);

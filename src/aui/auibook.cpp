@@ -200,6 +200,16 @@ void wxAuiTabContainer::SetMeasuringFont(const wxFont& font)
     m_art->SetMeasuringFont(font);
 }
 
+void wxAuiTabContainer::SetColour(const wxColour& colour)
+{
+    m_art->SetColour(colour);
+}
+
+void wxAuiTabContainer::SetActiveColour(const wxColour& colour)
+{
+    m_art->SetActiveColour(colour);
+}
+
 void wxAuiTabContainer::SetRect(const wxRect& rect)
 {
     m_targetRect = rect;
@@ -1261,6 +1271,54 @@ bool wxAuiTabContainer::ButtonHitTest(int x, int y,
     }
 
     return false;
+}
+
+
+
+// the utility function ShowWnd() is the same as show,
+// except it handles wxAuiMDIChildFrame windows as well,
+// as the Show() method on this class is "unplugged"
+static void ShowWnd(wxWindow* wnd, bool show)
+{
+#if wxUSE_MDI
+    if (wxDynamicCast(wnd, wxAuiMDIChildFrame))
+    {
+        wxAuiMDIChildFrame* cf = (wxAuiMDIChildFrame*)wnd;
+        cf->DoShow(show);
+    }
+    else
+#endif
+    {
+        wnd->Show(show);
+    }
+}
+
+
+// DoShowHide() this function shows the active window, then
+// hides all of the other windows (in that order)
+void wxAuiTabContainer::DoShowHide()
+{
+    wxAuiNotebookPageArray& pages = GetPages();
+    size_t i, page_count = pages.GetCount();
+
+    // show new active page first
+    for (i = 0; i < page_count; ++i)
+    {
+        wxAuiNotebookPage& page = pages.Item(i);
+        if (page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
+        {
+            ShowWnd(page.window, true);
+            break;
+        }
+    }
+
+    // hide all other pages
+    for (i = 0; i < page_count; ++i)
+    {
+        wxAuiNotebookPage& page = pages.Item(i);
+        if (!page.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
+            ShowWnd(page.window, false);
+    }
 }
 
 void wxAuiTabContainer::OnChildKeyDown(wxKeyEvent& evt)
