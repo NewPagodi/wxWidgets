@@ -1141,7 +1141,7 @@ void wxAuiTabContainer::MakeTabVisible(int tabPage)
 // TabHitTest() tests if a tab was hit, passing the window pointer
 // back if that condition was fulfilled.  The function returns
 // true if a tab was hit, otherwise false
-bool wxAuiTabContainer::TabHitTest(int x, int y, wxAuiPaneInfo** hit) const
+bool wxAuiTabContainer::TabHitTest(int x, int y, wxWindow** hit) const
 {
     //Remap the x and y to our internal rect
     x += m_rect.x-m_targetRect.x;
@@ -1184,10 +1184,10 @@ bool wxAuiTabContainer::TabHitTest(int x, int y, wxAuiPaneInfo** hit) const
     for (i = m_tabOffset; i < page_count; ++i)
     {
         wxAuiNotebookPage& page = m_pages.Item(i);
-        if (page.GetRect().Contains(x,y))
+        if (page.rect.Contains(x,y))
         {
             if (hit)
-                *hit = &page;
+                *hit = page.window;
             return true;
         }
     }

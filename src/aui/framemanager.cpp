@@ -4023,41 +4023,46 @@ bool wxAuiManager::DoDrop(wxAuiDockInfoArray& docks,
             return false;
         }
 
-        wxAuiPaneInfo* hitPane=NULL;
+        wxAuiPaneInfo hitPane;
+        wxWindow* hitWindow=NULL;
         int page=-1;
         // If we are above a tab then insert before it, otherwise insert at the end
-        if(!part->m_tab_container->TabHitTest(pt.x,pt.y,&hitPane))
+        if(!part->m_tab_container->TabHitTest(pt.x,pt.y,&hitWindow))
         {
-            if( part->m_tab_container->TabHitTest(pt.x+10,pt.y,&hitPane) || part->m_tab_container->TabHitTest(pt.x+10,pt.y+10,&hitPane) || part->m_tab_container->TabHitTest(pt.x,pt.y+10,&hitPane) )
+            if( part->m_tab_container->TabHitTest(pt.x+10,pt.y,&hitWindow) || part->m_tab_container->TabHitTest(pt.x+10,pt.y+10,&hitWindow) || part->m_tab_container->TabHitTest(pt.x,pt.y+10,&hitWindow) )
             {
+                hitPane=GetPane(hitWindow);
+                
                 //Before first tab - don't do anything
                 return false;
             }
             else
             {
                 // Insert at end.
-                hitPane = &part->m_tab_container->GetPage(part->m_tab_container->GetPageCount()-1);
-                page = hitPane->GetPage()+1;
+                hitPane = part->m_tab_container->GetPage(part->m_tab_container->GetPageCount()-1);
+                page = hitPane.GetPage()+1;
             }
         }
         else
         {
+            hitPane=GetPane(hitWindow);
+            
             // Insert after pane we are hovering over.
             if (isAlreadyInNotebook) {
-                if( drop.GetPage()<hitPane->GetPage() )
+                if( drop.GetPage()<hitPane.GetPage() )
                 {
-                    page = hitPane->GetPage()+1;
+                    page = hitPane.GetPage()+1;
                 }
                 else
                 {
                     // Insert before pane we are hovering over.
-                    page = hitPane->GetPage();
+                    page = hitPane.GetPage();
                 }
             }
         }
 
-        DoInsertPage(panes, hitPane->GetDirection(), hitPane->GetLayer(), hitPane->GetRow(), hitPane->GetPosition(), page);
-        drop.Dock().Direction(hitPane->GetDirection()).Layer(hitPane->GetLayer()).Row(hitPane->GetRow()).Position(hitPane->GetPosition()).Page(page);
+        DoInsertPage(panes, hitPane.GetDirection(), hitPane.GetLayer(), hitPane.GetRow(), hitPane.GetPosition(), page);
+        drop.Dock().Direction(hitPane.GetDirection()).Layer(hitPane.GetLayer()).Row(hitPane.GetRow()).Position(hitPane.GetPosition()).Page(page);
         return ProcessDockResult(target, drop);
     }
     else if(part->type == wxAuiDockUIPart::typeCaption)
@@ -5260,15 +5265,16 @@ void wxAuiManager::OnLeftDClick(wxMouseEvent& event)
     {
         if(part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane;
+            wxWindow* hitWindow = NULL;
             wxAuiTabContainerButton* hitbutton;
             if(!part->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&hitbutton)) {
 
-                if (part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitPane))
+                if (part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitWindow))
                 {
+                    wxAuiPaneInfo hitPane = GetPane(hitWindow);
                     wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_DCLICK, GetManagedWindow()->GetId());
                     e.SetEventObject(GetManagedWindow());
-                    e.SetSelection(GetAllPanes().Index(*hitPane));
+                    e.SetSelection(GetAllPanes().Index(hitPane));
                     GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
                 } else {
                     wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_BG_DCLICK, GetManagedWindow()->GetId());
@@ -5364,7 +5370,7 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
         }
         else if(part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane;
+            wxWindow* hitWindow=NULL;
             if(part->m_tab_container->ButtonHitTest(event.m_x,event.m_y,&m_hoverButton2))
             {
                 m_action = actionClickButton;
@@ -5376,10 +5382,11 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
                 m_hoverButton2->curState = wxAUI_BUTTON_STATE_PRESSED;
                 Repaint();
             }
-            else if(part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitPane))
+            else if(part->m_tab_container->TabHitTest(event.m_x,event.m_y,&hitWindow))
             {
+                wxAuiPaneInfo hitPane = GetPane(hitWindow);
                 int oldActivePaneIndex=GetActivePane(NULL);
-                int newActivePaneIndex=GetAllPanes().Index(*hitPane);
+                int newActivePaneIndex=GetAllPanes().Index(hitPane);
 
                 // If we are a wxAuiNotebook then we must fire off a wxEVT_AUINOTEBOOK_PAGE_CHANGING event and give the user an opportunity to veto it.
                 bool vetoed=false;
@@ -5396,13 +5403,13 @@ void wxAuiManager::OnLeftDown(wxMouseEvent& event)
                 // Either no event sent or event not vetoed - either way go ahead and do the change
                 if(!vetoed)
                 {
-                    SetActivePane(hitPane->GetWindow());
+                    SetActivePane(hitPane.GetWindow());
 
-                    m_actionOffset = wxPoint(event.m_x-hitPane->GetRect().x,event.m_y-part->rect.y);
+                    m_actionOffset = wxPoint(event.m_x-hitPane.GetRect().x,event.m_y-part->rect.y);
 
                     m_action = actionClickCaption;
                     m_actionPart = part;
-                    m_actionPart->pane = hitPane;
+                    m_actionPart->pane = &hitPane;
                     m_actionStart = wxPoint(event.m_x, event.m_y);
                     m_frame->CaptureMouse();
 
@@ -6052,12 +6059,13 @@ void wxAuiManager::OnRightDown(wxMouseEvent& evt)
     {
         if(part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane;
-            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
+            wxWindow* hitWindow = NULL;
+            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitWindow))
             {
+                wxAuiPaneInfo hitPane = GetPane(hitWindow);
                 wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_RIGHT_DOWN, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
-                e.SetSelection(GetAllPanes().Index(*hitPane));
+                e.SetSelection(GetAllPanes().Index(hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
             }
         }
@@ -6071,12 +6079,13 @@ void wxAuiManager::OnRightUp(wxMouseEvent& evt)
     {
         if(part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane;
-            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
+            wxWindow* hitWindow = NULL;
+            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitWindow))
             {
+                wxAuiPaneInfo hitPane = GetPane(hitWindow);
                 wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_RIGHT_UP, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
-                e.SetSelection(GetAllPanes().Index(*hitPane));
+                e.SetSelection(GetAllPanes().Index(hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
             }
         }
@@ -6090,12 +6099,13 @@ void wxAuiManager::OnMiddleDown(wxMouseEvent& evt)
     {
         if(part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane;
-            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitPane))
+            wxWindow* hitWindow = NULL;
+            if(part->m_tab_container->TabHitTest(evt.m_x,evt.m_y,&hitWindow))
             {
+                wxAuiPaneInfo hitPane = GetPane(hitWindow);
                 wxAuiNotebookEvent e(wxEVT_AUINOTEBOOK_TAB_MIDDLE_DOWN, GetManagedWindow()->GetId());
                 e.SetEventObject(GetManagedWindow());
-                e.SetSelection(GetAllPanes().Index(*hitPane));
+                e.SetSelection(GetAllPanes().Index(hitPane));
                 GetManagedWindow()->GetEventHandler()->ProcessEvent(e);
             }
         }
@@ -6118,10 +6128,11 @@ void wxAuiManager::OnMiddleUp(wxMouseEvent& evt)
     }
     if (part && part->type == wxAuiDockUIPart::typePaneTab)
     {
-        wxAuiPaneInfo* hitPane=NULL;
-        if(part->m_tab_container->TabHitTest(evt.GetX(),evt.GetY(),&hitPane))
+        wxWindow* hitWindow = NULL;
+        if(part->m_tab_container->TabHitTest(evt.GetX(),evt.GetY(),&hitWindow))
         {
-            part->pane = hitPane;
+            wxAuiPaneInfo hitPane = GetPane(hitWindow);
+            part->pane = &hitPane;
         }
     }
 
@@ -6304,23 +6315,24 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
                             // If tabs are differently sized then we need to set a 'dead' zone in order to prevent the tab immediately switching around again on next mouse move event
                             if(!HasFlag(wxAUI_MGR_NB_TAB_FIXED_WIDTH))
                             {
-                                wxAuiPaneInfo*     hitPane   = NULL;
+                                wxWindow*     hitWindow   = NULL;
                                 wxAuiTabContainer *container = m_actionPart->m_tab_container;
-                                container->TabHitTest(event.GetX(), event.GetY(),&hitPane);
-                                if( hitPane && hitPane->GetPage() != paneInfo->GetPage() )
+                                container->TabHitTest(event.GetX(), event.GetY(),&hitWindow);
+                                wxAuiPaneInfo hitPane = GetPane(hitWindow);
+                                if( hitWindow && hitPane.GetPage() != paneInfo->GetPage() )
                                 {
                                     // The dead zone is set to the area of the tab that has just exchanged it's position with the dragged one
-                                    wxRect deadZone = hitPane->GetRect();
+                                    wxRect deadZone = hitPane.GetRect();
                                     // The pane rectangle is the relative position of the tab area in the tab container, so we have to offset it
                                     deadZone.Offset(container->GetRect().GetTopLeft());
                                     // We finally reduce it to the zone between the current mouse position and the dragged tab (with a small margin)
                                     if (container->IsHorizontal()) {
-                                        if (hitPane->GetPage() > paneInfo->GetPage())
+                                        if (hitPane.GetPage() > paneInfo->GetPage())
                                             deadZone.SetRight(mouse_pos.x+5);
                                         else
                                             deadZone.SetLeft(mouse_pos.x-5);
                                     } else {
-                                        if (hitPane->GetPage() > paneInfo->GetPage())
+                                        if (hitPane.GetPage() > paneInfo->GetPage())
                                             deadZone.SetBottom(mouse_pos.y+5);
                                         else
                                             deadZone.SetTop(mouse_pos.y-5);
@@ -6489,10 +6501,11 @@ void wxAuiManager::OnMotion(wxMouseEvent& event)
             //For caption(s) and tab(s) set tooltip if one is present, for everything else cancel any existing tooltip.
             if(part->type == wxAuiDockUIPart::typePaneTab)
             {
-                wxAuiPaneInfo* hitPane=NULL;
-                if(part->m_tab_container->TabHitTest(event.GetX(), event.GetY(), &hitPane))
+                wxWindow* hitWindow=NULL;
+                if(part->m_tab_container->TabHitTest(event.GetX(), event.GetY(), &hitWindow))
                 {
-                    ShowToolTip(hitPane);
+                    wxAuiPaneInfo hitPane = GetPane(hitWindow);
+                    ShowToolTip(&hitPane);
                 }
                 else
                 {
@@ -6670,10 +6683,10 @@ void wxAuiManager::OnPaneButton(wxAuiManagerEvent& evt)
         wxAuiDockUIPart* part = HitTest(pt.x, pt.y);
         if (part && part->type == wxAuiDockUIPart::typePaneTab)
         {
-            wxAuiPaneInfo* hitPane=NULL;
-            if(part->m_tab_container->TabHitTest(pt.x,pt.y,&hitPane))
+            wxWindow* hitWindow = NULL;
+            if(part->m_tab_container->TabHitTest(pt.x,pt.y,&hitWindow))
             {
-                closepane = hitPane;
+                closepane = &GetPane(hitWindow);
             }
         }
 
