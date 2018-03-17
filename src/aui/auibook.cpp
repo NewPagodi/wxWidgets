@@ -1359,8 +1359,8 @@ extern void DoInsertPage(wxAuiPaneInfoArray&,int,int,int,int,int);
 
 
 wxBEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
-EVT_SIZE(wxAuiNotebook::OnSize)
-EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
+    EVT_SIZE(wxAuiNotebook::OnSize)
+    EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
 wxEND_EVENT_TABLE()
 
 // -- wxAuiNotebook class implementation --
@@ -1370,7 +1370,7 @@ bool wxAuiNotebook::Create(wxWindow* parent,
                            const wxSize& size,
                            long style)
 {
-    if(!wxControl::Create(parent, id, pos, size, style))
+    if (!wxControl::Create(parent, id, pos, size, style))
         return false;
 
     Init(style);
