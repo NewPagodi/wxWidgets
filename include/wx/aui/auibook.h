@@ -204,7 +204,7 @@ class WXDLLIMPEXP_AUI wxAuiNotebook : public wxNavigationEnabled<wxBookCtrlBase>
 
 public:
 
-    wxAuiNotebook() { }
+    wxAuiNotebook() { Init(); }
 
     wxAuiNotebook(wxWindow* parent,
                   wxWindowID id = wxID_ANY,
@@ -212,6 +212,7 @@ public:
                   const wxSize& size = wxDefaultSize,
                   long style = wxAUI_NB_DEFAULT_STYLE)
     {
+        Init();
         Create(parent, id, pos, size, style);
     }
 
@@ -329,6 +330,9 @@ public:
     wxWindow* GetCurrentPage() const;
 
 protected:
+    // Common part of all ctors.
+    void Init();
+
     // choose the default border for this window
     virtual wxBorder GetDefaultBorder() const wxOVERRIDE { return wxBORDER_NONE; }
 
@@ -351,7 +355,7 @@ protected:
 
 protected:
 
-    void Init(long style);
+    void InitNotebook(long style);
     wxAuiTabContainer* GetActiveTabCtrl();
     void OnTabCancelDrag(wxAuiNotebookEvent& evt);
     void OnPaneDrop(wxAuiManagerEvent& evt);

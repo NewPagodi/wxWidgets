@@ -1364,6 +1364,10 @@ wxBEGIN_EVENT_TABLE(wxAuiNotebook, wxControl)
     EVT_AUI_ALLOW_DND(wxAuiNotebook::OnPaneDrop)
 wxEND_EVENT_TABLE()
 
+void wxAuiNotebook::Init()
+{
+}
+
 bool wxAuiNotebook::Create(wxWindow* parent,
                            wxWindowID id,
                            const wxPoint& pos,
@@ -1373,13 +1377,14 @@ bool wxAuiNotebook::Create(wxWindow* parent,
     if (!wxControl::Create(parent, id, pos, size, style))
         return false;
 
-    Init(style);
+    InitNotebook(style);
+
     return true;
 }
 
-// Init contains common initialization
+// InitNotebook() contains common initialization
 // code called by all constructors
-void wxAuiNotebook::Init(long style)
+void wxAuiNotebook::InitNotebook(long style)
 {
     SetName(wxT("wxAuiNotebook"));
     SetArtProvider(new wxAuiDefaultTabArt);
