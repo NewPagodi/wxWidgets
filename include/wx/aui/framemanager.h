@@ -489,11 +489,6 @@ public:
 	bool IsCompactTab() const { return HasFlag(optionCompactTab); }
 	wxAuiPaneInfo &CompactTab(bool b = true) { return SetFlag(optionCompactTab, b); }
 
-    // return a string serializing the state of this pane.
-    wxString GetInfo() const;
-    // load the pane state from a serialized string.
-    void LoadInfo(wxString& info);
-
     // Move a pane over another one, creating a notebook if allowed.
     // The pane is set in the page immediatly after the targetted one
     wxAuiPaneInfo &MoveOver(const wxAuiPaneInfo &target);
@@ -579,8 +574,6 @@ public:
 
     bool IsValid() const;
 
-private:
-
     wxString m_tooltip;     // tooltip displayed when hovering over title/tab of window
     int      m_dock_page;   // tab position if we are in a notebook (0 = leftmost tab)
 
@@ -638,7 +631,7 @@ public:
 
     void Update();
 
-    wxString SavePaneInfo(wxAuiPaneInfo& pane);
+    wxString SavePaneInfo(const wxAuiPaneInfo& pane);
     void LoadPaneInfo(wxString panePart, wxAuiPaneInfo &pane);
     wxString SavePerspective();
     bool LoadPerspective(const wxString& perspective, bool update = true);

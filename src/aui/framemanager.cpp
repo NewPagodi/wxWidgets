@@ -1735,55 +1735,53 @@ static wxString EscapeDelimiters(const wxString& s)
     return result;
 }
 
-wxString wxAuiPaneInfo::GetInfo() const
+wxString wxAuiManager::SavePaneInfo(const wxAuiPaneInfo& pane)
 {
     wxString result = wxT("name=");
-    result += EscapeDelimiters(name);
+    result += EscapeDelimiters(pane.name);
     result += wxT(";");
 
     result += wxT("caption=");
-    result += EscapeDelimiters(caption);
+    result += EscapeDelimiters(pane.caption);
     result += wxT(";");
 
     result += wxT("tooltip=");
-    result += EscapeDelimiters(m_tooltip);
+    result += EscapeDelimiters(pane.m_tooltip);
     result += wxT(";");
 
-    result += wxString::Format(wxT("state=%u;"), state);
-    result += wxString::Format(wxT("dir=%d;"), dock_direction);
-    result += wxString::Format(wxT("layer=%d;"), dock_layer);
-    result += wxString::Format(wxT("row=%d;"), dock_row);
-    result += wxString::Format(wxT("pos=%d;"), dock_pos);
-    result += wxString::Format(wxT("prop=%d;"), dock_proportion);
-    result += wxString::Format(wxT("page=%d;"), m_dock_page);
-    result += wxString::Format(wxT("bestw=%d;"), best_size.x);
-    result += wxString::Format(wxT("besth=%d;"), best_size.y);
-    result += wxString::Format(wxT("minw=%d;"), min_size.x);
-    result += wxString::Format(wxT("minh=%d;"), min_size.y);
-    result += wxString::Format(wxT("maxw=%d;"), max_size.x);
-    result += wxString::Format(wxT("maxh=%d;"), max_size.y);
-    result += wxString::Format(wxT("floatx=%d;"), floating_pos.x);
-    result += wxString::Format(wxT("floaty=%d;"), floating_pos.y);
-    result += wxString::Format(wxT("floatw=%d;"), floating_size.x);
-    result += wxString::Format(wxT("floath=%d;"), floating_size.y);
+    result += wxString::Format(wxT("state=%u;"), pane.state);
+    result += wxString::Format(wxT("dir=%d;"), pane.dock_direction);
+    result += wxString::Format(wxT("layer=%d;"), pane.dock_layer);
+    result += wxString::Format(wxT("row=%d;"), pane.dock_row);
+    result += wxString::Format(wxT("pos=%d;"), pane.dock_pos);
+    result += wxString::Format(wxT("prop=%d;"), pane.dock_proportion);
+    result += wxString::Format(wxT("page=%d;"), pane.m_dock_page);
+    result += wxString::Format(wxT("bestw=%d;"), pane.best_size.x);
+    result += wxString::Format(wxT("besth=%d;"), pane.best_size.y);
+    result += wxString::Format(wxT("minw=%d;"), pane.min_size.x);
+    result += wxString::Format(wxT("minh=%d;"), pane.min_size.y);
+    result += wxString::Format(wxT("maxw=%d;"), pane.max_size.x);
+    result += wxString::Format(wxT("maxh=%d;"), pane.max_size.y);
+    result += wxString::Format(wxT("floatx=%d;"), pane.floating_pos.x);
+    result += wxString::Format(wxT("floaty=%d;"), pane.floating_pos.y);
+    result += wxString::Format(wxT("floatw=%d;"), pane.floating_size.x);
+    result += wxString::Format(wxT("floath=%d"), pane.floating_size.y);
+
     return result;
 }
-wxString wxAuiManager::SavePaneInfo(wxAuiPaneInfo& pane)
-{
-    return pane.GetInfo();
-}
 
-void wxAuiPaneInfo::LoadInfo(wxString& info)
+// Load a "pane" with the pane information settings in pane_part
+void wxAuiManager::LoadPaneInfo(wxString pane_part, wxAuiPaneInfo &pane)
 {
     // replace escaped characters so we can
     // split up the string easily
-    info.Replace(wxT("\\|"), wxT("\a"));
-    info.Replace(wxT("\\;"), wxT("\b"));
+    pane_part.Replace(wxT("\\|"), wxT("\a"));
+    pane_part.Replace(wxT("\\;"), wxT("\b"));
 
     while(1)
     {
-        wxString val_part = info.BeforeFirst(wxT(';'));
-        info = info.AfterFirst(wxT(';'));
+        wxString val_part = pane_part.BeforeFirst(wxT(';'));
+        pane_part = pane_part.AfterFirst(wxT(';'));
         wxString val_name = val_part.BeforeFirst(wxT('='));
         wxString value = val_part.AfterFirst(wxT('='));
         val_name.MakeLower();
@@ -1796,45 +1794,45 @@ void wxAuiPaneInfo::LoadInfo(wxString& info)
             break;
 
         if (val_name == wxT("name"))
-            name = value;
+            pane.name = value;
         else if (val_name == wxT("caption"))
-            caption = value;
+            pane.caption = value;
         else if (val_name == wxT("tooltip"))
-            m_tooltip = value;
+            pane.m_tooltip = value;
         else if (val_name == wxT("state"))
-            state = (unsigned int)wxAtoi(value.c_str());
+            pane.state = (unsigned int)wxAtoi(value.c_str());
         else if (val_name == wxT("dir"))
-            dock_direction = wxAtoi(value.c_str());
+            pane.dock_direction = wxAtoi(value.c_str());
         else if (val_name == wxT("layer"))
-            dock_layer = wxAtoi(value.c_str());
+            pane.dock_layer = wxAtoi(value.c_str());
         else if (val_name == wxT("row"))
-            dock_row = wxAtoi(value.c_str());
+            pane.dock_row = wxAtoi(value.c_str());
         else if (val_name == wxT("pos"))
-            dock_pos = wxAtoi(value.c_str());
+            pane.dock_pos = wxAtoi(value.c_str());
         else if (val_name == wxT("prop"))
-            dock_proportion = wxAtoi(value.c_str());
+            pane.dock_proportion = wxAtoi(value.c_str());
         else if (val_name == wxT("page"))
-            m_dock_page = wxAtoi(value.c_str());
+            pane.m_dock_page = wxAtoi(value.c_str());
         else if (val_name == wxT("bestw"))
-            best_size.x = wxAtoi(value.c_str());
+            pane.best_size.x = wxAtoi(value.c_str());
         else if (val_name == wxT("besth"))
-            best_size.y = wxAtoi(value.c_str());
+            pane.best_size.y = wxAtoi(value.c_str());
         else if (val_name == wxT("minw"))
-            min_size.x = wxAtoi(value.c_str());
+            pane.min_size.x = wxAtoi(value.c_str());
         else if (val_name == wxT("minh"))
-            min_size.y = wxAtoi(value.c_str());
+            pane.min_size.y = wxAtoi(value.c_str());
         else if (val_name == wxT("maxw"))
-            max_size.x = wxAtoi(value.c_str());
+            pane.max_size.x = wxAtoi(value.c_str());
         else if (val_name == wxT("maxh"))
-            max_size.y = wxAtoi(value.c_str());
+            pane.max_size.y = wxAtoi(value.c_str());
         else if (val_name == wxT("floatx"))
-            floating_pos.x = wxAtoi(value.c_str());
+            pane.floating_pos.x = wxAtoi(value.c_str());
         else if (val_name == wxT("floaty"))
-            floating_pos.y = wxAtoi(value.c_str());
+            pane.floating_pos.y = wxAtoi(value.c_str());
         else if (val_name == wxT("floatw"))
-            floating_size.x = wxAtoi(value.c_str());
+            pane.floating_size.x = wxAtoi(value.c_str());
         else if (val_name == wxT("floath"))
-            floating_size.y = wxAtoi(value.c_str());
+            pane.floating_size.y = wxAtoi(value.c_str());
         else {
             wxFAIL_MSG(wxT("Bad Perspective String"));
         }
@@ -1842,23 +1840,18 @@ void wxAuiPaneInfo::LoadInfo(wxString& info)
 
     // replace escaped characters so we can
     // split up the string easily
-    name.Replace(wxT("\a"), wxT("|"));
-    name.Replace(wxT("\b"), wxT(";"));
-    caption.Replace(wxT("\a"), wxT("|"));
-    caption.Replace(wxT("\b"), wxT(";"));
-    m_tooltip.Replace(wxT("\a"), wxT("|"));
-    m_tooltip.Replace(wxT("\b"), wxT(";"));
-    info.Replace(wxT("\a"), wxT("|"));
-    info.Replace(wxT("\b"), wxT(";"));
+    pane.name.Replace(wxT("\a"), wxT("|"));
+    pane.name.Replace(wxT("\b"), wxT(";"));
+    pane.caption.Replace(wxT("\a"), wxT("|"));
+    pane.caption.Replace(wxT("\b"), wxT(";"));
+    pane.m_tooltip.Replace(wxT("\a"), wxT("|"));
+    pane.m_tooltip.Replace(wxT("\b"), wxT(";"));
+    pane_part.Replace(wxT("\a"), wxT("|"));
+    pane_part.Replace(wxT("\b"), wxT(";"));
 
     // sanitize values
-    SetFlag(optionActive, false);
-}
+    pane.SetFlag(wxAuiPaneInfo::optionActive, false);
 
-// Load a "pane" with the pane infor settings in panePart
-void wxAuiManager::LoadPaneInfo(wxString panePart, wxAuiPaneInfo &pane)
-{
-    pane.LoadInfo(panePart);
     return;
 }
 
