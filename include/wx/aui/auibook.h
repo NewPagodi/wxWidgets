@@ -128,7 +128,7 @@ public:
     unsigned int GetFlags() const;
 
     bool AddPage(wxWindow* page, const wxAuiNotebookPage& info);
-    bool InsertPage(wxWindow* page, wxAuiNotebookPage& info, size_t idx);
+    bool InsertPage(wxWindow* page, const wxAuiNotebookPage& info, size_t idx);
     bool MovePage(wxWindow* page, size_t newIdx);
     bool RemovePage(wxWindow* page);
     bool SetActivePage(wxWindow* page);

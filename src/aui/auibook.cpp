@@ -217,6 +217,8 @@ void wxAuiTabContainer::SetRect(const wxRect& rect)
 bool wxAuiTabContainer::AddPage(wxWindow* page,
                                 const wxAuiNotebookPage& info)
 {
+	info.GetWindow()->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler(wxAuiTabContainer::OnChildKeyDown)  ,NULL,this);
+
     wxAuiNotebookPage page_info;
     page_info = info;
     page_info.window = page;
@@ -233,18 +235,23 @@ bool wxAuiTabContainer::AddPage(wxWindow* page,
 }
 
 bool wxAuiTabContainer::InsertPage(wxWindow* page,
-                                   wxAuiNotebookPage& info,
+                                   const wxAuiNotebookPage& info,
                                    size_t idx)
 {
     info.GetWindow()->Connect( wxEVT_KEY_DOWN, wxKeyEventHandler(wxAuiTabContainer::OnChildKeyDown)  ,NULL,this);
 
-    info.Window(page);
+    wxAuiNotebookPage page_info;
+    page_info = info;
+    page_info.window = page;
 
-    if (idx >= m_pages.GetCount()) {
-        info.Page(m_pages.size());
-        m_pages.Add(&info);        
-    } else {
-        m_pages.Insert(&info, idx);
+    if (idx >= m_pages.GetCount())
+    {
+        page_info.Page(m_pages.size());
+        m_pages.Add(page_info);
+    }
+    else
+    {
+        m_pages.Insert(page_info, idx);
         for(size_t i=idx; i < m_pages.GetCount(); i++)
             m_pages[i].Page(i);
     }
