@@ -2469,7 +2469,7 @@ void wxAuiManager::LayoutAddDock(wxSizer* cont,
             {
                 // This page is part of an existing notebook so add it to the container.
                 // If it is the active page then it is visible, otherwise hide it.
-                notebookContainer->AddPage(pane);
+                notebookContainer->AddPage(pane.window, pane);
                 if(pane.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
                 {
                     if(!activenotebookpagefound)
@@ -2572,7 +2572,7 @@ void wxAuiManager::LayoutAddDock(wxSizer* cont,
                     dock_sizer->Add(notebookSizer, pane.GetProportion(), wxEXPAND);
                     int flags = GetNotebookFlags();
                     notebookContainer->SetFlags(flags);
-                    notebookContainer->AddPage(pane);
+                    notebookContainer->AddPage(pane.window, pane);
 
                     // Top/Left Notebook
                     if(HasFlag(wxAUI_MGR_NB_LEFT))
@@ -2705,7 +2705,7 @@ void wxAuiManager::LayoutAddDock(wxSizer* cont,
             {
                 // This page is part of an existing notebook so add it to the container.
                 // If it is the active page then it is visible, otherwise hide it.
-                notebookContainer->AddPage(pane);
+                notebookContainer->AddPage(pane.window, pane);
 
                 if(pane.HasFlag(wxAuiPaneInfo::optionActiveNotebook))
                 {
@@ -2809,7 +2809,7 @@ void wxAuiManager::LayoutAddDock(wxSizer* cont,
                     dock_sizer->Add(notebookSizer, pane.GetProportion(), wxEXPAND);
                     int flags= GetNotebookFlags();
                     notebookContainer->SetFlags(flags);
-                    notebookContainer->AddPage(pane);
+                    notebookContainer->AddPage(pane.window, pane);
 
                     // Left/Top Notebook
                     if(HasFlag(wxAUI_MGR_NB_LEFT))

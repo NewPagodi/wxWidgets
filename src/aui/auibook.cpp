@@ -214,9 +214,22 @@ void wxAuiTabContainer::SetRect(const wxRect& rect)
     }
 }
 
-bool wxAuiTabContainer::AddPage(wxAuiNotebookPage& info)
+bool wxAuiTabContainer::AddPage(wxWindow* page,
+                                const wxAuiNotebookPage& info)
 {
-    return InsertPage(info.GetWindow(), info, info.GetPage());
+    wxAuiNotebookPage page_info;
+    page_info = info;
+    page_info.window = page;
+
+    m_pages.Add(page_info);
+
+    // let the art provider know how many pages we have
+    if (m_art)
+    {
+        m_art->SetSizingInfo(m_rect.GetSize(), m_pages.GetCount());
+    }
+
+    return true;
 }
 
 bool wxAuiTabContainer::InsertPage(wxWindow* page,
