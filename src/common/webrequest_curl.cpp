@@ -385,7 +385,7 @@ public:
 
     enum Result
     {
-        InvalidResult= 0,
+        InvalidResult = 0,
         ReadyForRead = 1,
         ReadyForWrite = 2,
         HasError = 4
@@ -430,10 +430,10 @@ private:
                 m_evtHandler = h;
             }
 
-            MessageId GetMessageId() const {return m_messageId;}
-            wxSOCKET_T GetSocket() const {return m_socket;}
-            int GetFlags() const {return m_flags;}
-            wxEvtHandler* GetEvtHandler() const {return m_evtHandler;}
+            MessageId GetMessageId() const { return m_messageId; }
+            wxSOCKET_T GetSocket() const { return m_socket; }
+            int GetFlags() const { return m_flags; }
+            wxEvtHandler* GetEvtHandler() const { return m_evtHandler; }
 
         private:
             wxSOCKET_T m_socket;
@@ -849,7 +849,7 @@ void SocketPoller::ThreadCheckSockets()
 
             if ( FD_ISSET(sock, &errorFds) )
             {
-                result |= HasError ;
+                result |= HasError;
             }
 
             if ( result != InvalidResult && hndlr != NULL )
@@ -886,7 +886,7 @@ wxWebSessionCURL::wxWebSessionCURL() :
 
     m_socketPoller = new SocketPoller();
     m_timeoutTimer.SetOwner(this);
-    Bind(wxEVT_TIMER ,&wxWebSessionCURL::TimeoutNotification, this);
+    Bind(wxEVT_TIMER, &wxWebSessionCURL::TimeoutNotification, this);
     Bind(wxSocketAction, &wxWebSessionCURL::ProcessSocketPollerResult, this);
 }
 
@@ -921,7 +921,7 @@ wxWebSessionCURL::CreateRequest(wxWebSession& session,
         else
         {
             curl_multi_setopt(m_handle, CURLMOPT_SOCKETDATA, this);
-            curl_multi_setopt(m_handle, CURLMOPT_SOCKETFUNCTION,SocketCallback);
+            curl_multi_setopt(m_handle, CURLMOPT_SOCKETFUNCTION, SocketCallback);
             curl_multi_setopt(m_handle, CURLMOPT_TIMERDATA, this);
             curl_multi_setopt(m_handle, CURLMOPT_TIMERFUNCTION, TimerCallback);
         }
@@ -1025,7 +1025,7 @@ void wxWebSessionCURL::TimeoutNotification(wxTimerEvent& WXUNUSED(event))
 void wxWebSessionCURL::ProcessTimeoutNotification()
 {
     int runningHandles;
-    curl_multi_socket_action(m_handle, CURL_SOCKET_TIMEOUT, 0,&runningHandles);
+    curl_multi_socket_action(m_handle, CURL_SOCKET_TIMEOUT, 0, &runningHandles);
 
     CheckForCompletedTransfers();
 }
