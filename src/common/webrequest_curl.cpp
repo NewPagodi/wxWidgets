@@ -41,19 +41,11 @@
     #include "sys/select.h"
 #endif
 
-
-
 // Define symbols that might be missing from older libcurl headers
 #ifndef CURL_AT_LEAST_VERSION
 #define CURL_VERSION_BITS(x,y,z) ((x)<<16|(y)<<8|z)
 #define CURL_AT_LEAST_VERSION(x,y,z) \
   (LIBCURL_VERSION_NUM >= CURL_VERSION_BITS(x, y, z))
-#endif
-
-#if CURL_AT_LEAST_VERSION(7, 28, 0)
-    #define wxCURL_HAVE_MULTI_WAIT 1
-#else
-    #define wxCURL_HAVE_MULTI_WAIT 0
 #endif
 
 // The new name was introduced in curl 7.21.6.
@@ -380,6 +372,9 @@ void wxWebAuthChallengeCURL::SetCredentials(const wxWebCredentials& cred)
     m_request.StartRequest();
 }
 
+//
+// SocketPoller - a helper class for wxWebSessionCURL
+//
 
 wxDECLARE_EVENT(wxEVT_SOCKET_POLLER_RESULT, wxThreadEvent);
 
@@ -646,6 +641,7 @@ public:
     void OnExceptionWaiting() wxOVERRIDE;
     ~SocketPollerSourceHandler(){}
 private:
+    void SendEvent(int);
     wxSOCKET_T m_socket;
     wxEvtHandler* m_handler;
 };
@@ -659,25 +655,24 @@ SocketPollerSourceHandler::SocketPollerSourceHandler(wxSOCKET_T sock,
 
 void SocketPollerSourceHandler::OnReadWaiting()
 {
-    wxThreadEvent event(wxEVT_SOCKET_POLLER_RESULT);
-    event.SetPayload<wxSOCKET_T>(m_socket);
-    event.SetInt(SocketPoller::READY_FOR_READ);
-    m_handler->ProcessEvent(event);
+    SendEvent(SocketPoller::READY_FOR_READ);
 }
 
 void SocketPollerSourceHandler::OnWriteWaiting()
 {
-    wxThreadEvent event(wxEVT_SOCKET_POLLER_RESULT);
-    event.SetPayload<wxSOCKET_T>(m_socket);
-    event.SetInt(SocketPoller::READY_FOR_WRITE);
-    m_handler->ProcessEvent(event);
+    SendEvent(SocketPoller::READY_FOR_WRITE);
 }
 
 void SocketPollerSourceHandler::OnExceptionWaiting()
 {
+    SendEvent(SocketPoller::HAS_ERROR);
+}
+
+void SocketPollerSourceHandler::SendEvent(int result)
+{
     wxThreadEvent event(wxEVT_SOCKET_POLLER_RESULT);
     event.SetPayload<wxSOCKET_T>(m_socket);
-    event.SetInt(SocketPoller::HAS_ERROR);
+    event.SetInt(result);
     m_handler->ProcessEvent(event);
 }
 
@@ -693,20 +688,10 @@ public:
     void ResumePolling(wxSOCKET_T) wxOVERRIDE;
 
 private:
-    // When asked to poll a socket, we will create a wxEventLoopSourceHandler
-    // object to report activity on the sockets. We also need to store a
-    // wxEventLoopSource in order to stop polling. This structure is used
-    // to keep track of these objects.
-    struct SocketData
-    {
-        SocketPollerSourceHandler* m_sourceHandler;
-        wxEventLoopSource* m_source;
-    };
+    WX_DECLARE_HASH_MAP(wxSOCKET_T, wxEventLoopSource*, wxIntegerHash,\
+                        wxIntegerEqual, SocketDataMap);
 
-    void CleanUpSocketData(const SocketData&);
-
-    WX_DECLARE_HASH_MAP(wxSOCKET_T, SocketData, wxIntegerHash, wxIntegerEqual,\
-                        SocketDataMap);
+    void CleanUpSocketSource(wxEventLoopSource*);
 
     SocketDataMap m_socketData;
     wxEvtHandler* m_handler;
@@ -720,18 +705,17 @@ SourceSocketPoller::SourceSocketPoller(wxEvtHandler* hndlr)
 SourceSocketPoller::~SourceSocketPoller()
 {
     // Clean up any leftover socket data.
-
     for ( SocketDataMap::iterator it = m_socketData.begin() ;
           it != m_socketData.end() ; ++it )
     {
-        CleanUpSocketData(it->second);
+        CleanUpSocketSource(it->second);
     }
 }
 
 static int SocketPoller2EventSource(int pollAction)
 {
     // Convert the SocketPoller::PollAction value to a flag that can be used
-    // by wxEventLoopSourceHandler and wxEventLoopSource.
+    // by wxEventLoopSource.
 
     // Always check for errors.
     int eventSourceFlag = wxEVENT_SOURCE_EXCEPTION;
@@ -760,26 +744,25 @@ bool SourceSocketPoller::StartPolling(wxSOCKET_T sock, int pollAction)
         // object with the new flags. We also need to delete the old source
         // object to stop the old polling checks.
 
-        SocketPollerSourceHandler* srcHandler = it->second.m_sourceHandler;
-
-        wxEventLoopSource* oldSrc = it->second.m_source;
-        it->second.m_source =
+        wxEventLoopSource* oldSrc = it->second;
+        wxEventLoopSourceHandler* srcHandler = oldSrc->GetHandler();
+        wxEventLoopSource* newSrc =
             wxEventLoopBase::AddSourceForFD(sock, srcHandler, eventSourceFlag);
 
         delete oldSrc;
+        m_socketData[sock] = newSrc;
     }
     else
     {
         // Otherwise create a new source handler and get a new event loop
         // source for this socket.
 
-        SocketData data;
-        data.m_sourceHandler = new SocketPollerSourceHandler(sock, m_handler);
-        data.m_source = wxEventLoopBase::AddSourceForFD(sock,
-                                                        data.m_sourceHandler,
-                                                        eventSourceFlag);
+        SocketPollerSourceHandler* srcHandler =
+            new SocketPollerSourceHandler(sock, m_handler);
+        wxEventLoopSource* newSrc =
+            wxEventLoopBase::AddSourceForFD(sock, srcHandler, eventSourceFlag);
 
-        m_socketData[sock] = data;
+        m_socketData[sock] = newSrc;
     }
 
     return true;
@@ -791,7 +774,7 @@ void SourceSocketPoller::StopPolling(wxSOCKET_T sock)
 
     if ( it != m_socketData.end() )
     {
-        CleanUpSocketData(it->second);
+        CleanUpSocketSource(it->second);
         m_socketData.erase(it);
     }
 }
@@ -800,10 +783,11 @@ void SourceSocketPoller::ResumePolling(wxSOCKET_T WXUNUSED(sock))
 {
 }
 
-void SourceSocketPoller::CleanUpSocketData(const SocketData& data)
+void SourceSocketPoller::CleanUpSocketSource(wxEventLoopSource* source)
 {
-    delete data.m_source;
-    delete data.m_sourceHandler;
+    wxEventLoopSourceHandler* srcHandler = source->GetHandler();
+    delete source;
+    delete srcHandler;
 }
 
 SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
