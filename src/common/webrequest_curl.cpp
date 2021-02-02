@@ -215,6 +215,8 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     curl_easy_setopt(m_handle, CURLOPT_ERRORBUFFER, m_errorBuffer);
     // Set this request in the private pointer
     curl_easy_setopt(m_handle, CURLOPT_PRIVATE, static_cast<void*>(this));
+    // Increase the ref count since the CURL handle is holding a reference.
+    IncRef();
     // Set URL to handle: note that we must use wxURI to escape characters not
     // allowed in the URLs correctly (URL API is only available in libcurl
     // since the relatively recent v7.62.0, so we don't want to rely on it).
@@ -1520,8 +1522,20 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
         {
             wxWebRequestCURL* request;
             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
-            curl_multi_remove_handle(m_handle, msg->easy_handle);
-            request->HandleCompletion();
+
+            wxObjectDataPtr<wxWebRequestCURL> requestPtr(request);
+            if ( requestPtr.get() )
+            {
+                curl_multi_remove_handle(m_handle, msg->easy_handle);
+                requestPtr->HandleCompletion();
+
+                // When the transfer was started, a pointer to wxWebRequestCURL
+                // object was stored in in the CURL handle and the ref count was
+                // increased. Now that the transfer is complete, remove the
+                // stored pointer and decrease the ref count. 
+                curl_easy_setopt(msg->easy_handle, CURLOPT_PRIVATE, NULL);
+                requestPtr->DecRef();
+            }
         }
     }
 }
