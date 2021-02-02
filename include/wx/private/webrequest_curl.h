@@ -147,7 +147,10 @@ public:
 
     bool StartRequest(wxWebRequestCURL& request);
 
-    void CancelRequest(wxWebRequestCURL* request);
+    static bool CurlRuntimeAtLeastVersion(unsigned char, unsigned char,
+                                          unsigned char);
+
+    static int ProgressFuncContinue();
 
 private:
     static int TimerCallback(CURLM*, long, void*);
@@ -165,6 +168,8 @@ private:
     CURLM* m_handle;
 
     static int ms_activeSessions;
+    static unsigned int ms_runtimeVersion;
+    static int ms_progressFuncContinue;
 
     wxDECLARE_NO_COPY_CLASS(wxWebSessionCURL);
 };
