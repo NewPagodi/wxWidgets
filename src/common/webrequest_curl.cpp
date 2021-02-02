@@ -71,6 +71,24 @@ static size_t wxCURLHeader(char *buffer, size_t size, size_t nitems, void *userd
     return static_cast<wxWebResponseCURL*>(userdata)->CURLOnHeader(buffer, size * nitems);
 }
 
+static size_t wxCURLCancelingWrite(void* WXUNUSED(buffer), size_t size,
+                                   size_t nmemb, void* WXUNUSED(userdata))
+{
+    // Usually a write callback returns the number of bytes handled
+    // (ie size*nmemb). Returning any other value causes curl to stop the
+    // transfer.
+    // However if this callback is used, the transfer must stop, so something
+    // other than size * nmemb will be returned.
+
+    return ( size == 1 && nmemb == 1 ) ? 0 : 1;
+}
+
+static size_t wxCURLCancelingRead(char* WXUNUSED(buffer), size_t size,
+                                  size_t nitems, void* WXUNUSED(userdata))
+{
+    return ( size == 1 && nitems == 1 ) ? 0 : 1;
+}
+
 int wxCURLXferInfo(void* clientp, curl_off_t WXUNUSED(dltotal),
                    curl_off_t WXUNUSED(dlnow),
                    curl_off_t WXUNUSED(ultotal),
@@ -78,7 +96,7 @@ int wxCURLXferInfo(void* clientp, curl_off_t WXUNUSED(dltotal),
 {
     wxWebRequestCURL* request = reinterpret_cast<wxWebRequestCURL*>(clientp);
 
-    if ( request->GetState() == wxWebRequest::State_Cancelled )
+    if ( request->HasPendingCancel() )
     {
         return 1;
     }
@@ -202,6 +220,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     m_sessionImpl(sessionImpl)
 {
     m_headerList = NULL;
+    m_cancelPending = false;
 
     m_handle = curl_easy_init();
     if ( !m_handle )
@@ -336,7 +355,12 @@ bool wxWebRequestCURL::StartRequest()
 
 void wxWebRequestCURL::DoCancel()
 {
-    SetState(wxWebRequest::State_Cancelled);
+    m_cancelPending = true;
+
+    // Replace the read and write callbacks to cause the transfer to stop the
+    // next time curl attempts to read or write.
+    curl_easy_setopt(m_handle, CURLOPT_WRITEFUNCTION, wxCURLCancelingWrite);
+    curl_easy_setopt(m_handle, CURLOPT_HEADERFUNCTION, wxCURLCancelingRead);
 }
 
 void wxWebRequestCURL::HandleCompletion()
@@ -377,6 +401,11 @@ size_t wxWebRequestCURL::CURLOnRead(char* buffer, size_t size)
     }
     else
         return 0;
+}
+
+bool wxWebRequestCURL::HasPendingCancel() const
+{
+    return m_cancelPending;
 }
 
 void wxWebRequestCURL::DestroyHeaderList()
@@ -1527,6 +1556,12 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
             if ( requestPtr.get() )
             {
                 curl_multi_remove_handle(m_handle, msg->easy_handle);
+
+                if ( requestPtr->HasPendingCancel() )
+                {
+                    requestPtr->SetState(wxWebRequest::State_Cancelled);
+                }
+
                 requestPtr->HandleCompletion();
 
                 // When the transfer was started, a pointer to wxWebRequestCURL
