@@ -605,7 +605,7 @@ void WinSock1SocketPoller::StopPolling(wxSOCKET_T sock)
     }
 }
 
-void WinSock1SocketPoller::ResumePolling(wxSOCKET_T)
+void WinSock1SocketPoller::ResumePolling(wxSOCKET_T WXUNUSED(sock))
 {
 }
 
