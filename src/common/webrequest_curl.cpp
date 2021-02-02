@@ -569,7 +569,7 @@ WinSock1SocketPoller::WinSock1SocketPoller(wxEvtHandler* hndlr)
 
     if ( m_hwnd == NULL )
     {
-        wxLogDebug("Unable to create message window for WinSock1SocketPoller");
+        wxLogError("Unable to create message window for WinSock1SocketPoller");
         return;
     }
 
@@ -900,7 +900,8 @@ private:
                 LastMessageId
             };
 
-            Message(MessageId i = LastMessageId, wxSOCKET_T s = -1, int f = 0)
+            explicit Message(MessageId i = LastMessageId, wxSOCKET_T s = -1,
+                             int f = 0)
             {
                 m_messageId = i;
                 m_socket = s;
@@ -958,13 +959,13 @@ SelectSocketPoller::SelectSocketPoller(wxEvtHandler* hndlr)
 
     if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
     {
-        wxLogDebug("Could not create socket poller worker thread!");
+        wxLogError("Could not create socket poller worker thread!");
         return;
     }
 
     if (GetThread()->Run() != wxTHREAD_NO_ERROR)
     {
-        wxLogDebug("Could not run socket poller worker thread!");
+        wxLogError("Could not run socket poller worker thread!");
         return;
     }
 }
@@ -1065,7 +1066,7 @@ wxThread::ExitCode SelectSocketPoller::Entry()
             }
             else if ( er == wxMSGQUEUE_MISC_ERROR )
             {
-                wxLogDebug("Error with socket poller message queue.");
+                wxLogError("Error with socket poller message queue.");
                 done = true;
                 break;
             }
