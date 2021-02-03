@@ -89,21 +89,15 @@ static size_t wxCURLCancelingRead(char* WXUNUSED(buffer), size_t size,
     return ( size * nitems == 1 ) ? 0 : 1;
 }
 
-int wxCURLXferInfo(void* clientp, curl_off_t WXUNUSED(dltotal),
+int wxCURLXferInfo(void* clientp, curl_off_t dltotal,
                    curl_off_t WXUNUSED(dlnow),
                    curl_off_t WXUNUSED(ultotal),
                    curl_off_t WXUNUSED(ulnow))
 {
-    wxWebRequestCURL* request = reinterpret_cast<wxWebRequestCURL*>(clientp);
+    wxCHECK_MSG( clientp, 0, "invalid curl progress callback data" );
 
-    if ( request->HasPendingCancel() )
-    {
-        return 1;
-    }
-    else
-    {
-        return wxWebSessionCURL::ProgressFuncContinue();
-    }
+    wxWebResponseCURL* response = reinterpret_cast<wxWebResponseCURL*>(clientp);
+    return response->CURLOnProgress(dltotal);
 }
 
 int wxCURLProgress(void* clientp, double dltotal, double dlnow, double ultotal,
@@ -120,6 +114,31 @@ wxWebResponseCURL::wxWebResponseCURL(wxWebRequestCURL& request) :
 {
     curl_easy_setopt(GetHandle(), CURLOPT_WRITEDATA, static_cast<void*>(this));
     curl_easy_setopt(GetHandle(), CURLOPT_HEADERDATA, static_cast<void*>(this));
+    m_knownSize = 0;
+
+    // Set the progress callback.
+    #if CURL_AT_LEAST_VERSION(7, 32, 0)
+        if ( wxWebSessionCURL::CurlRuntimeAtLeastVersion(7, 32, 0) )
+        {
+            curl_easy_setopt(GetHandle(), CURLOPT_XFERINFOFUNCTION,
+                             wxCURLXferInfo);
+            curl_easy_setopt(GetHandle(), CURLOPT_XFERINFODATA,
+                             static_cast<void*>(this));
+        }
+        else
+        {
+            curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSFUNCTION,
+                             wxCURLProgress);
+            curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSDATA,
+                             static_cast<void*>(this));
+        }
+    #else
+        curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSFUNCTION, wxCURLProgress);
+        curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSDATA,
+                         static_cast<void*>(this));
+    #endif
+    // Use our progress callback instead of the default one.
+    curl_easy_setopt(GetHandle(), CURLOPT_NOPROGRESS, 0L);
 
     Init();
 }
@@ -157,6 +176,27 @@ size_t wxWebResponseCURL::CURLOnHeader(const char * buffer, size_t size)
     }
 
     return size;
+}
+
+int wxWebResponseCURL::CURLOnProgress(curl_off_t total)
+{
+    if ( m_knownSize != total )
+    {
+        if ( m_request.GetStorage() == wxWebRequest::Storage_Memory )
+        {
+            SetBufferSize(static_cast<size_t>(total));
+        }
+        m_knownSize = total;
+    }
+
+    if ( static_cast<wxWebRequestCURL&>(m_request).HasPendingCancel() )
+    {
+        return 1;
+    }
+    else
+    {
+        return wxWebSessionCURL::ProgressFuncContinue();
+    }
 }
 
 wxFileOffset wxWebResponseCURL::GetContentLength() const
@@ -253,30 +293,6 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     // Enable all supported authentication methods
     curl_easy_setopt(m_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
     curl_easy_setopt(m_handle, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
-
-    // Set the progress callback.
-    #if CURL_AT_LEAST_VERSION(7, 32, 0)
-        if ( wxWebSessionCURL::CurlRuntimeAtLeastVersion(7, 32, 0) )
-        {
-            curl_easy_setopt(m_handle, CURLOPT_XFERINFOFUNCTION,
-                             wxCURLXferInfo);
-            curl_easy_setopt(m_handle, CURLOPT_XFERINFODATA,
-                             static_cast<void*>(this));
-        }
-        else
-        {
-            curl_easy_setopt(m_handle, CURLOPT_PROGRESSFUNCTION,
-                             wxCURLProgress);
-            curl_easy_setopt(m_handle, CURLOPT_PROGRESSDATA,
-                             static_cast<void*>(this));
-        }
-    #else
-        curl_easy_setopt(m_handle, CURLOPT_PROGRESSFUNCTION, wxCURLProgress);
-        curl_easy_setopt(m_handle, CURLOPT_PROGRESSDATA,
-                         static_cast<void*>(this));
-    #endif
-    // Use our progress callback instead of the default one.
-    curl_easy_setopt(m_handle, CURLOPT_NOPROGRESS, 0L);
 }
 
 wxWebRequestCURL::~wxWebRequestCURL()

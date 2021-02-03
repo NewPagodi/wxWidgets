@@ -117,10 +117,12 @@ public:
     // Methods called from libcurl callbacks
     size_t CURLOnWrite(void *buffer, size_t size);
     size_t CURLOnHeader(const char* buffer, size_t size);
+    int CURLOnProgress(curl_off_t);
 
 private:
     wxWebRequestHeaderMap m_headers;
     wxString m_statusText;
+    wxFileOffset m_knownSize;
 
     CURL* GetHandle() const
     { return static_cast<wxWebRequestCURL&>(m_request).GetHandle(); }
