@@ -71,11 +71,73 @@ static size_t wxCURLHeader(char *buffer, size_t size, size_t nitems, void *userd
     return static_cast<wxWebResponseCURL*>(userdata)->CURLOnHeader(buffer, size * nitems);
 }
 
+static size_t wxCURLCancelingWrite(void* WXUNUSED(buffer), size_t size,
+                                   size_t nmemb, void* WXUNUSED(userdata))
+{
+    // Usually a write callback returns the number of bytes handled
+    // (ie size*nmemb). Returning any other value causes curl to stop the
+    // transfer.
+    // However this callback is used when the transfer must stop, so something
+    // other than size * nmemb will be returned.
+
+    return ( size * nmemb == 1 ) ? 0 : 1;
+}
+
+static size_t wxCURLCancelingRead(char* WXUNUSED(buffer), size_t size,
+                                  size_t nitems, void* WXUNUSED(userdata))
+{
+    return ( size * nitems == 1 ) ? 0 : 1;
+}
+
+int wxCURLXferInfo(void* clientp, curl_off_t dltotal,
+                   curl_off_t WXUNUSED(dlnow),
+                   curl_off_t WXUNUSED(ultotal),
+                   curl_off_t WXUNUSED(ulnow))
+{
+    wxCHECK_MSG( clientp, 0, "invalid curl progress callback data" );
+
+    wxWebResponseCURL* response = reinterpret_cast<wxWebResponseCURL*>(clientp);
+    return response->CURLOnProgress(dltotal);
+}
+
+int wxCURLProgress(void* clientp, double dltotal, double dlnow, double ultotal,
+                   double ulnow)
+{
+    return wxCURLXferInfo(clientp, static_cast<curl_off_t>(dltotal),
+                          static_cast<curl_off_t>(dlnow),
+                          static_cast<curl_off_t>(ultotal),
+                          static_cast<curl_off_t>(ulnow));
+}
+
 wxWebResponseCURL::wxWebResponseCURL(wxWebRequestCURL& request) :
     wxWebResponseImpl(request)
 {
     curl_easy_setopt(GetHandle(), CURLOPT_WRITEDATA, static_cast<void*>(this));
     curl_easy_setopt(GetHandle(), CURLOPT_HEADERDATA, static_cast<void*>(this));
+
+    // Set the progress callback.
+    #if CURL_AT_LEAST_VERSION(7, 32, 0)
+        if ( wxWebSessionCURL::CurlRuntimeAtLeastVersion(7, 32, 0) )
+        {
+            curl_easy_setopt(GetHandle(), CURLOPT_XFERINFOFUNCTION,
+                             wxCURLXferInfo);
+            curl_easy_setopt(GetHandle(), CURLOPT_XFERINFODATA,
+                             static_cast<void*>(this));
+        }
+        else
+        {
+            curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSFUNCTION,
+                             wxCURLProgress);
+            curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSDATA,
+                             static_cast<void*>(this));
+        }
+    #else
+        curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSFUNCTION, wxCURLProgress);
+        curl_easy_setopt(GetHandle(), CURLOPT_PROGRESSDATA,
+                         static_cast<void*>(this));
+    #endif
+    // Use our progress callback instead of the default one.
+    curl_easy_setopt(GetHandle(), CURLOPT_NOPROGRESS, 0L);
 
     Init();
 }
@@ -113,6 +175,18 @@ size_t wxWebResponseCURL::CURLOnHeader(const char * buffer, size_t size)
     }
 
     return size;
+}
+
+int wxWebResponseCURL::CURLOnProgress(curl_off_t total)
+{
+    if ( static_cast<wxWebRequestCURL&>(m_request).HasPendingCancel() )
+    {
+        return 1;
+    }
+    else
+    {
+        return wxWebSessionCURL::ProgressFuncContinue();
+    }
 }
 
 wxFileOffset wxWebResponseCURL::GetContentLength() const
@@ -176,6 +250,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     m_sessionImpl(sessionImpl)
 {
     m_headerList = NULL;
+    m_cancelPending = false;
 
     m_handle = curl_easy_init();
     if ( !m_handle )
@@ -284,7 +359,12 @@ bool wxWebRequestCURL::StartRequest()
 
 void wxWebRequestCURL::DoCancel()
 {
-    m_sessionImpl.CancelRequest(this);
+    m_cancelPending = true;
+
+    // Replace the read and write callbacks to cause the transfer to stop the
+    // next time curl attempts to read or write.
+    curl_easy_setopt(m_handle, CURLOPT_WRITEFUNCTION, wxCURLCancelingWrite);
+    curl_easy_setopt(m_handle, CURLOPT_HEADERFUNCTION, wxCURLCancelingRead);
 }
 
 void wxWebRequestCURL::HandleCompletion()
@@ -325,6 +405,11 @@ size_t wxWebRequestCURL::CURLOnRead(char* buffer, size_t size)
     }
     else
         return 0;
+}
+
+bool wxWebRequestCURL::HasPendingCancel() const
+{
+    return m_cancelPending;
 }
 
 void wxWebRequestCURL::DestroyHeaderList()
@@ -1190,6 +1275,8 @@ SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
 //
 
 int wxWebSessionCURL::ms_activeSessions = 0;
+unsigned int wxWebSessionCURL::ms_runtimeVersion = 0;
+int wxWebSessionCURL::ms_progressFuncContinue = 0;
 
 wxWebSessionCURL::wxWebSessionCURL() :
     m_handle(NULL)
@@ -1198,7 +1285,27 @@ wxWebSessionCURL::wxWebSessionCURL() :
     if ( ms_activeSessions == 0 )
     {
         if ( curl_global_init(CURL_GLOBAL_ALL) )
+        {
             wxLogError(_("libcurl could not be initialized"));
+        }
+        else
+        {
+            curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
+            ms_runtimeVersion = data->version_num;
+
+            #if CURL_AT_LEAST_VERSION(7, 32, 0)
+                if ( CurlRuntimeAtLeastVersion(7, 68, 0) )
+                {
+                    ms_progressFuncContinue = CURL_PROGRESSFUNC_CONTINUE;
+                }
+                else
+                {
+                    ms_progressFuncContinue = 0;
+                }
+            #else
+                ms_progressFuncContinue = 0;
+            #endif
+        }
     }
 
     ms_activeSessions++;
@@ -1265,12 +1372,6 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
     return true;
 }
 
-void wxWebSessionCURL::CancelRequest(wxWebRequestCURL* request)
-{
-    curl_multi_remove_handle(m_handle, request->GetHandle());
-    request->SetState(wxWebRequest::State_Cancelled);
-}
-
 wxVersionInfo  wxWebSessionCURL::GetLibraryVersionInfo()
 {
     const curl_version_info_data* vi = curl_version_info(CURLVERSION_NOW);
@@ -1282,6 +1383,23 @@ wxVersionInfo  wxWebSessionCURL::GetLibraryVersionInfo()
         vi->version_num >> 8 & 0xff,
         vi->version_num & 0xff,
         desc);
+}
+
+bool wxWebSessionCURL::CurlRuntimeAtLeastVersion(unsigned char major,
+                                                 unsigned char minor,
+                                                 unsigned char patch)
+{
+    unsigned int queryVersion = major;
+    queryVersion <<= 8;
+    queryVersion |= minor;
+    queryVersion <<= 8;
+    queryVersion |= patch;
+    return (ms_runtimeVersion >= queryVersion);
+}
+
+int wxWebSessionCURL::ProgressFuncContinue()
+{
+    return ms_progressFuncContinue;
 }
 
 // curl interacts with the wxWebSessionCURL class through 2 callback functions
@@ -1438,8 +1556,17 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
         {
             wxWebRequestCURL* request;
             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
+
             curl_multi_remove_handle(m_handle, msg->easy_handle);
-            request->HandleCompletion();
+
+            if ( request->HasPendingCancel() )
+            {
+                request->SetState(wxWebRequest::State_Cancelled);
+            }
+            else
+            {
+                request->HandleCompletion();
+            }
         }
     }
 }
