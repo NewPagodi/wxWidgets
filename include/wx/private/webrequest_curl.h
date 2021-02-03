@@ -122,6 +122,7 @@ public:
 private:
     wxWebRequestHeaderMap m_headers;
     wxString m_statusText;
+    wxFileOffset m_knownSize;
 
     CURL* GetHandle() const
     { return static_cast<wxWebRequestCURL&>(m_request).GetHandle(); }
