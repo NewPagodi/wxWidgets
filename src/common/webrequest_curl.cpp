@@ -549,7 +549,7 @@ wxDEFINE_EVENT(wxSocketAction,wxThreadEvent);
     wxSOCKET_T SocketPoller::SOCKET_POLLER_INVALID_SOCKET = INVALID_SOCKET;
 #else
     wxSOCKET_T SocketPoller::SOCKET_POLLER_INVALID_SOCKET =
-        static_cast<wxSOCKET_T>(~0)
+        static_cast<wxSOCKET_T>(~0);
 #endif
 
 
