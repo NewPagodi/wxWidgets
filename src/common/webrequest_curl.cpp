@@ -1543,7 +1543,6 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
         {
             wxWebRequestCURL* request;
             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
-
             curl_multi_remove_handle(m_handle, msg->easy_handle);
 
             if ( request->HasPendingCancel() )
