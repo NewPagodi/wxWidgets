@@ -1623,7 +1623,7 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
 
                 if ( it2 != m_detachedTransfers.end() )
                 {
-                    curl_easy_cleanup(m_handle);
+                    curl_easy_cleanup(curl);
                     m_detachedTransfers.erase(it2);
                 }
             }
