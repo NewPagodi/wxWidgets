@@ -187,6 +187,8 @@ protected:
 
     void ReportDataReceived(size_t sizeReceived);
 
+    void SetBufferSize(size_t);
+
 private:
     // Called by wxWebRequestImpl only.
     friend class wxWebRequestImpl;
