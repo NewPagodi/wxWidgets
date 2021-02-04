@@ -100,7 +100,10 @@ int wxCURLXferInfo(void* clientp, curl_off_t dltotal,
                    curl_off_t WXUNUSED(ultotal),
                    curl_off_t WXUNUSED(ulnow))
 {
-    wxCHECK_MSG( clientp, 0, "invalid curl progress callback data" );
+    if ( clientp == NULL )
+    {
+        return 1;
+    }
 
     wxWebResponseCURL* response = reinterpret_cast<wxWebResponseCURL*>(clientp);
     return response->CURLOnProgress(dltotal);
@@ -302,10 +305,19 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
 
 wxWebRequestCURL::~wxWebRequestCURL()
 {
-    m_sessionImpl.RequestHasTerminated(*this);
     DestroyHeaderList();
 
-    curl_easy_cleanup(m_handle);
+    if ( m_sessionImpl.RequestHasTerminated(*this) )
+    {
+        curl_easy_cleanup(m_handle);
+    }
+    else
+    {
+        curl_easy_setopt(m_handle, CURLOPT_WRITEFUNCTION, wxCURLCancelingWrite);
+        curl_easy_setopt(m_handle, CURLOPT_HEADERFUNCTION, wxCURLCancelingRead);
+        curl_easy_setopt(m_handle, CURLOPT_PROGRESSDATA, NULL);
+        curl_easy_setopt(m_handle, CURLOPT_XFERINFODATA, NULL);
+    }
 }
 
 void wxWebRequestCURL::Start()
@@ -1396,14 +1408,20 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
     }
 }
 
-void wxWebSessionCURL::RequestHasTerminated(wxWebRequestCURL& request)
+bool wxWebSessionCURL::RequestHasTerminated(wxWebRequestCURL& request)
 {
     CURL* curl = request.GetHandle();
 
-    ActiveTransfers::iterator it = m_activeTransfers.find(curl);
+    ActiveTransferMap::iterator it = m_activeTransfers.find(curl);
     if ( it != m_activeTransfers.end() )
     {
         it->second = NULL;
+        m_detachedTransfers.insert(curl);
+        return false;
+    }
+    else
+    {
+        return true;
     }
 }
 
@@ -1593,11 +1611,21 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
             curl_multi_remove_handle(m_handle, curl);
 
             wxWebRequestCURL* request = NULL;
-            ActiveTransfers::iterator it = m_activeTransfers.find(curl);
+            ActiveTransferMap::iterator it = m_activeTransfers.find(curl);
             if ( it != m_activeTransfers.end() )
             {
                 request = it->second;
                 m_activeTransfers.erase(it);
+            }
+            else
+            {
+                TransferSet::iterator it2 = m_detachedTransfers.find(curl);
+
+                if ( it2 != m_detachedTransfers.end() )
+                {
+                    curl_easy_cleanup(m_handle);
+                    m_detachedTransfers.erase(it2);
+                }
             }
 
             if ( request )
@@ -1611,7 +1639,6 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
                     request->HandleCompletion();
                 }
             }
-            
         }
     }
 }

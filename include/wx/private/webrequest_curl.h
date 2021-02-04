@@ -18,6 +18,7 @@
 #include "wx/vector.h"
 #include "wx/timer.h"
 #include "wx/hashmap.h"
+#include "wx/hashset.h"
 
 #include "curl/curl.h"
 
@@ -153,7 +154,7 @@ public:
 
     bool StartRequest(wxWebRequestCURL& request);
 
-    void RequestHasTerminated(wxWebRequestCURL& request);
+    bool RequestHasTerminated(wxWebRequestCURL& request);
 
     static bool CurlRuntimeAtLeastVersion(unsigned char, unsigned char,
                                           unsigned char);
@@ -172,9 +173,12 @@ private:
     void CheckForCompletedTransfers();
 
     WX_DECLARE_HASH_MAP(CURL*, wxWebRequestCURL*, wxPointerHash, \
-                        wxPointerEqual, ActiveTransfers);
+                        wxPointerEqual, ActiveTransferMap);
 
-    ActiveTransfers m_activeTransfers;
+    WX_DECLARE_HASH_SET(CURL*, wxPointerHash, wxPointerEqual, TransferSet);
+
+    ActiveTransferMap m_activeTransfers;
+    TransferSet m_detachedTransfers;
     SocketPoller* m_socketPoller;
     wxTimer m_timeoutTimer;
     CURLM* m_handle;
