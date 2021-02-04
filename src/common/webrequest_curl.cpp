@@ -53,6 +53,12 @@
     #define CURLOPT_ACCEPT_ENCODING CURLOPT_ENCODING
 #endif
 
+#ifdef CURL_PROGRESSFUNC_CONTINUE
+    #define wxCURL_PROGRESSFUNC_CONTINUE CURL_PROGRESSFUNC_CONTINUE
+#else
+    #define wxCURL_PROGRESSFUNC_CONTINUE 0
+#endif
+
 //
 // wxWebResponseCURL
 //
@@ -185,7 +191,7 @@ int wxWebResponseCURL::CURLOnProgress(curl_off_t total)
     }
     else
     {
-        return wxWebSessionCURL::ProgressFuncContinue();
+        return wxCURL_PROGRESSFUNC_CONTINUE;
     }
 }
 
@@ -1276,7 +1282,6 @@ SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
 
 int wxWebSessionCURL::ms_activeSessions = 0;
 unsigned int wxWebSessionCURL::ms_runtimeVersion = 0;
-int wxWebSessionCURL::ms_progressFuncContinue = 0;
 
 wxWebSessionCURL::wxWebSessionCURL() :
     m_handle(NULL)
@@ -1292,19 +1297,6 @@ wxWebSessionCURL::wxWebSessionCURL() :
         {
             curl_version_info_data* data = curl_version_info(CURLVERSION_NOW);
             ms_runtimeVersion = data->version_num;
-
-            #if CURL_AT_LEAST_VERSION(7, 32, 0)
-                if ( CurlRuntimeAtLeastVersion(7, 68, 0) )
-                {
-                    ms_progressFuncContinue = CURL_PROGRESSFUNC_CONTINUE;
-                }
-                else
-                {
-                    ms_progressFuncContinue = 0;
-                }
-            #else
-                ms_progressFuncContinue = 0;
-            #endif
         }
     }
 
@@ -1395,11 +1387,6 @@ bool wxWebSessionCURL::CurlRuntimeAtLeastVersion(unsigned char major,
     queryVersion <<= 8;
     queryVersion |= patch;
     return (ms_runtimeVersion >= queryVersion);
-}
-
-int wxWebSessionCURL::ProgressFuncContinue()
-{
-    return ms_progressFuncContinue;
 }
 
 // curl interacts with the wxWebSessionCURL class through 2 callback functions
