@@ -118,6 +118,8 @@ int wxCURLProgress(void* clientp, double dltotal, double dlnow, double ultotal,
 wxWebResponseCURL::wxWebResponseCURL(wxWebRequestCURL& request) :
     wxWebResponseImpl(request)
 {
+    m_knownDownloadSize = 0;
+
     curl_easy_setopt(GetHandle(), CURLOPT_WRITEDATA, static_cast<void*>(this));
     curl_easy_setopt(GetHandle(), CURLOPT_HEADERDATA, static_cast<void*>(this));
 
@@ -183,8 +185,17 @@ size_t wxWebResponseCURL::CURLOnHeader(const char * buffer, size_t size)
     return size;
 }
 
-int wxWebResponseCURL::CURLOnProgress(curl_off_t WXUNUSED(total))
+int wxWebResponseCURL::CURLOnProgress(curl_off_t total)
 {
+    if ( m_knownDownloadSize != total )
+    {
+        if ( m_request.GetStorage() == wxWebRequest::Storage_Memory )
+        {
+            SetBufferSize(static_cast<size_t>(total));
+        }
+        m_knownDownloadSize = total;
+    }
+
     if ( static_cast<wxWebRequestCURL&>(m_request).HasPendingCancel() )
     {
         return 1;
