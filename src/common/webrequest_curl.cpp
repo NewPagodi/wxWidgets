@@ -279,10 +279,6 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     // Set error buffer to get more detailed CURL status
     m_errorBuffer[0] = '\0';
     curl_easy_setopt(m_handle, CURLOPT_ERRORBUFFER, m_errorBuffer);
-    // Set this request in the private pointer
-    curl_easy_setopt(m_handle, CURLOPT_PRIVATE, static_cast<void*>(this));
-    // Increase the ref count since the CURL handle is holding a reference.
-    IncRef();
     // Set URL to handle: note that we must use wxURI to escape characters not
     // allowed in the URLs correctly (URL API is only available in libcurl
     // since the relatively recent v7.62.0, so we don't want to rely on it).
@@ -306,6 +302,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
 
 wxWebRequestCURL::~wxWebRequestCURL()
 {
+    m_sessionImpl.RequestHasTerminated(*this);
     DestroyHeaderList();
 
     curl_easy_cleanup(m_handle);
@@ -1380,15 +1377,34 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
 {
     // Add request easy handle to multi handle
     CURL* curl = request.GetHandle();
-    curl_multi_add_handle(m_handle, curl);
+    CURLMcode code = curl_multi_add_handle(m_handle, curl);
 
-    request.SetState(wxWebRequest::State_Active);
+    if ( code == CURLM_OK )
+    {
+        // Report a timeout to curl to initiate this transfer.
+        int runningHandles;
+        curl_multi_socket_action(m_handle, CURL_SOCKET_TIMEOUT, 0,
+                                 &runningHandles);
 
-    // Report a timeout to curl to initiate this transfer.
-    int runningHandles;
-    curl_multi_socket_action(m_handle, CURL_SOCKET_TIMEOUT, 0, &runningHandles);
+        request.SetState(wxWebRequest::State_Active);
+        m_activeTransfers[curl] = &request;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
-    return true;
+void wxWebSessionCURL::RequestHasTerminated(wxWebRequestCURL& request)
+{
+    CURL* curl = request.GetHandle();
+
+    ActiveTransfers::iterator it = m_activeTransfers.find(curl);
+    if ( it != m_activeTransfers.end() )
+    {
+        it->second = NULL;
+    }
 }
 
 wxVersionInfo  wxWebSessionCURL::GetLibraryVersionInfo()
@@ -1573,9 +1589,16 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
     {
         if ( msg->msg == CURLMSG_DONE )
         {
-            wxWebRequestCURL* request;
-            curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
-            curl_multi_remove_handle(m_handle, msg->easy_handle);
+            CURL* curl = msg->easy_handle;
+            curl_multi_remove_handle(m_handle, curl);
+
+            wxWebRequestCURL* request = NULL;
+            ActiveTransfers::iterator it = m_activeTransfers.find(curl);
+            if ( it != m_activeTransfers.end() )
+            {
+                request = it->second;
+                m_activeTransfers.erase(it);
+            }
 
             if ( request )
             {
@@ -1587,14 +1610,8 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
                 {
                     request->HandleCompletion();
                 }
-
-                // When the transfer was started, a pointer to wxWebRequestCURL
-                // object was stored in in the CURL handle and the ref count was
-                // increased. Now that the transfer is complete, remove the
-                // stored pointer and decrease the ref count.
-                curl_easy_setopt(msg->easy_handle, CURLOPT_PRIVATE, NULL);
-                request->DecRef();
             }
+            
         }
     }
 }
