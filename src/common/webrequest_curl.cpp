@@ -1577,21 +1577,24 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
             curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
             curl_multi_remove_handle(m_handle, msg->easy_handle);
 
-            if ( request->HasPendingCancel() )
+            if ( request )
             {
-                request->SetState(wxWebRequest::State_Cancelled);
-            }
-            else
-            {
-                request->HandleCompletion();
-            }
+                if ( request->HasPendingCancel() )
+                {
+                    request->SetState(wxWebRequest::State_Cancelled);
+                }
+                else
+                {
+                    request->HandleCompletion();
+                }
 
-            // When the transfer was started, a pointer to wxWebRequestCURL
-            // object was stored in in the CURL handle and the ref count was
-            // increased. Now that the transfer is complete, remove the
-            // stored pointer and decrease the ref count.
-            curl_easy_setopt(msg->easy_handle, CURLOPT_PRIVATE, NULL);
-            request->DecRef();
+                // When the transfer was started, a pointer to wxWebRequestCURL
+                // object was stored in in the CURL handle and the ref count was
+                // increased. Now that the transfer is complete, remove the
+                // stored pointer and decrease the ref count.
+                curl_easy_setopt(msg->easy_handle, CURLOPT_PRIVATE, NULL);
+                request->DecRef();
+            }
         }
     }
 }
