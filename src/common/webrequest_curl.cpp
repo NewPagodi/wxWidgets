@@ -241,9 +241,19 @@ wxString wxWebResponseCURL::GetHeader(const wxString& name) const
 
 int wxWebResponseCURL::GetStatus() const
 {
-    long status = 0;
-    curl_easy_getinfo(GetHandle(), CURLINFO_RESPONSE_CODE, &status);
-    return status;
+    if ( static_cast<wxWebRequestCURL&>(m_request).HasInternalFail() )
+    {
+        // There's no good status to use here, but 499 is an unofficial code
+        // sometimes used to mean that the client has closed the request before
+        // the server could send a response.
+        return 499;
+    }
+    else
+    {
+        long status = 0;
+        curl_easy_getinfo(GetHandle(), CURLINFO_RESPONSE_CODE, &status);
+        return status;
+    }
 }
 
 //
@@ -267,6 +277,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
 {
     m_headerList = NULL;
     m_cancelPending = false;
+    m_hasInternalFail = false;
 
     m_handle = curl_easy_init();
     if ( !m_handle )
@@ -402,11 +413,30 @@ bool wxWebRequestCURL::HasPendingCancel() const
     return m_cancelPending;
 }
 
+bool wxWebRequestCURL::HasInternalFail() const
+{
+    return m_hasInternalFail;
+}
+
+void wxWebRequestCURL::SetInternalFail(const wxString& msg)
+{
+    m_cancelPending = true;
+    m_hasInternalFail = true;
+    m_internalFailMsg = msg;
+}
+
 wxString wxWebRequestCURL::GetError() const
 {
-    // We don't know what encoding is used for libcurl errors, so do whatever
-    // is needed in order to interpret this data at least somehow.
-    return wxString(m_errorBuffer, wxConvWhateverWorks);
+    if ( m_hasInternalFail )
+    {
+        return m_internalFailMsg;
+    }
+    else
+    {
+        // We don't know what encoding is used for libcurl errors, so do
+        // whatever is needed in order to interpret this data at least somehow.
+        return wxString(m_errorBuffer, wxConvWhateverWorks);
+    }
 }
 
 size_t wxWebRequestCURL::CURLOnRead(char* buffer, size_t size)
@@ -1472,11 +1502,11 @@ int wxWebSessionCURL::TimerCallback(CURLM* WXUNUSED(multi), long timeoutms,
     return 0;
 }
 
-int wxWebSessionCURL::SocketCallback(CURL* WXUNUSED(easy), curl_socket_t sock,
-                                    int what, void* userp, void* WXUNUSED(sp))
+int wxWebSessionCURL::SocketCallback(CURL* easy, curl_socket_t sock, int what,
+                                     void* userp, void* WXUNUSED(sp))
 {
     wxWebSessionCURL* session = reinterpret_cast<wxWebSessionCURL*>(userp);
-    session->ProcessSocketCallback(sock, what);
+    session->ProcessSocketCallback(easy, sock, what);
     return CURLM_OK;
 };
 
@@ -1541,7 +1571,8 @@ static int CurlPoll2SocketPoller(int what)
     return pollAction;
 }
 
-void wxWebSessionCURL::ProcessSocketCallback(curl_socket_t s, int what)
+void wxWebSessionCURL::ProcessSocketCallback(CURL* curl, curl_socket_t s,
+                                             int what)
 {
     // Have the socket poller start or stop monitoring a socket depending of
     // the value of what.
@@ -1553,7 +1584,23 @@ void wxWebSessionCURL::ProcessSocketCallback(curl_socket_t s, int what)
         case CURL_POLL_OUT:
             wxFALLTHROUGH;
         case CURL_POLL_INOUT:
-            m_socketPoller->StartPolling(s, CurlPoll2SocketPoller(what));
+            {
+                int pollAction = CurlPoll2SocketPoller(what);
+                bool success = m_socketPoller->StartPolling(s, pollAction);
+
+                if ( !success )
+                {
+                    TransferSet::iterator it = m_activeTransfers.find(curl);
+
+                    if ( it != m_activeTransfers.end() )
+                    {
+                        wxWebRequestCURL* request = it->second;
+                        request->SetInternalFail(
+                            "wxWebSession failed to monitor a socket for this "
+                            "transfer");
+                    }
+                }
+            }
             break;
         case CURL_POLL_REMOVE:
             m_socketPoller->StopPolling(s);
@@ -1615,7 +1662,12 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
                 wxWebRequestCURL* request = it->second;
                 curl_multi_remove_handle(m_handle, curl);
 
-                if ( request->HasPendingCancel() )
+                if ( request->HasInternalFail() )
+                {
+                    request->SetState(wxWebRequest::State_Failed,
+                                      request->GetError());
+                }
+                else if ( request->HasPendingCancel() )
                 {
                     request->SetState(wxWebRequest::State_Cancelled);
                 }
