@@ -136,6 +136,17 @@ wxWebResponseCURL::wxWebResponseCURL(wxWebRequestCURL& request) :
 
 size_t wxWebResponseCURL::CURLOnWrite(void* buffer, size_t size)
 {
+    if ( static_cast<wxWebRequestCURL&>(m_request).HasPendingCancel() )
+    {
+        // Usually a write callback returns the number of bytes handled
+        // (ie size). Returning any other value causes curl to stop the
+        // transfer.
+        // However if there is a pending cancel, this transfer must stop, so
+        // something other than size will be returned.
+
+        return ( size == 1 ) ? 0 : 1;
+    }
+
     void* buf = GetDataBuffer(size);
     memcpy(buf, buffer, size);
     ReportDataReceived(size);
@@ -180,7 +191,14 @@ int wxWebResponseCURL::CURLOnProgress(curl_off_t total)
         m_knownDownloadSize = total;
     }
 
-    return wxWebSessionCURL::ProgressFuncContinue();
+    if ( static_cast<wxWebRequestCURL&>(m_request).HasPendingCancel() )
+    {
+        return 1;
+    }
+    else
+    {
+        return wxWebSessionCURL::ProgressFuncContinue();
+    }
 }
 
 wxFileOffset wxWebResponseCURL::GetContentLength() const
@@ -244,6 +262,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     m_sessionImpl(sessionImpl)
 {
     m_headerList = NULL;
+    m_cancelPending = false;
 
     m_handle = curl_easy_init();
     if ( !m_handle )
@@ -351,7 +370,7 @@ bool wxWebRequestCURL::StartRequest()
 
 void wxWebRequestCURL::DoCancel()
 {
-    m_sessionImpl.CancelRequest(this);
+    m_cancelPending = true;
 }
 
 void wxWebRequestCURL::HandleCompletion()
@@ -374,6 +393,11 @@ void wxWebRequestCURL::HandleCompletion()
     }
 }
 
+bool wxWebRequestCURL::HasPendingCancel() const
+{
+    return m_cancelPending;
+}
+
 wxString wxWebRequestCURL::GetError() const
 {
     // We don't know what encoding is used for libcurl errors, so do whatever
@@ -383,6 +407,11 @@ wxString wxWebRequestCURL::GetError() const
 
 size_t wxWebRequestCURL::CURLOnRead(char* buffer, size_t size)
 {
+    if ( HasPendingCancel() )
+    {
+        return ( size == 1 ) ? 0 : 1;
+    }
+    
     if ( m_dataStream )
     {
         m_dataStream->Read(buffer, size);
@@ -1047,20 +1076,6 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
     }
 }
 
-void wxWebSessionCURL::CancelRequest(wxWebRequestCURL* request)
-{
-    CURL* curl = request->GetHandle();
-    TransferSet::iterator it = m_activeTransfers.find(curl);
-
-    if ( it != m_activeTransfers.end() )
-    {
-        curl_multi_remove_handle(m_handle, curl);
-        m_activeTransfers.erase(it);
-    }
-
-    request->SetState(wxWebRequest::State_Cancelled);
-}
-
 void wxWebSessionCURL::RequestHasTerminated(wxWebRequestCURL* request)
 {
     CURL* curl = request->GetHandle();
@@ -1264,7 +1279,16 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
             {
                 wxWebRequestCURL* request = it->second;
                 curl_multi_remove_handle(m_handle, curl);
-                request->HandleCompletion();
+
+                if ( request->HasPendingCancel() )
+                {
+                    request->SetState(wxWebRequest::State_Cancelled);
+                }
+                else
+                {
+                    request->HandleCompletion();
+                }
+
                 m_activeTransfers.erase(it);
             }
         }

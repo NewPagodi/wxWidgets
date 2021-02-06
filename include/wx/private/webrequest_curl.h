@@ -79,6 +79,8 @@ public:
     // Method called from libcurl callback
     size_t CURLOnRead(char* buffer, size_t size);
 
+    bool HasPendingCancel() const;
+
 private:
     void DoCancel() wxOVERRIDE;
 
@@ -90,6 +92,7 @@ private:
     wxObjectDataPtr<wxWebResponseCURL> m_response;
     wxObjectDataPtr<wxWebAuthChallengeCURL> m_authChallenge;
     wxFileOffset m_bytesSent;
+    bool m_cancelPending;
 
     void DestroyHeaderList();
 
@@ -149,8 +152,6 @@ public:
     }
 
     bool StartRequest(wxWebRequestCURL& request);
-
-    void CancelRequest(wxWebRequestCURL* request);
 
     void RequestHasTerminated(wxWebRequestCURL* request);
 
