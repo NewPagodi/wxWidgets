@@ -281,8 +281,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
 wxWebRequestCURL::~wxWebRequestCURL()
 {
     DestroyHeaderList();
-
-    curl_easy_cleanup(m_handle);
+    m_sessionImpl.RequestHasTerminated(this);
 }
 
 void wxWebRequestCURL::Start()
@@ -1033,6 +1032,7 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
     if ( code == CURLM_OK )
     {
         request.SetState(wxWebRequest::State_Active);
+        m_activeTransfers[curl] = &request;
 
         // Report a timeout to curl to initiate this transfer.
         int runningHandles;
@@ -1049,8 +1049,30 @@ bool wxWebSessionCURL::StartRequest(wxWebRequestCURL & request)
 
 void wxWebSessionCURL::CancelRequest(wxWebRequestCURL* request)
 {
-    curl_multi_remove_handle(m_handle, request->GetHandle());
+    CURL* curl = request->GetHandle();
+    TransferSet::iterator it = m_activeTransfers.find(curl);
+
+    if ( it != m_activeTransfers.end() )
+    {
+        curl_multi_remove_handle(m_handle, curl);
+        m_activeTransfers.erase(it);
+    }
+
     request->SetState(wxWebRequest::State_Cancelled);
+}
+
+void wxWebSessionCURL::RequestHasTerminated(wxWebRequestCURL* request)
+{
+    CURL* curl = request->GetHandle();
+    TransferSet::iterator it = m_activeTransfers.find(curl);
+
+    if ( it != m_activeTransfers.end() )
+    {
+        curl_multi_remove_handle(m_handle, curl);
+        m_activeTransfers.erase(it);
+    }
+
+    curl_easy_cleanup(curl);
 }
 
 wxVersionInfo  wxWebSessionCURL::GetLibraryVersionInfo()
@@ -1235,10 +1257,16 @@ void wxWebSessionCURL::CheckForCompletedTransfers()
     {
         if ( msg->msg == CURLMSG_DONE )
         {
-            wxWebRequestCURL* request;
-            curl_easy_getinfo(msg->easy_handle, CURLINFO_PRIVATE, &request);
-            curl_multi_remove_handle(m_handle, msg->easy_handle);
-            request->HandleCompletion();
+            CURL* curl = msg->easy_handle;
+            TransferSet::iterator it = m_activeTransfers.find(curl);
+
+            if ( it != m_activeTransfers.end() )
+            {
+                wxWebRequestCURL* request = it->second;
+                curl_multi_remove_handle(m_handle, curl);
+                request->HandleCompletion();
+                m_activeTransfers.erase(it);
+            }
         }
     }
 }
