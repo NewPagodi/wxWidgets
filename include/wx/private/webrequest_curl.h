@@ -18,6 +18,7 @@
 #include "wx/vector.h"
 #include "wx/timer.h"
 #include "wx/hashmap.h"
+#include "wx/ffile.h"
 
 #include "curl/curl.h"
 
@@ -99,6 +100,7 @@ private:
     bool m_cancelPending;
     bool m_hasInternalFail;
     wxString m_internalFailMsg;
+    wxFFile m_devNull;
 
     void DestroyHeaderList();
 

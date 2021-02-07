@@ -279,6 +279,12 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     m_cancelPending = false;
     m_hasInternalFail = false;
 
+#ifdef __WINDOWS__
+    m_devNull.Open("NUL","wb");
+#else
+    m_devNull.Open("/dev/null","wb");
+#endif
+
     m_handle = curl_easy_init();
     if ( !m_handle )
     {
@@ -310,12 +316,15 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     // Enable all supported authentication methods
     curl_easy_setopt(m_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
     curl_easy_setopt(m_handle, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+    // Block curl from sending messages to stderr.
+    curl_easy_setopt(GetHandle(), CURLOPT_STDERR, m_devNull.fp());
 }
 
 wxWebRequestCURL::~wxWebRequestCURL()
 {
     DestroyHeaderList();
     m_sessionImpl.RequestHasTerminated(this);
+    m_devNull.Close();
 }
 
 void wxWebRequestCURL::Start()
