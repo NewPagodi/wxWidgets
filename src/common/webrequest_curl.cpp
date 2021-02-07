@@ -24,15 +24,19 @@
 
 #include "wx/uri.h"
 #include "wx/socket.h"
-#include "wx/msgqueue.h"
-#include "wx/hashset.h"
-#include "wx/hashmap.h"
+#include "wx/evtloop.h"
 
 #ifdef __WINDOWS__
-    #include <wx/msw/wrapwin.h>
+    #include "wx/hashset.h"
+    #include "wx/msw/wrapwin.h"
+#elif wxUSE_EVENTLOOP_SOURCE
+    #include "wx/evtloopsrc.h"
+    #include "wx/evtloop.h"
 #else
-    #include <sys/socket.h>
-    #include <sys/select.h>
+    #include "wx/msgqueue.h"
+    #include "wx/hashset.h"
+    #include "sys/socket.h"
+    #include "sys/select.h"
 #endif
 
 
@@ -437,86 +441,497 @@ void wxWebAuthChallengeCURL::SetCredentials(const wxWebCredentials& cred)
     m_request.StartRequest();
 }
 
+//
+// SocketPoller - a helper class for wxWebSessionCURL
+//
 
-wxDECLARE_EVENT(wxSocketAction,wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_SOCKET_POLLER_RESULT, wxThreadEvent);
 
-class SocketPoller: public wxThreadHelper
+class SocketPollerImpl;
+
+class SocketPoller
 {
 public:
     enum PollAction
     {
-        InvalidAction = 0,
-        PollForRead = 1,
-        PollForWrite = 2,
-        PollForError = 4
+        INVALID_ACTION = 0x00,
+        POLL_FOR_READ = 0x01,
+        POLL_FOR_WRITE = 0x02
     };
 
     enum Result
     {
-        InvalidResult = 0,
-        ReadyForRead = 1,
-        ReadyForWrite = 2,
-        HasError = 4
+        INVALID_RESULT = 0x00,
+        READY_FOR_READ = 0x01,
+        READY_FOR_WRITE = 0x02,
+        HAS_ERROR = 0x04
     };
 
-    SocketPoller();
+    SocketPoller(wxEvtHandler*);
     ~SocketPoller();
-    bool StartPolling(wxSOCKET_T, int, wxEvtHandler*);
+    bool StartPolling(wxSOCKET_T, int);
     void StopPolling(wxSOCKET_T);
     void ResumePolling(wxSOCKET_T);
 
 private:
-    static const wxSOCKET_T SOCKET_POLLER_INVALID_SOCKET;
+    SocketPollerImpl* m_impl;
+};
 
+wxDEFINE_EVENT(wxEVT_SOCKET_POLLER_RESULT, wxThreadEvent);
+
+class SocketPollerImpl
+{
+public:
+    virtual ~SocketPollerImpl(){};
+    virtual bool StartPolling(wxSOCKET_T, int) = 0;
+    virtual void StopPolling(wxSOCKET_T) = 0;
+    virtual void ResumePolling(wxSOCKET_T) = 0;
+
+    static SocketPollerImpl* Create(wxEvtHandler*);
+};
+
+SocketPoller::SocketPoller(wxEvtHandler* hndlr)
+{
+    m_impl = SocketPollerImpl::Create(hndlr);
+}
+
+SocketPoller::~SocketPoller()
+{
+    delete m_impl;
+}
+
+bool SocketPoller::StartPolling(wxSOCKET_T sock, int pollAction)
+{
+    return m_impl->StartPolling(sock, pollAction);
+}
+void SocketPoller::StopPolling(wxSOCKET_T sock)
+{
+    m_impl->StopPolling(sock);
+}
+
+void SocketPoller::ResumePolling(wxSOCKET_T sock)
+{
+    m_impl->ResumePolling(sock);
+}
+
+#ifdef __WINDOWS__
+
+class WinSock1SocketPoller: public SocketPollerImpl
+{
+public:
+    WinSock1SocketPoller(wxEvtHandler*);
+    virtual ~WinSock1SocketPoller();
+    virtual bool StartPolling(wxSOCKET_T, int) wxOVERRIDE;
+    virtual void StopPolling(wxSOCKET_T) wxOVERRIDE;
+    virtual void ResumePolling(wxSOCKET_T) wxOVERRIDE;
+
+private:
+    static LRESULT CALLBACK MsgProc(HWND hwnd, WXUINT uMsg, WXWPARAM wParam,
+                                    WXLPARAM lParam);
+    static const WXUINT SOCKET_MESSAGE;
+
+    WX_DECLARE_HASH_SET(wxSOCKET_T, wxIntegerHash, wxIntegerEqual, SocketSet);
+
+    SocketSet m_polledSockets;
+    WXHWND m_hwnd;
+};
+
+const WXUINT WinSock1SocketPoller::SOCKET_MESSAGE = WM_USER + 1;
+
+WinSock1SocketPoller::WinSock1SocketPoller(wxEvtHandler* hndlr)
+{
+    // Initialize winsock in case it's not already done.
+    WORD wVersionRequested = MAKEWORD(1,1);
+    WSADATA wsaData;
+    WSAStartup(wVersionRequested, &wsaData);
+
+    // Create a dummy message only window.
+    m_hwnd = CreateWindowEx(
+        0,              //DWORD     dwExStyle,
+        TEXT("STATIC"), //LPCSTR    lpClassName,
+        NULL,           //LPCSTR    lpWindowName,
+        0,              //DWORD     dwStyle,
+        0,              //int       X,
+        0,              //int       Y,
+        0,              //int       nWidth,
+        0,              //int       nHeight,
+        HWND_MESSAGE,   //HWND      hWndParent,
+        NULL,           //HMENU     hMenu,
+        NULL,           //HINSTANCE hInstance,
+        NULL            //LPVOID    lpParam
+    );
+
+    if ( m_hwnd == NULL )
+    {
+        wxLogError("Unable to create message window for WinSock1SocketPoller");
+        return;
+    }
+
+    // Set the event handler to be the message window's user data. Also set the
+    // message window to use our MsgProc to process messages it receives.
+    SetWindowLongPtr(m_hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(hndlr));
+    SetWindowLongPtr(m_hwnd, GWLP_WNDPROC,
+                     reinterpret_cast<LONG_PTR>(WinSock1SocketPoller::MsgProc));
+}
+
+WinSock1SocketPoller::~WinSock1SocketPoller()
+{
+    // Stop monitoring any leftover sockets.
+    for ( SocketSet::iterator it = m_polledSockets.begin() ;
+          it != m_polledSockets.end() ; ++it )
+    {
+        WSAAsyncSelect(*it, m_hwnd, 0, 0);
+    }
+
+    // Close the message window.
+    if ( m_hwnd )
+    {
+        CloseWindow(m_hwnd);
+    }
+
+    // Cleanup winsock.
+    WSACleanup();
+}
+
+bool WinSock1SocketPoller::StartPolling(wxSOCKET_T sock, int pollAction)
+{
+    StopPolling(sock);
+
+    // Convert pollAction to a flag that can be used by winsock.
+    int winActions = 0;
+
+    if ( pollAction & SocketPoller::POLL_FOR_READ )
+    {
+        winActions |= FD_READ;
+    }
+
+    if ( pollAction & SocketPoller::POLL_FOR_WRITE )
+    {
+        winActions |= FD_WRITE;
+    }
+
+    // Have winsock send a message to our window whenever activity is
+    // detected on the socket.
+    WSAAsyncSelect(sock, m_hwnd, SOCKET_MESSAGE, winActions);
+
+    m_polledSockets.insert(sock);
+    return true;
+}
+
+void WinSock1SocketPoller::StopPolling(wxSOCKET_T sock)
+{
+    SocketSet::iterator it = m_polledSockets.find(sock);
+
+    if ( it != m_polledSockets.end() )
+    {
+        // Stop sending messages when there is activity on the socket.
+        WSAAsyncSelect(sock, m_hwnd, 0, 0);
+        m_polledSockets.erase(it);
+    }
+}
+
+void WinSock1SocketPoller::ResumePolling(wxSOCKET_T WXUNUSED(sock))
+{
+}
+
+LRESULT CALLBACK WinSock1SocketPoller::MsgProc(WXHWND hwnd, WXUINT uMsg,
+                                               WXWPARAM wParam, WXLPARAM lParam)
+{
+    // We only handle 1 message - the message we told winsock to send when
+    // it notices activity on sockets we are monitoring.
+
+    if ( uMsg == SOCKET_MESSAGE )
+    {
+        // Extract the result any any errors from lParam.
+        int winResult = LOWORD(lParam);
+        int error = HIWORD(lParam);
+
+        // Convert the result/errors to a SocketPoller::Result flag.
+        int pollResult = 0;
+
+        if ( winResult & FD_READ )
+        {
+            pollResult |= SocketPoller::READY_FOR_READ;
+        }
+
+        if ( winResult & FD_WRITE )
+        {
+            pollResult |= SocketPoller::READY_FOR_WRITE;
+        }
+
+        if ( error != 0 )
+        {
+            pollResult |= SocketPoller::HAS_ERROR;
+        }
+
+        // If there is a significant result, send an event.
+        if ( pollResult != 0 )
+        {
+            // The event handler is stored in the window's user data and the
+            // socket with activity is given by wParam.
+            LONG_PTR userData = GetWindowLongPtr(hwnd, GWLP_USERDATA);
+            wxEvtHandler* hndlr = reinterpret_cast<wxEvtHandler*>(userData);
+            wxSOCKET_T sock = wParam;
+
+            wxThreadEvent* event =
+                new wxThreadEvent(wxEVT_SOCKET_POLLER_RESULT);
+            event->SetPayload<wxSOCKET_T>(sock);
+            event->SetInt(pollResult);
+
+            if ( wxThread::IsMain() )
+            {
+                hndlr->ProcessEvent(*event);
+                delete event;
+            }
+            else
+            {
+                wxQueueEvent(hndlr, event);
+            }
+        }
+
+        return 0;
+    }
+    else
+    {
+        return DefWindowProc(hwnd, uMsg, wParam, lParam);
+    }
+}
+
+SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
+{
+    return new WinSock1SocketPoller(hndlr);
+}
+
+#elif wxUSE_EVENTLOOP_SOURCE
+
+// SocketPollerSourceHandler - a source handler used by the SocketPoller class.
+
+class SocketPollerSourceHandler: public wxEventLoopSourceHandler
+{
+public:
+    SocketPollerSourceHandler(wxSOCKET_T, wxEvtHandler*);
+
+    void OnReadWaiting() wxOVERRIDE;
+    void OnWriteWaiting() wxOVERRIDE;
+    void OnExceptionWaiting() wxOVERRIDE;
+    ~SocketPollerSourceHandler(){}
+private:
+    void SendEvent(int);
+    wxSOCKET_T m_socket;
+    wxEvtHandler* m_handler;
+};
+
+SocketPollerSourceHandler::SocketPollerSourceHandler(wxSOCKET_T sock,
+                                                     wxEvtHandler* hndlr)
+{
+    m_socket = sock;
+    m_handler = hndlr;
+}
+
+void SocketPollerSourceHandler::OnReadWaiting()
+{
+    SendEvent(SocketPoller::READY_FOR_READ);
+}
+
+void SocketPollerSourceHandler::OnWriteWaiting()
+{
+    SendEvent(SocketPoller::READY_FOR_WRITE);
+}
+
+void SocketPollerSourceHandler::OnExceptionWaiting()
+{
+    SendEvent(SocketPoller::HAS_ERROR);
+}
+
+void SocketPollerSourceHandler::SendEvent(int result)
+{
+    wxThreadEvent event(wxEVT_SOCKET_POLLER_RESULT);
+    event.SetPayload<wxSOCKET_T>(m_socket);
+    event.SetInt(result);
+    m_handler->ProcessEvent(event);
+}
+
+// SourceSocketPoller - a SocketPollerImpl based on event loop sources.
+
+class SourceSocketPoller: public SocketPollerImpl
+{
+public:
+    SourceSocketPoller(wxEvtHandler*);
+    ~SourceSocketPoller();
+    bool StartPolling(wxSOCKET_T, int) wxOVERRIDE;
+    void StopPolling(wxSOCKET_T) wxOVERRIDE;
+    void ResumePolling(wxSOCKET_T) wxOVERRIDE;
+
+private:
+    WX_DECLARE_HASH_MAP(wxSOCKET_T, wxEventLoopSource*, wxIntegerHash,\
+                        wxIntegerEqual, SocketDataMap);
+
+    void CleanUpSocketSource(wxEventLoopSource*);
+
+    SocketDataMap m_socketData;
+    wxEvtHandler* m_handler;
+};
+
+SourceSocketPoller::SourceSocketPoller(wxEvtHandler* hndlr)
+{
+    m_handler = hndlr;
+}
+
+SourceSocketPoller::~SourceSocketPoller()
+{
+    // Clean up any leftover socket data.
+    for ( SocketDataMap::iterator it = m_socketData.begin() ;
+          it != m_socketData.end() ; ++it )
+    {
+        CleanUpSocketSource(it->second);
+    }
+}
+
+static int SocketPoller2EventSource(int pollAction)
+{
+    // Convert the SocketPoller::PollAction value to a flag that can be used
+    // by wxEventLoopSource.
+
+    // Always check for errors.
+    int eventSourceFlag = wxEVENT_SOURCE_EXCEPTION;
+
+    if ( pollAction & SocketPoller::POLL_FOR_READ )
+    {
+        eventSourceFlag |= wxEVENT_SOURCE_INPUT;
+    }
+
+    if ( pollAction & SocketPoller::POLL_FOR_WRITE )
+    {
+        eventSourceFlag |= wxEVENT_SOURCE_OUTPUT;
+    }
+
+    return eventSourceFlag;
+}
+
+bool SourceSocketPoller::StartPolling(wxSOCKET_T sock, int pollAction)
+{
+    SocketDataMap::iterator it = m_socketData.find(sock);
+    wxEventLoopSourceHandler* srcHandler = NULL;
+
+    if ( it != m_socketData.end() )
+    {
+        // If this socket is already being polled, reuse the old handler. Also
+        // delete the old source object to stop the old polling operations.
+        wxEventLoopSource* oldSrc = it->second;
+        srcHandler = oldSrc->GetHandler();
+
+        delete oldSrc;
+    }
+    else
+    {
+        // Otherwise create a new source handler.
+        srcHandler =
+            new SocketPollerSourceHandler(sock, m_handler);
+    }
+
+    // Get a new source object for these polling checks.
+    bool socketIsPolled = true;
+    int eventSourceFlag = SocketPoller2EventSource(pollAction);
+    wxEventLoopSource* newSrc =
+        wxEventLoopBase::AddSourceForFD(sock, srcHandler, eventSourceFlag);
+
+    if ( newSrc == NULL )
+    {
+        // We were not able to add a source for this socket.
+        wxLogDebug(wxString::Format(
+                       "Unable to create event loop source for %d",
+                       static_cast<int>(sock)));
+
+        delete srcHandler;
+        socketIsPolled = false;
+
+        if ( it != m_socketData.end() )
+        {
+            m_socketData.erase(it);
+        }
+    }
+    else
+    {
+        m_socketData[sock] = newSrc;
+    }
+
+    return socketIsPolled;
+}
+
+void SourceSocketPoller::StopPolling(wxSOCKET_T sock)
+{
+    SocketDataMap::iterator it = m_socketData.find(sock);
+
+    if ( it != m_socketData.end() )
+    {
+        CleanUpSocketSource(it->second);
+        m_socketData.erase(it);
+    }
+}
+
+void SourceSocketPoller::ResumePolling(wxSOCKET_T WXUNUSED(sock))
+{
+}
+
+void SourceSocketPoller::CleanUpSocketSource(wxEventLoopSource* source)
+{
+    wxEventLoopSourceHandler* srcHandler = source->GetHandler();
+    delete source;
+    delete srcHandler;
+}
+
+SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
+{
+    return new SourceSocketPoller(hndlr);
+}
+
+#else
+
+class SelectSocketPoller: public wxThreadHelper, public SocketPollerImpl
+{
+public:
+    SelectSocketPoller(wxEvtHandler*);
+    ~SelectSocketPoller();
+    bool StartPolling(wxSOCKET_T, int) wxOVERRIDE;
+    void StopPolling(wxSOCKET_T) wxOVERRIDE;
+    void ResumePolling(wxSOCKET_T) wxOVERRIDE;
+
+private:
     class Message
     {
         public:
             enum MessageId
             {
-                AddSocketAction,
-                DeleteSocketAction,
-                ResumePolling,
-                Quit,
-                LastMessageId
+                ADD_SOCKET_ACTION,
+                DELETE_SOCKET_ACTION,
+                RESUME_POLLING,
+                QUIT,
+                LAST_MESSAGE_ID
             };
 
-            explicit Message(MessageId i = LastMessageId,
-                    wxSOCKET_T s = SOCKET_POLLER_INVALID_SOCKET,
-                    int f = 0,
-                    wxEvtHandler* h = NULL)
+            explicit Message(MessageId i = LAST_MESSAGE_ID, wxSOCKET_T s = -1,
+                             int f = 0)
             {
                 m_messageId = i;
                 m_socket = s;
                 m_flags = f;
-                m_evtHandler = h;
             }
 
             MessageId GetMessageId() const { return m_messageId; }
             wxSOCKET_T GetSocket() const { return m_socket; }
             int GetFlags() const { return m_flags; }
-            wxEvtHandler* GetEvtHandler() const { return m_evtHandler; }
 
         private:
             wxSOCKET_T m_socket;
             int m_flags;
             MessageId m_messageId;
-            wxEvtHandler* m_evtHandler;
     };
 
-    struct SocketData
-    {
-        int m_pollAction;
-        void* m_event;
-        wxEvtHandler* m_handler;
-    };
-
-    WX_DECLARE_HASH_SET(wxSOCKET_T, wxIntegerHash, wxIntegerEqual, SocketSet );
-    WX_DECLARE_HASH_MAP(wxSOCKET_T, SocketData, wxIntegerHash, wxIntegerEqual, \
-                        SocketDataMap );
+    WX_DECLARE_HASH_SET(wxSOCKET_T, wxIntegerHash, wxIntegerEqual, SocketSet);
+    WX_DECLARE_HASH_MAP(wxSOCKET_T, int, wxIntegerHash, wxIntegerEqual, \
+                        PollActions);
 
     // Items used from main thread.
-    void CreateSocketPair();
-    void CloseSocket(wxSOCKET_T);
     void PostAndSignal(const Message&);
 
     SocketSet m_polledSockets;
@@ -526,138 +941,56 @@ private:
     // Items used in both threads.
     wxMessageQueue<Message> m_msgQueue;
     wxSOCKET_T m_readEnd;
+    wxEvtHandler* m_handler;
 
 
     // Items used from worker thread.
     virtual wxThread::ExitCode Entry() wxOVERRIDE;
 
     void ThreadRemoveFromDL(wxSOCKET_T);
-    void ThreadSetSocketAction(wxSOCKET_T, int,wxEvtHandler*);
+    void ThreadSetSocketAction(wxSOCKET_T, int);
     void ThreadDeleteSocketAction(wxSOCKET_T);
     void ThreadCheckSockets();
 
-    SocketDataMap m_socketData;
+    PollActions m_pollActions;
     SocketSet m_disabledList;
 };
 
-wxDEFINE_EVENT(wxSocketAction,wxThreadEvent);
-
-#ifdef INVALID_SOCKET
-    const wxSOCKET_T SocketPoller::SOCKET_POLLER_INVALID_SOCKET =
-        INVALID_SOCKET;
-#else
-    const wxSOCKET_T SocketPoller::SOCKET_POLLER_INVALID_SOCKET =
-        static_cast<wxSOCKET_T>(~0);
-#endif
-
-
-SocketPoller::SocketPoller()
+SelectSocketPoller::SelectSocketPoller(wxEvtHandler* hndlr)
 {
-    m_writeEnd = static_cast<wxSOCKET_T>(SocketPoller::SOCKET_POLLER_INVALID_SOCKET);
-    m_readEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-    CreateSocketPair();
+    m_handler = hndlr;
 
-    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
-    {
-        wxLogDebug("Could not create socket poller worker thread!");
-        return;
-    }
-
-    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
-    {
-        wxLogDebug("Could not run socket poller worker thread!");
-        return;
-    }
-}
-
-SocketPoller::~SocketPoller()
-{
-    SocketPoller::Message msg(Message::Quit);
-    PostAndSignal(msg);
-
-    GetThread()->Wait();
-
-    CloseSocket(m_writeEnd);
-    CloseSocket(m_readEnd);
-
-#ifdef __WINDOWS__
-    WSACleanup();
-#endif
-}
-
-void SocketPoller::CreateSocketPair()
-{
-#ifdef __WINDOWS__
-    WORD wVersionRequested = MAKEWORD(1,1);
-    WSADATA wsaData;
-    WSAStartup(wVersionRequested, &wsaData);
-
-    m_writeEnd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    if ( m_writeEnd == INVALID_SOCKET )
-    {
-        wxLogDebug("Unable to create write end of socket pair.");
-        m_writeEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-        return;
-    }
-
-    m_readEnd = socket(AF_INET, SOCK_DGRAM, 0);
-
-    if ( m_readEnd == INVALID_SOCKET )
-    {
-        wxLogDebug("Unable to create read end of socket pair.");
-        CloseSocket(m_writeEnd);
-        m_writeEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-        m_readEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-        return;
-    }
-
-    // Bind the read end. This will assign it to an unused port.
-    struct sockaddr_in serverAddr;
-    serverAddr.sin_family = AF_INET;
-    serverAddr.sin_port = htons(0);
-    serverAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-
-    int retcode = bind(m_readEnd, (struct sockaddr *)&serverAddr,
-                       sizeof(serverAddr));
-    if ( retcode < 0 )
-    {
-        wxLogDebug("Unable bind socket to port.");
-        CloseSocket(m_writeEnd);
-        m_writeEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-        CloseSocket(m_readEnd);
-        m_readEnd = SocketPoller::SOCKET_POLLER_INVALID_SOCKET;
-        return;
-    }
-
-    // Get the ip address and port of the read end.
-    struct sockaddr_in readEndAddr;
-    ZeroMemory(&readEndAddr, sizeof(readEndAddr));
-    int len = sizeof(readEndAddr);
-    getsockname(m_readEnd, (struct sockaddr *) &readEndAddr, &len);
-
-    // Unlike with stream sockets, this is a synchronous operation and just
-    // sets location for the send function.
-    connect(m_writeEnd, (struct sockaddr *)&readEndAddr, sizeof(readEndAddr));
-#else
     int fd[2];
     socketpair(AF_UNIX, SOCK_STREAM, 0, fd);
 
     m_writeEnd = fd[0];
     m_readEnd = fd[1];
-#endif
+
+    if (CreateThread(wxTHREAD_JOINABLE) != wxTHREAD_NO_ERROR)
+    {
+        wxLogError("Could not create socket poller worker thread!");
+        return;
+    }
+
+    if (GetThread()->Run() != wxTHREAD_NO_ERROR)
+    {
+        wxLogError("Could not run socket poller worker thread!");
+        return;
+    }
 }
 
-void SocketPoller::CloseSocket(wxSOCKET_T s)
+SelectSocketPoller::~SelectSocketPoller()
 {
-#ifdef __WINDOWS__
-    closesocket(s);
-#else
-    close(s);
-#endif
+    Message msg(Message::QUIT);
+    PostAndSignal(msg);
+
+    GetThread()->Wait();
+
+    close(m_writeEnd);
+    close(m_readEnd);
 }
 
-bool SocketPoller::StartPolling(wxSOCKET_T s, int flags, wxEvtHandler* hndlr)
+bool SelectSocketPoller::StartPolling(wxSOCKET_T s, int flags)
 {
     SocketSet::iterator it = m_polledSockets.find(s);
 
@@ -674,15 +1007,15 @@ bool SocketPoller::StartPolling(wxSOCKET_T s, int flags, wxEvtHandler* hndlr)
         m_polledSockets.insert(s);
     }
 
-    SocketPoller::Message msg(Message::AddSocketAction, s, flags, hndlr);
+    Message msg(Message::ADD_SOCKET_ACTION, s, flags);
     PostAndSignal(msg);
 
     return true;
 }
 
-void SocketPoller::StopPolling(wxSOCKET_T s)
+void SelectSocketPoller::StopPolling(wxSOCKET_T s)
 {
-    SocketPoller::Message msg(Message::DeleteSocketAction, s);
+    Message msg(Message::DELETE_SOCKET_ACTION, s);
     PostAndSignal(msg);
 
     SocketSet::iterator it = m_polledSockets.find(s);
@@ -693,27 +1026,27 @@ void SocketPoller::StopPolling(wxSOCKET_T s)
     }
 }
 
-void SocketPoller::ResumePolling(wxSOCKET_T s)
+void SelectSocketPoller::ResumePolling(wxSOCKET_T s)
 {
-    SocketPoller::Message msg(Message::ResumePolling, s);
+    Message msg(Message::RESUME_POLLING, s);
     PostAndSignal(msg);
 }
 
-void SocketPoller::PostAndSignal(const Message& msg)
+void SelectSocketPoller::PostAndSignal(const Message& msg)
 {
     m_msgQueue.Post(msg);
 
-    if ( m_writeEnd != SocketPoller::SOCKET_POLLER_INVALID_SOCKET )
+    if ( m_writeEnd != -1 )
     {
         char c = 32;
         send(m_writeEnd, &c, 1, 0);
     }
 }
 
-wxThread::ExitCode SocketPoller::Entry()
+wxThread::ExitCode SelectSocketPoller::Entry()
 {
     wxMessageQueueError er;
-    SocketPoller::Message msg;
+    Message msg;
     bool done = false;
     size_t socketsUnderConsideration = 0;
     int timeOut = 50;
@@ -742,28 +1075,27 @@ wxThread::ExitCode SocketPoller::Entry()
             }
             else if ( er == wxMSGQUEUE_MISC_ERROR )
             {
-                wxLogDebug("Error with socket poller message queue.");
+                wxLogError("Error with socket poller message queue.");
                 done = true;
                 break;
             }
-            else if ( id == Message::Quit )
+            else if ( id == Message::QUIT )
             {
                 done = true;
                 break;
             }
-            else if ( id == Message::AddSocketAction )
+            else if ( id == Message::ADD_SOCKET_ACTION )
             {
                 wxSOCKET_T s = msg.GetSocket();
                 int f = msg.GetFlags();
-                wxEvtHandler* hndlr = msg.GetEvtHandler();
-                ThreadSetSocketAction(s, f, hndlr);
+                ThreadSetSocketAction(s, f);
             }
-            else if ( id == Message::DeleteSocketAction )
+            else if ( id == Message::DELETE_SOCKET_ACTION )
             {
                 wxSOCKET_T s = msg.GetSocket();
                 ThreadDeleteSocketAction(s);
             }
-            else if ( id == Message::ResumePolling )
+            else if ( id == Message::RESUME_POLLING )
             {
                 wxSOCKET_T s = msg.GetSocket();
                 ThreadRemoveFromDL(s);
@@ -772,7 +1104,7 @@ wxThread::ExitCode SocketPoller::Entry()
             timeOut = 0;
         }
 
-        socketsUnderConsideration = m_socketData.size() - m_disabledList.size();
+        socketsUnderConsideration = m_pollActions.size() - m_disabledList.size();
 
         if ( socketsUnderConsideration  > 0 && !done )
         {
@@ -783,7 +1115,7 @@ wxThread::ExitCode SocketPoller::Entry()
     return static_cast<wxThread::ExitCode>(0);
 }
 
-void SocketPoller::ThreadRemoveFromDL(wxSOCKET_T s)
+void SelectSocketPoller::ThreadRemoveFromDL(wxSOCKET_T s)
 {
     SocketSet::iterator it = m_disabledList.find(s);
 
@@ -793,32 +1125,25 @@ void SocketPoller::ThreadRemoveFromDL(wxSOCKET_T s)
     }
 }
 
-void SocketPoller::ThreadDeleteSocketAction(wxSOCKET_T sock)
+void SelectSocketPoller::ThreadDeleteSocketAction(wxSOCKET_T sock)
 {
     ThreadRemoveFromDL(sock);
 
-    SocketDataMap::iterator it = m_socketData.find(sock);
+    PollActions::iterator it = m_pollActions.find(sock);
 
-    if ( it != m_socketData.end() )
+    if ( it != m_pollActions.end() )
     {
-        m_socketData.erase(it);
+        m_pollActions.erase(it);
     }
 }
 
-void SocketPoller::ThreadSetSocketAction(wxSOCKET_T sock, int flags,
-                                         wxEvtHandler* hndlr)
+void SelectSocketPoller::ThreadSetSocketAction(wxSOCKET_T sock, int pollAction)
 {
     ThreadDeleteSocketAction(sock);
-
-    SocketData data;
-    data.m_pollAction = flags;
-    data.m_event = NULL;
-    data.m_handler = hndlr;
-
-    m_socketData[sock] = data;
+    m_pollActions[sock] = pollAction;
 }
 
-void SocketPoller::ThreadCheckSockets()
+void SelectSocketPoller::ThreadCheckSockets()
 {
     fd_set readFds, writeFds, errorFds;
     FD_ZERO(&readFds);
@@ -827,14 +1152,14 @@ void SocketPoller::ThreadCheckSockets()
 
     wxSOCKET_T maxSd = 0;
 
-    if ( m_readEnd != SocketPoller::SOCKET_POLLER_INVALID_SOCKET )
+    if ( m_readEnd != -1 )
     {
         FD_SET(m_readEnd, &readFds);
         maxSd = m_readEnd;
     }
 
-    for ( SocketDataMap::iterator it = m_socketData.begin() ;
-          it != m_socketData.end() ; ++it )
+    for ( PollActions::iterator it = m_pollActions.begin() ;
+          it != m_pollActions.end() ; ++it )
     {
         wxSOCKET_T sock = it->first;
 
@@ -843,14 +1168,14 @@ void SocketPoller::ThreadCheckSockets()
             continue;
         }
 
-        int checkAction = it->second.m_pollAction;
+        int checkAction = it->second;
 
-        if ( checkAction & PollForRead )
+        if ( checkAction & SocketPoller::POLL_FOR_READ )
         {
             FD_SET(sock, &readFds);
         }
 
-        if ( checkAction & PollForWrite )
+        if ( checkAction & SocketPoller::POLL_FOR_WRITE )
         {
             FD_SET(sock, &writeFds);
         }
@@ -867,27 +1192,35 @@ void SocketPoller::ThreadCheckSockets()
     timeout.tv_sec = 0;  // 1s timeout
     timeout.tv_usec = 50*1000;
 
-    int selectStatus = select(maxSd+1, &readFds, &writeFds, &errorFds,&timeout);
+    int selectStatus = select(maxSd+1, &readFds, &writeFds, &errorFds, &timeout);
 
     if ( selectStatus < 0 )
     {
-        // Massive error: do something
+        // Massive error: report an error on each socket.
+        for ( PollActions::iterator it = m_pollActions.begin() ;
+              it != m_pollActions.end() ; ++it )
+        {
+            wxThreadEvent* event =
+                new wxThreadEvent(wxEVT_SOCKET_POLLER_RESULT);
+            event->SetPayload<wxSOCKET_T>(it->first);
+            event->SetInt(SocketPoller::HAS_ERROR);
+            wxQueueEvent(m_handler, event);
+        }
     }
     else if ( selectStatus == 0 )
     {
         ;// select timed out.  There is no need to do anything.
     }
-    else
+    else // selectStatus > 0. There was activity on at least 1 socket.
     {
-        if ( (m_readEnd != SocketPoller::SOCKET_POLLER_INVALID_SOCKET)
-              && FD_ISSET(m_readEnd, &readFds) )
+        if ( (m_readEnd != -1) && FD_ISSET(m_readEnd, &readFds) )
         {
             char c;
             recv(m_readEnd, &c, 1, 0);
         }
 
-        for ( SocketDataMap::iterator it = m_socketData.begin() ;
-              it != m_socketData.end() ; ++it )
+        for ( PollActions::iterator it = m_pollActions.begin() ;
+              it != m_pollActions.end() ; ++it )
         {
             wxSOCKET_T sock = it->first;
 
@@ -896,44 +1229,49 @@ void SocketPoller::ThreadCheckSockets()
                 continue;
             }
 
-            int checkActions = it->second.m_pollAction;
-            wxEvtHandler* hndlr = it->second.m_handler;
-            int result = InvalidResult;
+            int checkActions = it->second;
+            int result = SocketPoller::INVALID_RESULT;
 
-            if ( checkActions & PollForRead )
+            if ( checkActions & SocketPoller::POLL_FOR_READ )
             {
                 if ( FD_ISSET(sock, &readFds) )
                 {
-                    result |= ReadyForRead;
+                    result |= SocketPoller::READY_FOR_READ;
                 }
             }
 
-            if ( checkActions & ReadyForWrite )
+            if ( checkActions & SocketPoller::POLL_FOR_WRITE )
             {
                 if ( FD_ISSET(sock, &writeFds) )
                 {
-                    result |= ReadyForWrite;
+                    result |= SocketPoller::READY_FOR_WRITE;
                 }
             }
 
             if ( FD_ISSET(sock, &errorFds) )
             {
-                result |= HasError;
+                result |= SocketPoller::HAS_ERROR;
             }
 
-            if ( result != InvalidResult && hndlr != NULL )
+            if ( result != SocketPoller::INVALID_RESULT )
             {
-                wxThreadEvent* event = new wxThreadEvent(wxSocketAction);
+                wxThreadEvent* event =
+                    new wxThreadEvent(wxEVT_SOCKET_POLLER_RESULT);
                 event->SetPayload<wxSOCKET_T>(sock);
                 event->SetInt(result);
-                wxQueueEvent(hndlr,event);
+                wxQueueEvent(m_handler, event);
                 m_disabledList.insert(sock);
             }
         }
     }
 }
 
+SocketPollerImpl* SocketPollerImpl::Create(wxEvtHandler* hndlr)
+{
+    return new SelectSocketPoller(hndlr);
+}
 
+#endif
 
 //
 // wxWebSessionCURL
@@ -962,10 +1300,11 @@ wxWebSessionCURL::wxWebSessionCURL() :
 
     ms_activeSessions++;
 
-    m_socketPoller = new SocketPoller();
+    m_socketPoller = new SocketPoller(this);
     m_timeoutTimer.SetOwner(this);
     Bind(wxEVT_TIMER, &wxWebSessionCURL::TimeoutNotification, this);
-    Bind(wxSocketAction, &wxWebSessionCURL::ProcessSocketPollerResult, this);
+    Bind(wxEVT_SOCKET_POLLER_RESULT,
+         &wxWebSessionCURL::ProcessSocketPollerResult, this);
 }
 
 wxWebSessionCURL::~wxWebSessionCURL()
@@ -1155,19 +1494,20 @@ void wxWebSessionCURL::ProcessTimeoutNotification()
 
 static int CurlPoll2SocketPoller(int what)
 {
-    int pollAction = SocketPoller::InvalidAction;
+    int pollAction = SocketPoller::INVALID_ACTION;
 
     if ( what == CURL_POLL_IN )
     {
-        pollAction = SocketPoller::PollForRead ;
+        pollAction = SocketPoller::POLL_FOR_READ ;
     }
     else if ( what == CURL_POLL_OUT )
     {
-        pollAction = SocketPoller::PollForWrite;
+        pollAction = SocketPoller::POLL_FOR_WRITE;
     }
     else if ( what == CURL_POLL_INOUT )
     {
-        pollAction = SocketPoller::PollForRead | SocketPoller::PollForWrite;
+        pollAction =
+            SocketPoller::POLL_FOR_READ | SocketPoller::POLL_FOR_WRITE;
     }
 
     return pollAction;
@@ -1185,7 +1525,7 @@ void wxWebSessionCURL::ProcessSocketCallback(curl_socket_t s, int what)
         case CURL_POLL_OUT:
             wxFALLTHROUGH;
         case CURL_POLL_INOUT:
-            m_socketPoller->StartPolling(s, CurlPoll2SocketPoller(what), this);
+            m_socketPoller->StartPolling(s, CurlPoll2SocketPoller(what));
             break;
         case CURL_POLL_REMOVE:
             m_socketPoller->StopPolling(s);
@@ -1200,17 +1540,17 @@ static int SocketPollerResult2CurlSelect(int socketEventFlag)
 {
     int curlSelect = 0;
 
-    if ( socketEventFlag & SocketPoller::ReadyForRead )
+    if ( socketEventFlag & SocketPoller::READY_FOR_READ )
     {
         curlSelect |= CURL_CSELECT_IN;
     }
 
-    if ( socketEventFlag & SocketPoller::ReadyForWrite )
+    if ( socketEventFlag & SocketPoller::READY_FOR_WRITE )
     {
         curlSelect |= CURL_CSELECT_OUT;
     }
 
-    if ( socketEventFlag &  SocketPoller::HasError )
+    if ( socketEventFlag &  SocketPoller::HAS_ERROR )
     {
         curlSelect |= CURL_CSELECT_ERR;
     }
