@@ -218,6 +218,31 @@ static size_t wxCURLRead(char *buffer, size_t size, size_t nitems, void *userdat
     return static_cast<wxWebRequestCURL*>(userdata)->CURLOnRead(buffer, size * nitems);
 }
 
+static curl_socket_t wxCURLOpensocket(void* clientp,
+                                      curlsocktype WXUNUSED(purpose),
+                                      struct curl_sockaddr* addr)
+{
+    wxCHECK_MSG( clientp, 0, "invalid curl open socket callback data" );
+
+    curl_socket_t sock = socket(addr->family, addr->socktype, addr->protocol);
+    static_cast<wxWebRequestCURL*>(clientp)->SetActiveSocket(sock);
+
+    return sock;
+}
+
+static int wxCURLClosesocket(void* clientp, curl_socket_t sock)
+{
+    wxWebSessionCURL::CloseSocket(sock);
+
+    if ( clientp != NULL )
+    {
+        static_cast<wxWebRequestCURL*>(clientp)->
+            SetActiveSocket(CURL_SOCKET_BAD);
+    }
+
+    return 0;
+}
+
 wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
                                    wxWebSessionCURL& sessionImpl,
                                    wxEvtHandler* handler,
@@ -227,6 +252,7 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     m_sessionImpl(sessionImpl)
 {
     m_headerList = NULL;
+    m_activeSocket = CURL_SOCKET_BAD;
 
     m_handle = curl_easy_init();
     if ( !m_handle )
@@ -257,12 +283,25 @@ wxWebRequestCURL::wxWebRequestCURL(wxWebSession & session,
     // Enable all supported authentication methods
     curl_easy_setopt(m_handle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
     curl_easy_setopt(m_handle, CURLOPT_PROXYAUTH, CURLAUTH_ANY);
+    // Set the socket callbacks needed for recording the active socket.
+    curl_easy_setopt(m_handle, CURLOPT_OPENSOCKETFUNCTION, wxCURLOpensocket);
+    curl_easy_setopt(m_handle, CURLOPT_OPENSOCKETDATA,
+                     static_cast<void*>(this));
+    curl_easy_setopt(m_handle, CURLOPT_CLOSESOCKETFUNCTION, wxCURLClosesocket);
+    curl_easy_setopt(m_handle, CURLOPT_CLOSESOCKETDATA,
+                     static_cast<void*>(this));
+
 }
 
 wxWebRequestCURL::~wxWebRequestCURL()
 {
     DestroyHeaderList();
     m_sessionImpl.RequestHasTerminated(this);
+
+    // If the transfer is still in progress, there may be a later call to
+    // close the socket. Make sure the close socket callback doesn't try to
+    // this object since it's being deleted.
+    curl_easy_setopt(m_handle, CURLOPT_CLOSESOCKETDATA, NULL);
 }
 
 void wxWebRequestCURL::Start()
@@ -373,6 +412,16 @@ size_t wxWebRequestCURL::CURLOnRead(char* buffer, size_t size)
     }
     else
         return 0;
+}
+
+curl_socket_t wxWebRequestCURL::GetActiveSocket() const
+{
+    return m_activeSocket;
+}
+
+void wxWebRequestCURL::SetActiveSocket(curl_socket_t sock)
+{
+    m_activeSocket = sock;
 }
 
 void wxWebRequestCURL::DestroyHeaderList()
@@ -974,7 +1023,7 @@ void wxWebSessionCURL::CancelRequest(wxWebRequestCURL* request)
     }
 
     curl_multi_remove_handle(m_handle, curl);
-    StopTransfer(curl);
+    StopTransfer(request);
 
     request->SetState(wxWebRequest::State_Cancelled);
 }
@@ -1211,73 +1260,29 @@ void wxWebSessionCURL::FailRequest(CURL* curl,const wxString& msg)
         wxWebRequestCURL* request = it->second;
         m_activeTransfers.erase(it);
         curl_multi_remove_handle(m_handle, curl);
-        StopTransfer(curl);
+        StopTransfer(request);
 
         request->SetState(wxWebRequest::State_Failed, msg);
     }
 }
 
-void wxWebSessionCURL::StopTransfer(CURL* curl)
+void wxWebSessionCURL::StopTransfer(wxWebRequestCURL* request)
 {
-    curl_socket_t activeSocket;
-    bool closeActiveSocket = true;
-    bool useLastSocket = false;
+    curl_socket_t activeSocket = request->GetActiveSocket();
 
-#if CURL_AT_LEAST_VERSION(7, 45, 0)
-    if ( CurlRuntimeAtLeastVersion(7, 45, 0) )
+    if ( activeSocket != CURL_SOCKET_BAD )
     {
-        CURLcode code = curl_easy_getinfo(curl, CURLINFO_ACTIVESOCKET,
-                                          &activeSocket);
+        CloseSocket(activeSocket);
+    }
+}
 
-        if ( code != CURLE_OK || activeSocket == CURL_SOCKET_BAD )
-        {
-            closeActiveSocket = false;
-        }
-    }
-    else
-    {
-        useLastSocket = true;
-    }
+void wxWebSessionCURL::CloseSocket(curl_socket_t sock)
+{
+#ifdef __WINDOWS__
+    closesocket(sock);
 #else
-    useLastSocket = true;
-#endif //CURL_AT_LEAST_VERSION(7, 45, 0)
-
-    // CURLINFO_ACTIVESOCKET is not available either at compile time or run
-    // time. So we must use the older CURLINFO_LASTSOCKET instead.
-    if ( useLastSocket )
-    {
-        #ifdef __WIN64__
-            // CURLINFO_LASTSOCKET won't work on 64 bit windows because it
-            // uses a long to retrive the socket. However sockets will be 64
-            // bit values. In this case there is nothing we can do.
-            closeActiveSocket = false;
-        #endif //__WIN64__
-
-        if ( closeActiveSocket )
-        {
-            long longSocket;
-            CURLcode code = curl_easy_getinfo(curl, CURLINFO_LASTSOCKET,
-                                              &longSocket);
-
-            if ( code == CURLE_OK && longSocket!= -1 )
-            {
-                activeSocket = static_cast<curl_socket_t>(longSocket);
-            }
-            else
-            {
-                closeActiveSocket = false;
-            }
-        }
-    }
-
-    if ( closeActiveSocket )
-    {
-        #ifdef __WINDOWS__
-            closesocket(activeSocket);
-        #else
-            close(activeSocket);
-        #endif
-    }
+    close(sock);
+#endif
 }
 
 #endif // wxUSE_WEBREQUEST_CURL

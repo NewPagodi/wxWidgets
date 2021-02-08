@@ -79,6 +79,9 @@ public:
     // Method called from libcurl callback
     size_t CURLOnRead(char* buffer, size_t size);
 
+    curl_socket_t GetActiveSocket() const;
+    void SetActiveSocket(curl_socket_t);
+
 private:
     void DoCancel() wxOVERRIDE;
 
@@ -90,6 +93,7 @@ private:
     wxObjectDataPtr<wxWebResponseCURL> m_response;
     wxObjectDataPtr<wxWebAuthChallengeCURL> m_authChallenge;
     wxFileOffset m_bytesSent;
+    curl_socket_t m_activeSocket;
 
     void DestroyHeaderList();
 
@@ -157,6 +161,8 @@ public:
     static bool CurlRuntimeAtLeastVersion(unsigned int, unsigned int,
                                           unsigned int);
 
+    static void CloseSocket(curl_socket_t);
+
 private:
     static int TimerCallback(CURLM*, long, void*);
     static int SocketCallback(CURL*, curl_socket_t, int, void*, void*);
@@ -168,7 +174,7 @@ private:
     void ProcessSocketPollerResult(wxThreadEvent&);
     void CheckForCompletedTransfers();
     void FailRequest(CURL*, const wxString&);
-    void StopTransfer(CURL*);
+    void StopTransfer(wxWebRequestCURL*);
 
     WX_DECLARE_HASH_MAP(CURL*, wxWebRequestCURL*, wxPointerHash, \
                         wxPointerEqual, TransferSet);
